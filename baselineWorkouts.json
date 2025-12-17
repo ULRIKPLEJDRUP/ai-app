@@ -1,0 +1,337 @@
+{
+  "day1": {
+    "workoutTitle": "Dag 1: Bryst, Skulder & Triceps (Baseline)",
+    "exercises": [
+      {
+        "name": "Bench press",
+        "sets": [
+          {
+            "reps": 8,
+            "kg": 82
+          },
+          {
+            "reps": 8,
+            "kg": 82
+          },
+          {
+            "reps": 8,
+            "kg": 82
+          },
+          {
+            "reps": 8,
+            "kg": 82
+          }
+        ]
+      },
+      {
+        "name": "Incline dumbbell press",
+        "sets": [
+          {
+            "reps": 10,
+            "kg": 30
+          },
+          {
+            "reps": 10,
+            "kg": 30
+          },
+          {
+            "reps": 10,
+            "kg": 30
+          },
+          {
+            "reps": 10,
+            "kg": 30
+          }
+        ]
+      },
+      {
+        "name": "Overhead press",
+        "sets": [
+          {
+            "reps": 8,
+            "kg": 45
+          },
+          {
+            "reps": 8,
+            "kg": 45
+          },
+          {
+            "reps": 8,
+            "kg": 45
+          }
+        ]
+      },
+      {
+        "name": "Lateral raises",
+        "sets": [
+          {
+            "reps": 12,
+            "kg": 10
+          },
+          {
+            "reps": 12,
+            "kg": 10
+          },
+          {
+            "reps": 12,
+            "kg": 10
+          }
+        ]
+      },
+      {
+        "name": "Triceps pushdown",
+        "sets": [
+          {
+            "reps": 12,
+            "kg": 25
+          },
+          {
+            "reps": 12,
+            "kg": 25
+          },
+          {
+            "reps": 12,
+            "kg": 25
+          }
+        ]
+      },
+      {
+        "name": "Dips",
+        "sets": [
+          {
+            "reps": 8,
+            "kg": 0
+          },
+          {
+            "reps": 8,
+            "kg": 0
+          },
+          {
+            "reps": 8,
+            "kg": 0
+          }
+        ]
+      }
+    ],
+    "title": "Dag 1: Bryst, Skulder & Triceps",
+    "name": "Dag 1: Bryst, Skulder & Triceps"
+  },
+  "day2": {
+    "workoutTitle": "Dag 2: Ryg & Biceps (Baseline)",
+    "exercises": [
+      {
+        "name": "Pull-up",
+        "sets": [
+          {
+            "reps": 6,
+            "kg": 0
+          },
+          {
+            "reps": 6,
+            "kg": 0
+          },
+          {
+            "reps": 6,
+            "kg": 0
+          }
+        ]
+      },
+      {
+        "name": "Barbell row",
+        "sets": [
+          {
+            "reps": 8,
+            "kg": 70
+          },
+          {
+            "reps": 8,
+            "kg": 70
+          },
+          {
+            "reps": 8,
+            "kg": 70
+          }
+        ]
+      },
+      {
+        "name": "Lat pulldown",
+        "sets": [
+          {
+            "reps": 10,
+            "kg": 60
+          },
+          {
+            "reps": 10,
+            "kg": 60
+          },
+          {
+            "reps": 10,
+            "kg": 60
+          }
+        ]
+      },
+      {
+        "name": "Face pulls",
+        "sets": [
+          {
+            "reps": 12,
+            "kg": 20
+          },
+          {
+            "reps": 12,
+            "kg": 20
+          },
+          {
+            "reps": 12,
+            "kg": 20
+          }
+        ]
+      },
+      {
+        "name": "Biceps curls",
+        "sets": [
+          {
+            "reps": 10,
+            "kg": 14
+          },
+          {
+            "reps": 10,
+            "kg": 14
+          },
+          {
+            "reps": 10,
+            "kg": 14
+          }
+        ]
+      },
+      {
+        "name": "Hammer curls",
+        "sets": [
+          {
+            "reps": 10,
+            "kg": 14
+          },
+          {
+            "reps": 10,
+            "kg": 14
+          },
+          {
+            "reps": 10,
+            "kg": 14
+          }
+        ]
+      }
+    ],
+    "title": "Dag 2: Ryg & Biceps",
+    "name": "Dag 2: Ryg & Biceps"
+  },
+  "day3": {
+    "workoutTitle": "Dag 3: Ben, Core & Mave (Baseline)",
+    "exercises": [
+      {
+        "name": "Squat",
+        "sets": [
+          {
+            "reps": 6,
+            "kg": 90
+          },
+          {
+            "reps": 6,
+            "kg": 90
+          },
+          {
+            "reps": 6,
+            "kg": 90
+          }
+        ]
+      },
+      {
+        "name": "Romanian deadlift",
+        "sets": [
+          {
+            "reps": 8,
+            "kg": 90
+          },
+          {
+            "reps": 8,
+            "kg": 90
+          },
+          {
+            "reps": 8,
+            "kg": 90
+          }
+        ]
+      },
+      {
+        "name": "Walking lunges",
+        "sets": [
+          {
+            "reps": 10,
+            "kg": 20
+          },
+          {
+            "reps": 10,
+            "kg": 20
+          },
+          {
+            "reps": 10,
+            "kg": 20
+          }
+        ]
+      },
+      {
+        "name": "Calf raises",
+        "sets": [
+          {
+            "reps": 12,
+            "kg": 40
+          },
+          {
+            "reps": 12,
+            "kg": 40
+          },
+          {
+            "reps": 12,
+            "kg": 40
+          }
+        ]
+      },
+      {
+        "name": "Plank",
+        "sets": [
+          {
+            "reps": 1,
+            "kg": 60
+          },
+          {
+            "reps": 1,
+            "kg": 60
+          },
+          {
+            "reps": 1,
+            "kg": 60
+          }
+        ]
+      },
+      {
+        "name": "Ab wheel",
+        "sets": [
+          {
+            "reps": 8,
+            "kg": 0
+          },
+          {
+            "reps": 8,
+            "kg": 0
+          },
+          {
+            "reps": 8,
+            "kg": 0
+          }
+        ]
+      }
+    ],
+    "title": "Dag 3: Ben, Core & Mave",
+    "name": "Dag 3: Ben, Core & Mave"
+  }
+}

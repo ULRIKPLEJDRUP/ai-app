@@ -1,0 +1,573 @@
+{
+  "sessions": [
+    {
+      "createdAt": "2025-12-16T10:34:21.954Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 3,
+          "weights": [
+            82,
+            105,
+            105
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "exerciseKey": "skull_crushers",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T10:40:32.734Z",
+      "dayKey": "day2",
+      "title": "Dag 2: Ryg & Biceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "pull_up",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "exerciseKey": "barbell_row",
+          "sets": 3,
+          "weights": [
+            70,
+            70,
+            70
+          ]
+        },
+        {
+          "exerciseKey": "lat_pulldown",
+          "sets": 3,
+          "weights": [
+            60,
+            60,
+            60
+          ]
+        },
+        {
+          "exerciseKey": "face_pulls",
+          "sets": 3,
+          "weights": [
+            20,
+            20,
+            20
+          ]
+        },
+        {
+          "exerciseKey": "biceps_curls",
+          "sets": 3,
+          "weights": [
+            14,
+            14,
+            14
+          ]
+        },
+        {
+          "exerciseKey": "hammer_curls",
+          "sets": 3,
+          "weights": [
+            14,
+            14,
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T10:46:51.574Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 3,
+          "weights": [
+            82,
+            105,
+            105
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "exerciseKey": "skull_crushers",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T10:52:26.871Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 3,
+          "weights": [
+            82,
+            105,
+            105
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "exerciseKey": "skull_crushers",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T11:14:40.138Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 4,
+          "weights": [
+            82,
+            82,
+            82,
+            82
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T11:32:17.775Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 4,
+          "weights": [
+            82,
+            82,
+            82,
+            82
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T11:36:16.392Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 4,
+          "weights": [
+            82,
+            82,
+            91,
+            91
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T11:52:49.819Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 4,
+          "weights": [
+            82,
+            82,
+            91,
+            91
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 3,
+          "weights": [
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 3,
+          "weights": [
+            45,
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 2,
+          "weights": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 3,
+          "weights": [
+            25,
+            25,
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 3,
+          "weights": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "createdAt": "2025-12-16T12:03:00.809Z",
+      "dayKey": "day1",
+      "title": "Dag 1: Bryst, Skulder & Triceps (I DAG)",
+      "exercises": [
+        {
+          "exerciseKey": "bench_press",
+          "sets": 4,
+          "weights": [
+            82,
+            82,
+            91,
+            91
+          ]
+        },
+        {
+          "exerciseKey": "incline_db_press",
+          "sets": 4,
+          "weights": [
+            30,
+            30,
+            30,
+            30
+          ]
+        },
+        {
+          "exerciseKey": "overhead_press",
+          "sets": 2,
+          "weights": [
+            45,
+            45
+          ]
+        },
+        {
+          "exerciseKey": "lateral_raises",
+          "sets": 1,
+          "weights": [
+            10
+          ]
+        },
+        {
+          "exerciseKey": "triceps_pushdown",
+          "sets": 1,
+          "weights": [
+            25
+          ]
+        },
+        {
+          "exerciseKey": "dips",
+          "sets": 2,
+          "weights": [
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

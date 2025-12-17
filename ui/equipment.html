@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Udstyr</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding: 20px; background:#fafafa; }
+    h1 { margin: 0 0 6px; font-size: 20px; }
+    .muted { color:#666; font-size: 13px; margin: 0 0 14px; }
+    table { border-collapse: collapse; width: 100%; max-width: 900px; background:#fff; }
+    th,td { border:1px solid #ddd; padding:8px 10px; font-size:14px; text-align:left; vertical-align: top; }
+    th { background:#f5f5f5; }
+    input[type="text"] { padding:6px; font-size:14px; width:100%; box-sizing:border-box; }
+    .equip-legend { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .equip-pill { background:#f8f8f8; border:1px solid #e0e0e0; border-radius:8px; padding:6px 10px; font-size:12px; }
+    .equip-pill strong { display:block; font-size:12px; }
+    .equip-pill small { font-size:11px; color:#666; }
+    .panel { background:#fff; border:1px solid #ddd; padding:16px; margin-bottom:18px; }
+    .equip-actions { display:flex; gap:6px; }
+    button { font-size: 13px; padding:6px 10px; cursor:pointer; }
+    button[disabled] { opacity:0.5; cursor:not-allowed; }
+    form.inline { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; margin-top:12px; }
+    form.inline label { font-size:12px; color:#555; display:block; margin-bottom:4px; }
+    form.inline input { width:auto; min-width:150px; }
+    #status { margin-top: 14px; font-size: 13px; color:#444; }
+  </style>
+</head>
+<body>
+
+<h1>Udstyr</h1>
+<p class="muted">
+  Vedligehold udstyrskataloget. Disse data bruges på RM-siden og senere i programmets logik.
+</p>
+<p class="muted">
+  Tilbage til RM: <a href="/rm">/rm</a>
+</p>
+
+<div class="panel">
+  <h2>Oversigt</h2>
+  <div class="equip-legend" id="equipLegend"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:140px;">Key</th>
+        <th>Label</th>
+        <th>Tags</th>
+        <th style="width:140px;">Handling</th>
+      </tr>
+    </thead>
+    <tbody id="equipmentRows">
+      <tr><td colspan="4">Loader…</td></tr>
+    </tbody>
+  </table>
+
+  <form id="addEquipmentForm" class="inline">
+    <div>
+      <label for="equipKey">Ny key</label>
+      <input type="text" id="equipKey" placeholder="fx resistance_band" required />
+    </div>
+    <div>
+      <label for="equipLabel">Label</label>
+      <input type="text" id="equipLabel" placeholder="Visningsnavn" />
+    </div>
+    <div>
+      <label for="equipTags">Tags</label>
+      <input type="text" id="equipTags" placeholder="fx travel,assist" />
+    </div>
+    <button type="submit">+ Tilføj / opdater</button>
+  </form>
+</div>
+
+<div id="status"></div>
+
+<script>
+let equipmentCatalog = [];
+
+function setStatus(msg) {
+  document.getElementById("status").textContent = msg;
+}
+
+function slugKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+}
+
+function parseTags(str) {
+  return String(str || "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+function parseServerError(text, fallback) {
+  if (!text) return fallback;
+  try {
+    const data = JSON.parse(text);
+    if (data && typeof data.error === "string") return data.error;
+  } catch {
+    // ignore
+  }
+  return text;
+}
+
+function renderEquipmentLegend() {
+  const legendEl = document.getElementById("equipLegend");
+  if (!legendEl) return;
+  if (!equipmentCatalog.length) {
+    legendEl.innerHTML = "<em>Ingen udstyr registreret endnu</em>";
+    return;
+  }
+  legendEl.innerHTML = equipmentCatalog
+    .map((item) => {
+      const tags = Array.isArray(item.tags) && item.tags.length ? item.tags.join(", ") : "ingen tags";
+      const label = item.label || item.key;
+      return `
+        <span class="equip-pill">
+          <strong>${label}</strong>
+          <small>${tags}</small>
+        </span>
+      `;
+    })
+    .join("");
+}
+
+function renderEquipmentTable(errorMessage) {
+  const rowsEl = document.getElementById("equipmentRows");
+  if (!rowsEl) return;
+
+  if (errorMessage) {
+    rowsEl.innerHTML = `<tr><td colspan="4">${errorMessage}</td></tr>`;
+    return;
+  }
+
+  if (!equipmentCatalog.length) {
+    rowsEl.innerHTML = "<tr><td colspan='4'>Ingen udstyr registreret</td></tr>";
+    return;
+  }
+
+  rowsEl.innerHTML = equipmentCatalog
+    .map((item) => {
+      const tags = Array.isArray(item.tags) ? item.tags.join(", ") : "";
+      return `
+        <tr data-equip-key="${item.key}" id="equip-${item.key}">
+          <td><input type="text" value="${item.key}" disabled /></td>
+          <td><input type="text" value="${item.label || ""}" data-field="label" /></td>
+          <td><input type="text" value="${tags}" data-field="tags" placeholder="comma,separeret" /></td>
+          <td>
+            <div class="equip-actions">
+              <button type="button" data-action="save">Gem</button>
+              <button type="button" data-action="delete">Slet</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+async function loadEquipmentCatalog() {
+  const rowsEl = document.getElementById("equipmentRows");
+  if (rowsEl) rowsEl.innerHTML = "<tr><td colspan='4'>Loader…</td></tr>";
+  try {
+    const res = await fetch("/api/equipment");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    equipmentCatalog = Array.isArray(data) ? data : [];
+    renderEquipmentLegend();
+    renderEquipmentTable();
+    setStatus("Katalog indlæst ✅");
+  } catch (err) {
+    console.error("Kunne ikke hente udstyr", err);
+    setStatus("Udstyrskatalog ikke tilgængeligt");
+    equipmentCatalog = [];
+    renderEquipmentLegend();
+    renderEquipmentTable("Fejl ved hentning");
+  }
+}
+
+async function upsertEquipment(payload) {
+  const res = await fetch("/api/equipment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(parseServerError(msg, "Kunne ikke gemme udstyr"));
+  }
+}
+
+async function deleteEquipment(key) {
+  const res = await fetch(`/api/equipment/${encodeURIComponent(key)}`, { method: "DELETE" });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(parseServerError(msg, "Kunne ikke slette udstyr"));
+  }
+}
+
+document.getElementById("addEquipmentForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const keyInput = document.getElementById("equipKey");
+  const key = slugKey(keyInput.value);
+  const label = document.getElementById("equipLabel").value.trim();
+  const tags = parseTags(document.getElementById("equipTags").value);
+  if (!key) {
+    alert("Key er påkrævet (brug bogstaver/tal)");
+    keyInput.focus();
+    return;
+  }
+  keyInput.value = key;
+  try {
+    setStatus("Gemmer udstyr…");
+    await upsertEquipment({ key, label, tags });
+    e.target.reset();
+    await loadEquipmentCatalog();
+    setStatus("Udstyr gemt ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus(err.message || "Kunne ikke gemme udstyr ❌");
+  }
+});
+
+document.addEventListener("click", async (event) => {
+  const action = event.target.dataset?.action;
+  if (!action) return;
+  const row = event.target.closest("tr[data-equip-key]");
+  if (!row) return;
+  const key = row.dataset.equipKey;
+
+  if (action === "save") {
+    const labelInput = row.querySelector('input[data-field="label"]');
+    const tagsInput = row.querySelector('input[data-field="tags"]');
+    const payload = {
+      key,
+      label: labelInput?.value || "",
+      tags: parseTags(tagsInput?.value),
+    };
+    try {
+      event.target.disabled = true;
+      setStatus(`Gemmer ${key}…`);
+      await upsertEquipment(payload);
+      await loadEquipmentCatalog();
+      setStatus(`Udstyr ${key} gemt ✅`);
+    } catch (err) {
+      console.error(err);
+      setStatus(err.message || "Gemning af udstyr fejlede ❌");
+    } finally {
+      event.target.disabled = false;
+    }
+  }
+
+  if (action === "delete") {
+    if (!confirm(`Slet udstyr '${key}'?`)) return;
+    try {
+      event.target.disabled = true;
+      setStatus(`Sletter ${key}…`);
+      await deleteEquipment(key);
+      await loadEquipmentCatalog();
+      setStatus(`Udstyr ${key} slettet ✅`);
+    } catch (err) {
+      console.error(err);
+      setStatus(err.message || "Sletning af udstyr fejlede ❌");
+    } finally {
+      event.target.disabled = false;
+    }
+  }
+});
+
+loadEquipmentCatalog();
+</script>
+
+</body>
+</html>

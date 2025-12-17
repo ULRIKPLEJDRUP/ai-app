@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>RM tabel</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding: 20px; background:#fafafa; }
+    h1 { margin: 0 0 6px; font-size: 20px; }
+    .muted { color:#666; font-size: 13px; margin: 0 0 14px; }
+    table { border-collapse: collapse; width: 100%; max-width: 1200px; background:#fff; }
+    th,td { border:1px solid #ddd; padding:8px 10px; font-size:14px; text-align:left; vertical-align: top; }
+    th { background:#f5f5f5; }
+    input { width:70px; padding:6px; font-size:14px; }
+    #status { margin-top: 10px; font-size: 13px; color:#666; }
+    code { background:#f3f3f3; padding:2px 6px; border-radius:6px; }
+    .link-note { margin-top:10px; font-size:13px; }
+    a { color:#0b72ff; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .equip-chip { display:inline-block; background:#eef4ff; border:1px solid #d2e3ff; padding:3px 8px; border-radius:10px; margin:0 6px 4px 0; font-size:12px; }
+    .equip-chip.missing { background:#ffecec; border-color:#ffc7c7; color:#a20000; }
+    .equip-tags { font-size:12px; color:#555; margin:6px 0; }
+    .equip-cell { min-width:220px; }
+    .equip-select { width:100%; min-width:200px; }
+    .equip-edit-link { font-size:12px; display:inline-block; margin-top:4px; }
+    details.equip-editor > summary { cursor:pointer; list-style:none; }
+    details.equip-editor summary::marker { display:none; }
+    .equip-summary-text { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+    .equip-summary-empty { color:#777; font-size:12px; }
+    .equip-editor-body { margin-top:10px; }
+    .pct-col { display:none; }
+    body.show-pct .pct-col { display:table-cell; }
+    #togglePct { margin: 10px 0 14px; padding:6px 12px; font-size:13px; }
+  </style>
+</head>
+<body>
+
+<h1>RM – baseline</h1>
+<p class="muted">
+  Ret hvilket som helst felt (1/3/5/8/10) og klik væk → alle andre felter opdateres automatisk og gemmes.
+  (Formel: Epley) • Data: <code>/api/rm</code>
+</p>
+
+<p class="link-note">
+  Udstyr redigeres nu på <a href="/equipment" target="_blank">/equipment</a>.
+</p>
+
+<button id="togglePct" type="button">Vis % af 1RM</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Øvelse</th>
+      <th>Type</th>
+      <th>Udstyr / tags</th>
+      <th>1RM</th>
+      <th>3RM</th>
+      <th>5RM</th>
+      <th>8RM</th>
+      <th>10RM</th>
+      <th class="pct-col">10%</th>
+      <th class="pct-col">20%</th>
+      <th class="pct-col">30%</th>
+      <th class="pct-col">40%</th>
+      <th class="pct-col">50%</th>
+      <th class="pct-col">60%</th>
+      <th class="pct-col">70%</th>
+      <th class="pct-col">80%</th>
+      <th class="pct-col">90%</th>
+      <th class="pct-col">100%</th>
+    </tr>
+  </thead>
+  <tbody id="rows">
+    <tr><td colspan="18">Loader…</td></tr>
+  </tbody>
+</table>
+
+<div id="status"></div>
+
+<script>
+const reps = [1,3,5,8,10];
+const pctSteps = [10,20,30,40,50,60,70,80,90,100];
+let equipmentCatalog = [];
+let equipmentMap = new Map();
+let showPctColumns = false;
+
+function setStatus(msg) {
+  document.getElementById("status").textContent = msg;
+}
+
+function slugKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+}
+
+function oneRMFromWeight(weight, reps) {
+  return weight * (1 + reps / 30);
+}
+
+function weightFrom1RM(oneRM, reps) {
+  return oneRM / (1 + reps / 30);
+}
+
+function roundTo(x, step = 0.5) {
+  return Math.round(x / step) * step;
+}
+
+function parseNumber(str) {
+  const raw = String(str || "").trim().replace(",", ".");
+  if (raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function toFiniteNumber(val) {
+  const n = Number(val);
+  return Number.isFinite(n) ? n : null;
+}
+
+function applyPctVisibility() {
+  document.body.classList.toggle("show-pct", showPctColumns);
+  const toggleBtn = document.getElementById("togglePct");
+  if (toggleBtn) toggleBtn.textContent = showPctColumns ? "Skjul % af 1RM" : "Vis % af 1RM";
+  try {
+    localStorage.setItem("rmShowPct", showPctColumns ? "1" : "0");
+  } catch {}
+}
+
+async function saveCell(exerciseKey, rep, value) {
+  const r = await fetch("/api/rm", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ exerciseKey, rep, value })
+  });
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    throw new Error("Save failed: " + msg);
+  }
+}
+
+async function saveAll(exerciseKey, rmObj) {
+  for (const r of reps) {
+    const v = rmObj[r] ?? null;
+    await saveCell(exerciseKey, r, v);
+  }
+}
+
+function tagsForList(list) {
+  const tags = new Set();
+  for (const key of list) {
+    const info = equipmentMap.get(slugKey(key));
+    if (!info) continue;
+    (info.tags || []).forEach((t) => tags.add(t));
+  }
+  return tags.size ? Array.from(tags).join(", ") : "ingen tags";
+}
+
+function summaryChips(list) {
+  if (!list.length) {
+    return `<span class="equip-summary-empty">Ingen udstyr (klik for at vælge)</span>`;
+  }
+  return list
+    .map((key) => {
+      const normalizedKey = slugKey(key);
+      const info = equipmentMap.get(normalizedKey);
+      if (!info) {
+        return `<span class="equip-chip missing">${normalizedKey || key}</span>`;
+      }
+      const label = info.label || normalizedKey;
+      return `<span class="equip-chip">${label}</span>`;
+    })
+    .join("");
+}
+
+function renderEquipmentCell(ex) {
+  const list = Array.isArray(ex.equipment) ? ex.equipment : [];
+
+  if (!equipmentCatalog.length) {
+    return `<td class="equip-cell">
+      <div class="muted">Ingen udstyrskatalog</div>
+      <a href="/equipment" target="_blank" class="equip-edit-link">Åbn katalog</a>
+    </td>`;
+  }
+
+  const selectedKeys = new Set(list.map((key) => slugKey(key)));
+  const options = equipmentCatalog
+    .map((item) => {
+      const key = slugKey(item.key);
+      const selected = selectedKeys.has(key) ? "selected" : "";
+      const label = item.label || item.key;
+      return `<option value="${item.key}" ${selected}>${label}</option>`;
+    })
+    .join("");
+
+  const tagText = tagsForList(list);
+
+  return `
+    <td class="equip-cell">
+      <div class="equip-tags">${tagText}</div>
+      <details class="equip-editor" data-key="${ex.exerciseKey}">
+        <summary>
+          <div class="equip-summary-text">${summaryChips(list)}</div>
+        </summary>
+        <div class="equip-editor-body">
+          <select data-role="equipment" data-key="${ex.exerciseKey}" class="equip-select" multiple size="5">
+            ${options}
+          </select>
+          <a href="/equipment" target="_blank" class="equip-edit-link">Rediger tags/labels</a>
+        </div>
+      </details>
+    </td>
+  `;
+}
+
+function renderPctCells(oneRM) {
+  return pctSteps
+    .map((pct) => {
+      if (oneRM === null) return `<td class="pct-col"></td>`;
+      const val = roundTo(oneRM * (pct / 100), 0.5);
+      return `<td class="pct-col">${val}</td>`;
+    })
+    .join("");
+}
+async function loadRM() {
+  const tbody = document.getElementById("rows");
+  try {
+    const res = await fetch("/api/rm");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+
+    tbody.innerHTML = "";
+
+    if (!data.length) {
+      tbody.innerHTML = "<tr><td colspan='18'>Ingen data</td></tr>";
+      setStatus("Tom liste");
+      return;
+    }
+
+    for (const ex of data) {
+      const rm = ex.rm || {};
+      const oneRMValue = toFiniteNumber(rm[1]);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${ex.name}</td>
+        <td>${ex.type || ""}</td>
+        ${renderEquipmentCell(ex)}
+        ${reps.map(r => `
+          <td>
+            <input
+              value="${rm[r] ?? ""}"
+              data-key="${ex.exerciseKey}"
+              data-rep="${r}"
+              inputmode="decimal"
+            >
+          </td>
+        `).join("")}
+        ${renderPctCells(oneRMValue)}
+      `;
+      tbody.appendChild(tr);
+    }
+
+    setStatus("Klar ✅");
+  } catch (e) {
+    console.error(e);
+    tbody.innerHTML = "<tr><td colspan='18'>Fejl ved hentning</td></tr>";
+    setStatus("Fejl ❌");
+  }
+}
+async function loadEquipmentCatalog() {
+  try {
+    const res = await fetch("/api/equipment");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    equipmentCatalog = Array.isArray(data) ? data : [];
+    equipmentMap = new Map(equipmentCatalog.map((item) => [slugKey(item.key), item]));
+  } catch (err) {
+    console.warn("Kunne ikke hente udstyr", err);
+    equipmentCatalog = [];
+    equipmentMap = new Map();
+  }
+}
+
+async function saveEquipmentSelection(exerciseKey, equipmentKeys) {
+  const res = await fetch("/api/exercise-equipment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ exerciseKey, equipmentKeys }),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error("Kunne ikke gemme udstyr: " + msg);
+  }
+}
+
+document.addEventListener("change", async (e) => {
+  const equipmentSelect =
+    e.target.matches && e.target.matches('select[data-role="equipment"]') ? e.target : null;
+
+  if (equipmentSelect) {
+    const exerciseKey = equipmentSelect.dataset.key;
+    const equipmentKeys = Array.from(equipmentSelect.selectedOptions).map((opt) => opt.value);
+    try {
+      setStatus("Gemmer udstyr…");
+      await saveEquipmentSelection(exerciseKey, equipmentKeys);
+      const editor = equipmentSelect.closest(".equip-editor");
+      if (editor) {
+        const tagEl = editor.querySelector(".equip-tags");
+        if (tagEl) tagEl.textContent = tagsForList(equipmentKeys);
+        const summary = editor.querySelector(".equip-summary-text");
+        if (summary) summary.innerHTML = summaryChips(equipmentKeys);
+      }
+      setStatus("Udstyr gemt ✅");
+    } catch (err) {
+      console.error(err);
+      setStatus("Gemning af udstyr fejlede ❌");
+    }
+    return;
+  }
+
+  if (!e.target.matches || e.target.tagName !== "INPUT") return;
+
+  const input = e.target;
+  const exerciseKey = input.dataset.key;
+  const changedRep = Number(input.dataset.rep);
+
+  const changedValue = parseNumber(input.value);
+  if (Number.isNaN(changedValue)) {
+    setStatus("Ugyldigt tal ❌");
+    return;
+  }
+
+  if (changedValue === null) {
+    try {
+      setStatus("Gemmer…");
+      await saveCell(exerciseKey, changedRep, null);
+      setStatus("Gemt ✅ (felt tømt)");
+    } catch (err) {
+      console.error(err);
+      setStatus("Gem fejlede ❌");
+    }
+    return;
+  }
+
+  try {
+    const implied1RM = oneRMFromWeight(changedValue, changedRep);
+    const newRM = {};
+    newRM[1]  = roundTo(implied1RM, 0.5);
+    newRM[3]  = roundTo(weightFrom1RM(implied1RM, 3), 0.5);
+    newRM[5]  = roundTo(weightFrom1RM(implied1RM, 5), 0.5);
+    newRM[8]  = roundTo(weightFrom1RM(implied1RM, 8), 0.5);
+    newRM[10] = roundTo(weightFrom1RM(implied1RM, 10), 0.5);
+
+    newRM[changedRep] = changedValue;
+
+    const rowInputs = Array.from(document.querySelectorAll(`input[data-key="${exerciseKey}"]`));
+    for (const el of rowInputs) {
+      const r = Number(el.dataset.rep);
+      el.value = (newRM[r] ?? "");
+    }
+
+    setStatus("Gemmer alle felter…");
+    await saveAll(exerciseKey, newRM);
+    setStatus("Gemt ✅ (alle felter opdateret)");
+  } catch (err) {
+    console.error(err);
+    setStatus("Gem fejlede ❌");
+  }
+});
+
+async function init() {
+  try {
+    showPctColumns = (typeof localStorage !== "undefined" && localStorage.getItem("rmShowPct") === "1");
+    applyPctVisibility();
+    const toggleBtn = document.getElementById("togglePct");
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        showPctColumns = !showPctColumns;
+        applyPctVisibility();
+      });
+    }
+    setStatus("Loader udstyr…");
+    await loadEquipmentCatalog();
+    setStatus("Loader RM…");
+    await loadRM();
+  } catch (err) {
+    console.error(err);
+    setStatus("Init fejlede ❌");
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

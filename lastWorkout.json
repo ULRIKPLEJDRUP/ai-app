@@ -1,0 +1,110 @@
+{
+  "workoutTitle": "Udvidet bryst/biceps med triceps fokus på 54 min",
+  "exercises": [
+    {
+      "name": "Bænkpres",
+      "sets": [
+        {
+          "reps": 8,
+          "kg": 84
+        },
+        {
+          "reps": 8,
+          "kg": 84
+        },
+        {
+          "reps": 8,
+          "kg": 84
+        },
+        {
+          "reps": 8,
+          "kg": 84
+        },
+        {
+          "reps": 8,
+          "kg": 84
+        },
+        {
+          "reps": 8,
+          "kg": 84
+        }
+      ]
+    },
+    {
+      "name": "Incline dumbbell press",
+      "sets": [
+        {
+          "reps": 10,
+          "kg": 31
+        },
+        {
+          "reps": 10,
+          "kg": 31
+        },
+        {
+          "reps": 10,
+          "kg": 31
+        },
+        {
+          "reps": 10,
+          "kg": 31
+        },
+        {
+          "reps": 10,
+          "kg": 31
+        },
+        {
+          "reps": 10,
+          "kg": 31
+        },
+        {
+          "reps": 10,
+          "kg": 31
+        }
+      ]
+    },
+    {
+      "name": "Biceps curls",
+      "sets": [
+        {
+          "reps": 12,
+          "kg": 14.5
+        },
+        {
+          "reps": 10,
+          "kg": 14.5
+        },
+        {
+          "reps": 10,
+          "kg": 14.5
+        },
+        {
+          "reps": 10,
+          "kg": 14.5
+        }
+      ]
+    },
+    {
+      "name": "Triceps pushdown",
+      "sets": [
+        {
+          "reps": 10,
+          "kg": 20
+        },
+        {
+          "reps": 10,
+          "kg": 20
+        },
+        {
+          "reps": 10,
+          "kg": 20
+        },
+        {
+          "reps": 10,
+          "kg": 20
+        }
+      ]
+    }
+  ],
+  "coachNote": "Øgede vægt i bænkpres og incline dumbbell press med 2,5 %, tilføjede 1 sæt til begge, samt tilføjede 1 sæt triceps pushdown og 1 reps på ét biceps curl-sæt. Total tid ca. 54 min inkl. pauser og buffer."
+}

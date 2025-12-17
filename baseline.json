@@ -1,0 +1,64 @@
+{
+  "bench_press": {
+    "name": "Bænkpres (barbell)",
+    "activeEntryId": "e_1",
+    "entries": [
+      {
+        "id": "e_1",
+        "method": "brzycki",
+        "input": {
+          "weight": 117,
+          "reps": 5
+        },
+        "estimated1rm": 131.625,
+        "note": "5 reps a 117",
+        "date": "2025-12-14T21:38:36.212+01:00"
+      }
+    ]
+  },
+  "deadlift": {
+    "name": "Dødløft",
+    "activeEntryId": "e_1",
+    "entries": [
+      {
+        "id": "e_1",
+        "method": "brzycki",
+        "input": {
+          "weight": 117,
+          "reps": 10
+        },
+        "estimated1rm": 156,
+        "note": "",
+        "date": "2025-12-14T21:42:43.746+01:00"
+      }
+    ]
+  },
+  "pull_up": {
+    "name": "Pull-ups",
+    "activeEntryId": "e_1",
+    "entries": [
+      {
+        "id": "e_1",
+        "method": "maxreps",
+        "input": {
+          "reps": 10,
+          "addedKg": 0
+        },
+        "estimated1rm": null,
+        "note": "",
+        "date": "2025-12-14T23:04:40.797+01:00"
+      },
+      {
+        "id": "e_2",
+        "method": "maxreps",
+        "input": {
+          "reps": 6,
+          "addedKg": 10
+        },
+        "estimated1rm": null,
+        "note": "",
+        "date": "2025-12-14T23:04:54.978+01:00"
+      }
+    ]
+  }
+}

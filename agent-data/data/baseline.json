@@ -1,0 +1,20 @@
+{
+  "bænkpres": {
+    "exerciseName": "Bænkpres",
+    "baselineKg": 111,
+    "baselineReps": 10,
+    "lastKg": 110,
+    "lastReps": 12,
+    "updatedAt": "2025-12-16T08:28:01.962Z",
+    "historyCount": 2
+  },
+  "bænkpres_82": {
+    "exerciseName": "Bænkpres 82,",
+    "baselineKg": 110,
+    "baselineReps": 10,
+    "lastKg": 110,
+    "lastReps": 10,
+    "updatedAt": "2025-12-16T08:37:52.976Z",
+    "historyCount": 1
+  }
+}

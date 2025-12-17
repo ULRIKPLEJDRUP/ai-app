@@ -1,0 +1,376 @@
+{
+  "exercises": [
+    {
+      "key": "bench_press",
+      "name": "Bænkpres",
+      "aliases": [
+        "bench",
+        "bænk",
+        "barbell bench press"
+      ],
+      "tags": [
+        "compound",
+        "push",
+        "chest"
+      ],
+      "equipment": [
+        "barbell",
+        "bench"
+      ],
+      "rm": {
+        "1": 105,
+        "3": 97.5,
+        "5": 90,
+        "8": 82,
+        "10": 77.5
+      }
+    },
+    {
+      "key": "incline_dumbbell_press",
+      "name": "Incline dumbbell press",
+      "aliases": [
+        "incline db press",
+        "incline dumbbell",
+        "skrå bænk håndvægte"
+      ],
+      "tags": [
+        "compound",
+        "push",
+        "chest"
+      ],
+      "equipment": [
+        "dumbbell",
+        "bench"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "overhead_press",
+      "name": "Shoulder press (OHP)",
+      "aliases": [
+        "ohp",
+        "military press",
+        "shoulder press"
+      ],
+      "tags": [
+        "compound",
+        "push",
+        "shoulders"
+      ],
+      "equipment": [
+        "barbell"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "dips",
+      "name": "Dips",
+      "aliases": [
+        "triceps dips",
+        "parallel bars dips"
+      ],
+      "tags": [
+        "compound",
+        "push",
+        "triceps"
+      ],
+      "equipment": [
+        "bodyweight"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "triceps_pushdown",
+      "name": "Triceps pushdown",
+      "aliases": [
+        "pushdown",
+        "triceps cable",
+        "rope pushdown"
+      ],
+      "tags": [
+        "isolation",
+        "triceps"
+      ],
+      "equipment": [
+        "cable"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "pull_ups",
+      "name": "Pull-ups",
+      "aliases": [
+        "chinups",
+        "pull ups",
+        "pullup"
+      ],
+      "tags": [
+        "compound",
+        "pull",
+        "back"
+      ],
+      "equipment": [
+        "bodyweight",
+        "pullup_bar"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "barbell_row",
+      "name": "Barbell row",
+      "aliases": [
+        "bb row",
+        "bent over row",
+        "rows"
+      ],
+      "tags": [
+        "compound",
+        "pull",
+        "back"
+      ],
+      "equipment": [
+        "barbell"
+      ],
+      "rm": {
+        "1": 113.5,
+        "3": 103,
+        "5": 97,
+        "8": 89.5,
+        "10": 85
+      }
+    },
+    {
+      "key": "lat_pulldown",
+      "name": "Lat pulldown",
+      "aliases": [
+        "pulldown",
+        "lat pull down"
+      ],
+      "tags": [
+        "compound",
+        "pull",
+        "back"
+      ],
+      "equipment": [
+        "cable",
+        "machine"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "dumbbell_row",
+      "name": "One-arm dumbbell row",
+      "aliases": [
+        "db row",
+        "one arm row"
+      ],
+      "tags": [
+        "compound",
+        "pull",
+        "back"
+      ],
+      "equipment": [
+        "dumbbell",
+        "bench"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "face_pull",
+      "name": "Face pull",
+      "aliases": [
+        "rear delt cable",
+        "facepull"
+      ],
+      "tags": [
+        "isolation",
+        "shoulders",
+        "upper_back"
+      ],
+      "equipment": [
+        "cable"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "biceps_curl",
+      "name": "Biceps curls",
+      "aliases": [
+        "curl",
+        "biceps curl",
+        "db curls"
+      ],
+      "tags": [
+        "isolation",
+        "biceps"
+      ],
+      "equipment": [
+        "dumbbell"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "hammer_curl",
+      "name": "Hammer curls",
+      "aliases": [
+        "hammer curl",
+        "neutral grip curl"
+      ],
+      "tags": [
+        "isolation",
+        "biceps",
+        "forearms"
+      ],
+      "equipment": [
+        "dumbbell"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "back_squat",
+      "name": "Squat (back squat)",
+      "aliases": [
+        "squat",
+        "barbell squat"
+      ],
+      "tags": [
+        "compound",
+        "legs"
+      ],
+      "equipment": [
+        "barbell",
+        "rack"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "deadlift",
+      "name": "Deadlift",
+      "aliases": [
+        "dødløft",
+        "conventional deadlift"
+      ],
+      "tags": [
+        "compound",
+        "legs",
+        "pull"
+      ],
+      "equipment": [
+        "barbell"
+      ],
+      "rm": {
+        "1": 148,
+        "3": 134.5,
+        "5": 127,
+        "8": 117,
+        "10": 111
+      }
+    },
+    {
+      "key": "romanian_deadlift",
+      "name": "Romanian deadlift",
+      "aliases": [
+        "rdl",
+        "romansk dødløft"
+      ],
+      "tags": [
+        "compound",
+        "legs",
+        "hinge"
+      ],
+      "equipment": [
+        "barbell",
+        "dumbbell"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "hip_thrust",
+      "name": "Hip thrust",
+      "aliases": [
+        "glute bridge",
+        "barbell hip thrust"
+      ],
+      "tags": [
+        "compound",
+        "legs",
+        "glutes"
+      ],
+      "equipment": [
+        "barbell",
+        "bench"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "leg_press",
+      "name": "Leg press",
+      "aliases": [
+        "press"
+      ],
+      "tags": [
+        "compound",
+        "legs"
+      ],
+      "equipment": [
+        "machine"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "calf_raise",
+      "name": "Calf raises",
+      "aliases": [
+        "standing calf raise",
+        "seated calf raise"
+      ],
+      "tags": [
+        "isolation",
+        "legs",
+        "calves"
+      ],
+      "equipment": [
+        "rack",
+        "barbell"
+      ],
+      "rm": {
+        "1": 185.5,
+        "3": 168.5,
+        "5": 159,
+        "8": 146.5,
+        "10": 139
+      }
+    },
+    {
+      "key": "plank",
+      "name": "Plank",
+      "aliases": [
+        "front plank"
+      ],
+      "tags": [
+        "isolation",
+        "core"
+      ],
+      "equipment": [
+        "bodyweight"
+      ],
+      "rm": {}
+    },
+    {
+      "key": "ab_wheel",
+      "name": "Ab wheel rollout",
+      "aliases": [
+        "ab wheel",
+        "rollout"
+      ],
+      "tags": [
+        "isolation",
+        "core"
+      ],
+      "equipment": [
+        "ab_wheel"
+      ],
+      "rm": {}
+    }
+  ]
+}

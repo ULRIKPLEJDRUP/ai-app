@@ -1,0 +1,128 @@
+{
+  "equipment": [
+    {
+      "key": "barbell",
+      "label": "Stang (barbell)",
+      "tags": [
+        "free_weight",
+        "heavy",
+        "bilateral"
+      ]
+    },
+    {
+      "key": "bench",
+      "label": "Træningsbænk",
+      "tags": [
+        "support",
+        "bench",
+        "setup"
+      ]
+    },
+    {
+      "key": "dumbbell",
+      "label": "Håndvægte",
+      "tags": [
+        "free_weight",
+        "unilateral",
+        "adjustable"
+      ]
+    },
+    {
+      "key": "kettlebell",
+      "label": "Kettlebell",
+      "tags": [
+        "free_weight",
+        "ballistic",
+        "unilateral"
+      ]
+    },
+    {
+      "key": "cable",
+      "label": "Cable-stack",
+      "tags": [
+        "machine",
+        "adjustable",
+        "isolation"
+      ]
+    },
+    {
+      "key": "machine",
+      "label": "Maskine (generisk)",
+      "tags": [
+        "machine",
+        "guided",
+        "stable"
+      ]
+    },
+    {
+      "key": "rack",
+      "label": "Squat rack / stativ",
+      "tags": [
+        "rack",
+        "heavy",
+        "safety"
+      ]
+    },
+    {
+      "key": "pullup_bar",
+      "label": "Pullup bar / rig",
+      "tags": [
+        "bodyweight",
+        "rig",
+        "hanging"
+      ]
+    },
+    {
+      "key": "bodyweight",
+      "label": "Kropsvægt",
+      "tags": [
+        "minimal",
+        "travel",
+        "no_equipment"
+      ]
+    },
+    {
+      "key": "resistance_band",
+      "label": "Elastik / resistance band",
+      "tags": [
+        "accessory",
+        "travel",
+        "assist"
+      ]
+    },
+    {
+      "key": "trx",
+      "label": "trx",
+      "tags": [
+        "travel",
+        "core",
+        "warm_up"
+      ]
+    },
+    {
+      "key": "ab_wheel",
+      "label": "Ab wheel / rollout",
+      "tags": [
+        "core",
+        "accessory",
+        "floor",
+        "travel"
+      ]
+    },
+    {
+      "key": "pull_down",
+      "label": "Pull down",
+      "tags": [
+        "Home_gym"
+      ]
+    },
+    {
+      "key": "captain_crush",
+      "label": "Captain of Crush",
+      "tags": [
+        "travel",
+        "strength"
+      ]
+    }
+  ]
+}

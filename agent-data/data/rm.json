@@ -1,0 +1,20 @@
+{
+  "bench_press": {
+    "updatedAt": "2025-12-16T22:45:28.603Z",
+    "measured": {
+      "reps": 10,
+      "kg": 105
+    },
+    "est1rm": 140,
+    "trainingMax": 126
+  },
+  "squat": {
+    "updatedAt": "2025-12-16T23:11:09.879Z",
+    "measured": {
+      "reps": 5,
+      "kg": 120
+    },
+    "est1rm": 135,
+    "trainingMax": 121.5
+  }
+}
