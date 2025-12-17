@@ -175,6 +175,8 @@ function readProfile() {
         trainingFrequency: "",
         profileImagePath: "",
         progressPhotos: [],
+        injuries: [],
+        injuryNotes: "",
       };
       fs.mkdirSync(path.dirname(PROFILE_PATH), { recursive: true });
       fs.writeFileSync(PROFILE_PATH, JSON.stringify(empty, null, 2), "utf8");
@@ -302,6 +304,7 @@ function sanitizeProfile(body) {
     "waistCm",
     "trainingExperience",
     "trainingFrequency",
+    "injuryNotes",
   ];
   for (const key of copyFields) {
     const val = body?.[key];
@@ -322,6 +325,12 @@ function sanitizeProfile(body) {
         if (!date || !pathValue) return null;
         return { date, path: pathValue };
       })
+      .filter(Boolean);
+  }
+
+  if (Array.isArray(body?.injuries)) {
+    profile.injuries = body.injuries
+      .map((item) => String(item || "").trim())
       .filter(Boolean);
   }
 
