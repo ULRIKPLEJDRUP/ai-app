@@ -6,6 +6,20 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 const DATA_PATH = path.join(__dirname, "..", "data", "exercises.json");
 const EQUIPMENT_PATH = path.join(__dirname, "..", "data", "equipmentCatalog.json");
 const PROFILE_PATH = path.join(__dirname, "..", "data", "profile.json");
+const MUSCLE_PATH = path.join(__dirname, "..", "data", "muscleGroups.json");
+const DEFAULT_MUSCLES = [
+  { key: "shoulder", label: "Skulder" },
+  { key: "knee", label: "Knæ" },
+  { key: "lower_back", label: "Nedre ryg" },
+  { key: "upper_back", label: "Øvre ryg/nakke" },
+  { key: "hip", label: "Hofte" },
+  { key: "ankle", label: "Ankel/fod" },
+  { key: "elbow", label: "Albue" },
+  { key: "wrist", label: "Håndled" },
+  { key: "core", label: "Core" },
+  { key: "cardio", label: "Kredsløb/lunger" },
+  { key: "other", label: "Andet" },
+];
 const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
 const AVATAR_DIR = path.join(UPLOAD_DIR, "avatar");
 const PROGRESS_DIR = path.join(UPLOAD_DIR, "progress");
@@ -173,6 +187,31 @@ function equipmentKeySet() {
   return new Set(readEquipmentCatalog().map((item) => item.key));
 }
 
+function readMuscleCatalog() {
+  try {
+    if (!fs.existsSync(MUSCLE_PATH)) {
+      fs.mkdirSync(path.dirname(MUSCLE_PATH), { recursive: true });
+      fs.writeFileSync(MUSCLE_PATH, JSON.stringify({ muscles: DEFAULT_MUSCLES }, null, 2), "utf8");
+      return DEFAULT_MUSCLES;
+    }
+    const raw = fs.readFileSync(MUSCLE_PATH, "utf8");
+    const data = JSON.parse(raw);
+    return Array.isArray(data?.muscles) ? data.muscles : DEFAULT_MUSCLES;
+  } catch {
+    return DEFAULT_MUSCLES;
+  }
+}
+
+function writeMuscleCatalog(items) {
+  const payload = { muscles: items };
+  fs.mkdirSync(path.dirname(MUSCLE_PATH), { recursive: true });
+  fs.writeFileSync(MUSCLE_PATH, JSON.stringify(payload, null, 2), "utf8");
+}
+
+function muscleKeySet() {
+  return new Set(readMuscleCatalog().map((item) => item.key));
+}
+
 function readProfile() {
   try {
     if (!fs.existsSync(PROFILE_PATH)) {
@@ -241,6 +280,13 @@ app.get("/api/equipment", (req, res) => {
   res.json(catalog);
 });
 
+app.get("/api/muscles", (req, res) => {
+  const catalog = readMuscleCatalog().sort((a, b) => {
+    return (a.label || a.key).localeCompare(b.label || b.key, "da");
+  });
+  res.json(catalog);
+});
+
 function normalizeEquipmentPayload(body) {
   const key = slugKey(body?.key);
   if (!key) throw new Error("Key er påkrævet (brug bogstaver/tal)");
@@ -298,6 +344,39 @@ app.delete("/api/equipment/:key", (req, res) => {
     writeDb(db);
   }
 
+  res.json({ ok: true });
+});
+
+function normalizeMusclePayload(body) {
+  const key = slugKey(body?.key);
+  if (!key) throw new Error("Key er påkrævet");
+  const label = String(body?.label || "").trim() || key;
+  return { key, label };
+}
+
+app.post("/api/muscles", (req, res) => {
+  try {
+    const payload = normalizeMusclePayload(req.body);
+    const catalog = readMuscleCatalog();
+    const idx = catalog.findIndex((item) => item.key === payload.key);
+    if (idx >= 0) catalog[idx] = payload;
+    else catalog.push(payload);
+    writeMuscleCatalog(catalog);
+    res.json(payload);
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Ugyldigt payload" });
+  }
+});
+
+app.delete("/api/muscles/:key", (req, res) => {
+  const key = String(req.params.key || "").trim();
+  if (!key) return res.status(400).json({ error: "Key mangler" });
+  const catalog = readMuscleCatalog();
+  const filtered = catalog.filter((item) => item.key !== key);
+  if (filtered.length === catalog.length) {
+    return res.status(404).json({ error: "Muskel findes ikke" });
+  }
+  writeMuscleCatalog(filtered);
   res.json({ ok: true });
 });
 
@@ -413,11 +492,12 @@ app.post("/api/exercise-muscles", (req, res) => {
     return res.status(400).json({ error: "Missing exerciseKey/muscles" });
   }
 
+  const allowed = muscleKeySet();
   const sanitized = Array.from(
     new Set(
       muscles
         .map((key) => slugKey(key))
-        .filter((key) => key && MUSCLE_GROUP_KEYS.includes(key))
+        .filter((key) => key && allowed.has(key))
     )
   );
 
@@ -497,6 +577,10 @@ app.get("/equipment", (req, res) => {
 
 app.get("/profile", (req, res) => {
   res.sendFile(path.join(__dirname, "profile.html"));
+});
+
+app.get("/muscles", (req, res) => {
+  res.sendFile(path.join(__dirname, "muscles.html"));
 });
 
 app.listen(PORT, () => {

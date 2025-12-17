@@ -142,18 +142,7 @@
 <script>
 let profileImagePath = "";
 let progressPhotos = [];
-const injuryOptionsData = [
-  { key: "shoulder", label: "Skulder" },
-  { key: "knee", label: "Knæ" },
-  { key: "lower_back", label: "Nedre ryg" },
-  { key: "upper_back", label: "Øvre ryg/nakke" },
-  { key: "hip", label: "Hofte" },
-  { key: "ankle", label: "Ankel/fod" },
-  { key: "elbow", label: "Albue" },
-  { key: "wrist", label: "Håndled" },
-  { key: "cardio", label: "Kredsløb/lunger" },
-  { key: "other", label: "Andet" }
-];
+let injuryOptionsData = [];
 
 function setStatus(msg) {
   document.getElementById("status").textContent = msg;
@@ -231,6 +220,10 @@ function renderProgressPhotos() {
 function renderInjuryOptions(selected) {
   const container = document.getElementById("injuryOptions");
   if (!container) return;
+  if (!injuryOptionsData.length) {
+    container.innerHTML = "<span class='muted'>Ingen muskelgrupper tilgængelige</span>";
+    return;
+  }
   const selectedSet = new Set(selected || []);
   container.innerHTML = injuryOptionsData
     .map((opt) => {
@@ -373,7 +366,23 @@ document.getElementById("profileForm").addEventListener("submit", async (e) => {
   }
 });
 
-loadProfile();
+async function initProfile() {
+  try {
+    setStatus("Loader muskelgrupper…");
+    const res = await fetch("/api/muscles");
+    if (res.ok) {
+      const data = await res.json();
+      injuryOptionsData = Array.isArray(data) ? data : [];
+    } else {
+      injuryOptionsData = [];
+    }
+  } catch {
+    injuryOptionsData = [];
+  }
+  await loadProfile();
+}
+
+initProfile();
 </script>
 
 </body>
