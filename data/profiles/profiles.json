@@ -1,0 +1,16 @@
+{
+  "profiles": [
+    {
+      "id": "default",
+      "label": "Standard"
+    },
+    {
+      "id": "ulrik-strong",
+      "label": "ULRIK"
+    },
+    {
+      "id": "jacob-teen",
+      "label": "Jacob Plejdrup"
+    }
+  ]
+}

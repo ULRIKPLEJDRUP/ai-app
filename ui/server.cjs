@@ -6,6 +6,11 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 const DATA_PATH = path.join(__dirname, "..", "data", "exercises.json");
 const EQUIPMENT_PATH = path.join(__dirname, "..", "data", "equipmentCatalog.json");
 const PROFILE_PATH = path.join(__dirname, "..", "data", "profile.json");
+const VISION_PATH = path.join(__dirname, "..", "data", "vision.json");
+const PROFILES_DIR = path.join(__dirname, "..", "data", "profiles");
+const PROFILE_INDEX_PATH = path.join(PROFILES_DIR, "profiles.json");
+const DEFAULT_PROFILE_ID = "default";
+const DEFAULT_PROFILE_META = { id: DEFAULT_PROFILE_ID, label: "Standard" };
 const MUSCLE_PATH = path.join(__dirname, "..", "data", "muscleGroups.json");
 const DEFAULT_MUSCLES = [
   { key: "shoulder", label: "Skulder" },
@@ -23,6 +28,44 @@ const DEFAULT_MUSCLES = [
 const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
 const AVATAR_DIR = path.join(UPLOAD_DIR, "avatar");
 const PROGRESS_DIR = path.join(UPLOAD_DIR, "progress");
+const PROFILE_RM_FILE = "rm.json";
+const PROFILE_METRICS_FILE = "metrics.json";
+const EXERCISE_METRICS = {
+  dips: { count: true },
+  pull_ups: { count: true },
+  plank: { time: true },
+  ab_wheel: { count: true, time: true },
+};
+const DEFAULT_PROFILE_DATA = {
+  username: "",
+  gender: "",
+  age: "",
+  bodyType: "",
+  weightKg: "",
+  heightCm: "",
+  waistCm: "",
+  trainingExperience: "",
+  trainingFrequency: "",
+  profileImagePath: "",
+  progressPhotos: [],
+  injuries: [],
+  injuryNotes: "",
+};
+const DEFAULT_VISION = {
+  headline: "",
+  motivation: "",
+  targets: {
+    weightKg: "",
+    waistCm: "",
+    benchKg: "",
+    squatKg: "",
+    deadliftKg: "",
+    cardioGoal: "",
+  },
+  habits: [],
+  deadline: "",
+  notes: "",
+};
 
 const app = express();
 app.use(express.json({ limit: "200mb" }));
@@ -82,6 +125,7 @@ function toPublicPath(absPath) {
 }
 
 function resolveUploadPath(subDir, filename) {
+  ensureDir(subDir);
   const finalName = uniqueFilename(filename);
   const abs = path.join(subDir, finalName);
   return abs;
@@ -115,6 +159,184 @@ const MUSCLE_GROUP_KEYS = [
   "cardio",
   "other",
 ];
+
+ensureDir(PROFILES_DIR);
+ensureProfileIndex();
+migrateLegacyRmData();
+
+function profileDir(profileId = DEFAULT_PROFILE_ID) {
+  const id = profileId || DEFAULT_PROFILE_ID;
+  return path.join(PROFILES_DIR, id);
+}
+
+function profileFilePath(profileId = DEFAULT_PROFILE_ID) {
+  return path.join(profileDir(profileId), "profile.json");
+}
+
+function visionFilePath(profileId = DEFAULT_PROFILE_ID) {
+  return path.join(profileDir(profileId), "vision.json");
+}
+
+function profileRMPath(profileId = DEFAULT_PROFILE_ID) {
+  return path.join(profileDir(profileId), PROFILE_RM_FILE);
+}
+
+function profileMetricsPath(profileId = DEFAULT_PROFILE_ID) {
+  return path.join(profileDir(profileId), PROFILE_METRICS_FILE);
+}
+
+function ensureProfileIndex() {
+  ensureDir(PROFILES_DIR);
+  if (!fs.existsSync(PROFILE_INDEX_PATH)) {
+    const payload = { profiles: [DEFAULT_PROFILE_META] };
+    fs.writeFileSync(PROFILE_INDEX_PATH, JSON.stringify(payload, null, 2), "utf8");
+  }
+}
+
+function readProfileIndex() {
+  ensureProfileIndex();
+  try {
+    const raw = fs.readFileSync(PROFILE_INDEX_PATH, "utf8");
+    const data = JSON.parse(raw);
+    let list = Array.isArray(data?.profiles) ? data.profiles : [];
+    if (!list.length) list = [DEFAULT_PROFILE_META];
+    return list.map((meta) => ({
+      id: slugKey(meta?.id) || DEFAULT_PROFILE_ID,
+      label: meta?.label ? String(meta.label).trim() : meta?.id || DEFAULT_PROFILE_META.label,
+    }));
+  } catch {
+    return [DEFAULT_PROFILE_META];
+  }
+}
+
+function writeProfileIndex(list) {
+  const sanitized = Array.isArray(list)
+    ? list
+        .map((meta) => {
+          const id = slugKey(meta?.id);
+          if (!id) return null;
+          return { id, label: meta?.label || meta?.name || id };
+        })
+        .filter(Boolean)
+    : [];
+  const finalList = sanitized.length ? sanitized : [DEFAULT_PROFILE_META];
+  ensureDir(PROFILE_INDEX_PATH ? path.dirname(PROFILE_INDEX_PATH) : PROFILES_DIR);
+  fs.writeFileSync(PROFILE_INDEX_PATH, JSON.stringify({ profiles: finalList }, null, 2), "utf8");
+}
+
+function ensureProfileMeta(profileId = DEFAULT_PROFILE_ID, label = "") {
+  const id = slugKey(profileId) || DEFAULT_PROFILE_ID;
+  const list = readProfileIndex();
+  const existing = list.find((meta) => meta.id === id);
+  if (existing) {
+    if (label && label !== existing.label) {
+      existing.label = label;
+      writeProfileIndex(list);
+    }
+    return existing;
+  }
+  const labelValue = label || `Profil ${id}`;
+  list.push({ id, label: labelValue });
+  writeProfileIndex(list);
+  return { id, label: labelValue };
+}
+
+function resolveProfileId(value) {
+  const slug = slugKey(value);
+  return slug || DEFAULT_PROFILE_ID;
+}
+
+function getProfileIdFromRequest(req) {
+  const raw = req.query?.profileId || req.headers["x-profile-id"] || DEFAULT_PROFILE_ID;
+  return resolveProfileId(raw);
+}
+
+function normalizeProfileMetaPayload(body) {
+  const desiredLabel = String(body?.label || body?.name || "").trim();
+  const idInput = body?.id || body?.key || "";
+  const id = slugKey(idInput || desiredLabel);
+  if (!id) throw new Error("Profilnavn er påkrævet");
+  const label = desiredLabel || `Profil ${id}`;
+  return { id, label };
+}
+
+function migrateLegacyRmData() {
+  try {
+    if (!fs.existsSync(DATA_PATH)) return;
+    const dbRaw = fs.readFileSync(DATA_PATH, "utf8");
+    const db = JSON.parse(dbRaw);
+    const rmData = {};
+    let touched = false;
+    for (const ex of db.exercises || []) {
+      if (ex.rm && typeof ex.rm === "object" && Object.keys(ex.rm).length) {
+        rmData[ex.key] = ex.rm;
+        delete ex.rm;
+        touched = true;
+      }
+    }
+    if (Object.keys(rmData).length) {
+      ensureDir(profileDir(DEFAULT_PROFILE_ID));
+      if (!fs.existsSync(profileRMPath(DEFAULT_PROFILE_ID))) {
+        fs.writeFileSync(profileRMPath(DEFAULT_PROFILE_ID), JSON.stringify(rmData, null, 2), "utf8");
+      }
+    }
+    if (touched) {
+      fs.writeFileSync(DATA_PATH, JSON.stringify(db, null, 2), "utf8");
+    }
+  } catch (err) {
+    console.warn("Kunne ikke migrere RM-data", err);
+  }
+}
+
+function readProfileRM(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const filePath = profileRMPath(id);
+  try {
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      const data = JSON.parse(raw);
+      return data && typeof data === "object" ? data : {};
+    }
+  } catch {
+    // ignore
+  }
+  writeProfileRM(id, {});
+  return {};
+}
+
+function writeProfileRM(profileId = DEFAULT_PROFILE_ID, data = {}) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const dir = profileDir(id);
+  ensureDir(dir);
+  fs.writeFileSync(profileRMPath(id), JSON.stringify(data, null, 2), "utf8");
+}
+
+function readProfileMetrics(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const filePath = profileMetricsPath(id);
+  try {
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      const data = JSON.parse(raw);
+      return data && typeof data === "object" ? data : {};
+    }
+  } catch {
+    // ignore
+  }
+  writeProfileMetrics(id, {});
+  return {};
+}
+
+function writeProfileMetrics(profileId = DEFAULT_PROFILE_ID, data = {}) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const dir = profileDir(id);
+  ensureDir(dir);
+  fs.writeFileSync(profileMetricsPath(id), JSON.stringify(data, null, 2), "utf8");
+}
 
 function normalizeEquipmentEntry(entry) {
   if (!entry) return null;
@@ -212,39 +434,68 @@ function muscleKeySet() {
   return new Set(readMuscleCatalog().map((item) => item.key));
 }
 
-function readProfile() {
+function readProfile(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const filePath = profileFilePath(id);
   try {
-    if (!fs.existsSync(PROFILE_PATH)) {
-      const empty = {
-        username: "",
-        gender: "",
-        age: "",
-        bodyType: "",
-        weightKg: "",
-        heightCm: "",
-        waistCm: "",
-        trainingExperience: "",
-        trainingFrequency: "",
-        profileImagePath: "",
-        progressPhotos: [],
-        injuries: [],
-        injuryNotes: "",
-      };
-      fs.mkdirSync(path.dirname(PROFILE_PATH), { recursive: true });
-      fs.writeFileSync(PROFILE_PATH, JSON.stringify(empty, null, 2), "utf8");
-      return empty;
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      const data = JSON.parse(raw);
+      return { ...DEFAULT_PROFILE_DATA, ...(data || {}) };
     }
-    const raw = fs.readFileSync(PROFILE_PATH, "utf8");
-    const data = JSON.parse(raw);
-    return data && typeof data === "object" ? data : {};
+    if (id === DEFAULT_PROFILE_ID && fs.existsSync(PROFILE_PATH)) {
+      const legacyRaw = fs.readFileSync(PROFILE_PATH, "utf8");
+      const legacyData = JSON.parse(legacyRaw);
+      const merged = { ...DEFAULT_PROFILE_DATA, ...(legacyData || {}) };
+      writeProfile(id, merged);
+      return merged;
+    }
   } catch {
-    return {};
+    // ignore
   }
+  writeProfile(id, { ...DEFAULT_PROFILE_DATA });
+  return { ...DEFAULT_PROFILE_DATA };
 }
 
-function writeProfile(profile) {
-  fs.mkdirSync(path.dirname(PROFILE_PATH), { recursive: true });
-  fs.writeFileSync(PROFILE_PATH, JSON.stringify(profile, null, 2), "utf8");
+function writeProfile(profileId = DEFAULT_PROFILE_ID, profile) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const dir = profileDir(id);
+  ensureDir(dir);
+  fs.writeFileSync(profileFilePath(id), JSON.stringify(profile, null, 2), "utf8");
+}
+
+function readVision(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const filePath = visionFilePath(id);
+  try {
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      const data = JSON.parse(raw);
+      return { ...DEFAULT_VISION, ...(data || {}) };
+    }
+    if (id === DEFAULT_PROFILE_ID && fs.existsSync(VISION_PATH)) {
+      const legacyRaw = fs.readFileSync(VISION_PATH, "utf8");
+      const legacyData = JSON.parse(legacyRaw);
+      const merged = { ...DEFAULT_VISION, ...(legacyData || {}) };
+      writeVision(id, merged);
+      return merged;
+    }
+  } catch {
+    // ignore
+  }
+  writeVision(id, { ...DEFAULT_VISION });
+  return { ...DEFAULT_VISION };
+}
+
+function writeVision(profileId = DEFAULT_PROFILE_ID, vision) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const dir = profileDir(id);
+  ensureDir(dir);
+  fs.writeFileSync(visionFilePath(id), JSON.stringify(vision, null, 2), "utf8");
 }
 
 function inferType(ex) {
@@ -257,6 +508,9 @@ function inferType(ex) {
 
 // Hent alle øvelser som RM-rækker
 app.get("/api/rm", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const rmData = readProfileRM(profileId);
+  const metricsData = readProfileMetrics(profileId);
   const db = readDb();
   const rows = (db.exercises || [])
     .map((ex) => ({
@@ -265,7 +519,9 @@ app.get("/api/rm", (req, res) => {
       type: inferType(ex),
       equipment: Array.isArray(ex.equipment) ? ex.equipment : [],
       muscleGroups: Array.isArray(ex.muscleGroups) ? ex.muscleGroups : [],
-      rm: ex.rm || {},
+      rm: rmData?.[ex.key] || {},
+      metricTypes: EXERCISE_METRICS[ex.key] || null,
+      metrics: metricsData?.[ex.key] || {},
     }))
     .sort((a, b) => a.name.localeCompare(b.name, "da"));
 
@@ -382,11 +638,12 @@ app.delete("/api/muscles/:key", (req, res) => {
 
 // Personlige data
 app.get("/api/profile", (req, res) => {
-  res.json(readProfile());
+  const profileId = getProfileIdFromRequest(req);
+  res.json(readProfile(profileId));
 });
 
-function sanitizeProfile(body) {
-  const profile = readProfile();
+function sanitizeProfile(profileId, body) {
+  const profile = readProfile(profileId);
   const copyFields = [
     "username",
     "gender",
@@ -431,22 +688,94 @@ function sanitizeProfile(body) {
 }
 
 app.post("/api/profile", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
   try {
-    const updated = sanitizeProfile(req.body || {});
-    writeProfile(updated);
-    res.json({ ok: true, profile: updated });
+    const updated = sanitizeProfile(profileId, req.body || {});
+    writeProfile(profileId, updated);
+    res.json({ ok: true, profile: updated, profileId });
   } catch (err) {
     res.status(400).json({ error: err.message || "Ugyldigt profil-data" });
   }
 });
 
+app.get("/api/profiles", (req, res) => {
+  res.json(readProfileIndex());
+});
+
+app.post("/api/profiles", (req, res) => {
+  try {
+    const meta = normalizeProfileMetaPayload(req.body || {});
+    const cloneSource = req.body?.cloneFrom ? resolveProfileId(req.body.cloneFrom) : null;
+    ensureProfileMeta(meta.id, meta.label);
+    if (cloneSource && cloneSource !== meta.id) {
+      writeProfile(meta.id, readProfile(cloneSource));
+      writeVision(meta.id, readVision(cloneSource));
+    } else {
+      readProfile(meta.id);
+      readVision(meta.id);
+    }
+    res.json(meta);
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Kunne ikke oprette profil" });
+  }
+});
+
+function sanitizeVision(profileId, body) {
+  const current = readVision(profileId);
+  const safe = { ...DEFAULT_VISION, ...current };
+  safe.headline = String(body?.headline ?? safe.headline ?? "").trim();
+  safe.motivation = String(body?.motivation ?? safe.motivation ?? "").trim();
+  safe.deadline = String(body?.deadline ?? safe.deadline ?? "").trim();
+  safe.notes = String(body?.notes ?? safe.notes ?? "").trim();
+
+  const incomingTargets = body?.targets && typeof body.targets === "object" ? body.targets : {};
+  safe.targets = {
+    weightKg: String(incomingTargets.weightKg ?? safe.targets.weightKg ?? "").trim(),
+    waistCm: String(incomingTargets.waistCm ?? safe.targets.waistCm ?? "").trim(),
+    benchKg: String(incomingTargets.benchKg ?? safe.targets.benchKg ?? "").trim(),
+    squatKg: String(incomingTargets.squatKg ?? safe.targets.squatKg ?? "").trim(),
+    deadliftKg: String(incomingTargets.deadliftKg ?? safe.targets.deadliftKg ?? "").trim(),
+    cardioGoal: String(incomingTargets.cardioGoal ?? safe.targets.cardioGoal ?? "").trim(),
+  };
+
+  if (Array.isArray(body?.habits)) {
+    safe.habits = body.habits
+      .map((habit) => ({
+        title: String(habit?.title || "").trim(),
+        cadence: String(habit?.cadence || "").trim(),
+        link: String(habit?.link || "").trim(),
+      }))
+      .filter((habit) => habit.title);
+  }
+
+  return safe;
+}
+
+app.get("/api/vision", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  res.json(readVision(profileId));
+});
+
+app.post("/api/vision", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  try {
+    const updated = sanitizeVision(profileId, req.body || {});
+    writeVision(profileId, updated);
+    res.json({ ok: true, vision: updated, profileId });
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Ugyldigt vision-data" });
+  }
+});
+
 app.post("/api/profile/avatar", express.raw({ limit: "50mb", type: "*/*" }), (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
   const originalName = req.headers["x-filename"] || "avatar";
   if (!req.body || !req.body.length) {
     return res.status(400).json({ error: "Tomt upload" });
   }
   try {
-    const absPath = resolveUploadPath(AVATAR_DIR, originalName);
+    const profileAvatarDir = path.join(AVATAR_DIR, profileId);
+    const absPath = resolveUploadPath(profileAvatarDir, originalName);
     fs.writeFileSync(absPath, req.body);
     const publicPath = toPublicPath(absPath);
     res.json({ path: publicPath });
@@ -464,12 +793,14 @@ app.delete("/api/profile/avatar", (req, res) => {
 });
 
 app.post("/api/profile/progress-photo", express.raw({ limit: "50mb", type: "*/*" }), (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
   const date = String(req.query.date || req.headers["x-date"] || "").trim();
   const originalName = req.headers["x-filename"] || "progress";
   if (!date) return res.status(400).json({ error: "Dato mangler" });
   if (!req.body || !req.body.length) return res.status(400).json({ error: "Tomt upload" });
   try {
-    const absPath = resolveUploadPath(PROGRESS_DIR, originalName);
+    const profileProgressDir = path.join(PROGRESS_DIR, profileId);
+    const absPath = resolveUploadPath(profileProgressDir, originalName);
     fs.writeFileSync(absPath, req.body);
     const publicPath = toPublicPath(absPath);
     res.json({ date, path: publicPath });
@@ -510,8 +841,9 @@ app.post("/api/exercise-muscles", (req, res) => {
   res.json({ ok: true, muscleGroups: sanitized });
 });
 
-// Gem én celle tilbage i exercises.json
+// Gem én celle tilbage i profilens RM-data
 app.post("/api/rm", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
   const { exerciseKey, rep, value } = req.body || {};
 
   if (!exerciseKey || rep === undefined || rep === null) {
@@ -527,18 +859,60 @@ app.post("/api/rm", (req, res) => {
   const ex = (db.exercises || []).find((x) => x.key === exerciseKey);
   if (!ex) return res.status(404).json({ error: "Exercise not found" });
 
-  if (!ex.rm) ex.rm = {};
-
+  const rmData = readProfileRM(profileId);
+  const target = rmData[exerciseKey] ? { ...rmData[exerciseKey] } : {};
   if (value === null || value === "") {
-    delete ex.rm[r];
+    delete target[r];
   } else {
     const n = Number(value);
     if (!Number.isFinite(n)) return res.status(400).json({ error: "Invalid value" });
-    ex.rm[r] = n;
+    target[r] = n;
   }
 
-  writeDb(db);
-  res.json({ ok: true });
+  if (Object.keys(target).length) {
+    rmData[exerciseKey] = target;
+  } else {
+    delete rmData[exerciseKey];
+  }
+
+  writeProfileRM(profileId, rmData);
+  res.json({ ok: true, profileId, rm: rmData[exerciseKey] || {} });
+});
+
+app.post("/api/rm-metric", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const { exerciseKey, metric, value } = req.body || {};
+
+  if (!exerciseKey || !metric) {
+    return res.status(400).json({ error: "Missing exerciseKey/metric" });
+  }
+
+  const allowed = EXERCISE_METRICS[exerciseKey];
+  if (!allowed || !allowed[metric]) {
+    return res.status(400).json({ error: "Metric not allowed for exercise" });
+  }
+
+  const metrics = readProfileMetrics(profileId);
+  const target = metrics[exerciseKey] ? { ...metrics[exerciseKey] } : {};
+
+  if (value === null || value === "" || value === undefined) {
+    delete target[metric];
+  } else {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
+      return res.status(400).json({ error: "Invalid metric value" });
+    }
+    target[metric] = num;
+  }
+
+  if (Object.keys(target).length) {
+    metrics[exerciseKey] = target;
+  } else {
+    delete metrics[exerciseKey];
+  }
+
+  writeProfileMetrics(profileId, metrics);
+  res.json({ ok: true, profileId, metrics: metrics[exerciseKey] || {} });
 });
 
 // Opdater hvilke udstyrstyper en øvelse kræver
@@ -571,6 +945,10 @@ app.get("/rm", (req, res) => {
   res.sendFile(path.join(__dirname, "rm.html"));
 });
 
+app.get("/common.js", (req, res) => {
+  res.type("application/javascript").sendFile(path.join(__dirname, "common.js"));
+});
+
 app.get("/equipment", (req, res) => {
   res.sendFile(path.join(__dirname, "equipment.html"));
 });
@@ -581,6 +959,14 @@ app.get("/profile", (req, res) => {
 
 app.get("/muscles", (req, res) => {
   res.sendFile(path.join(__dirname, "muscles.html"));
+});
+
+app.get("/profiles", (req, res) => {
+  res.sendFile(path.join(__dirname, "profiles.html"));
+});
+
+app.get("/vision", (req, res) => {
+  res.sendFile(path.join(__dirname, "vision.html"));
 });
 
 app.listen(PORT, () => {

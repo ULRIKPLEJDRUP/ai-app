@@ -23,16 +23,35 @@
     form.inline label { font-size:12px; color:#555; display:block; margin-bottom:4px; }
     form.inline input { width:auto; min-width:150px; }
     #status { margin-top: 14px; font-size: 13px; color:#444; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    body.admin-locked [data-admin-only] { pointer-events:none; }
+    [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
+    .admin-disabled { opacity:0.6; }
   </style>
+  <script src="/common.js"></script>
 </head>
 <body>
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment" class="active">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/profiles">Profiler</a>
+</nav>
 
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
+  <a href="/profiles">skift</a>
+  <button type="button" data-admin-toggle>Admin-tilstand: låst</button>
+</div>
 <h1>Udstyr</h1>
 <p class="muted">
   Vedligehold udstyrskataloget. Disse data bruges på RM-siden og senere i programmets logik.
-</p>
-<p class="muted">
-  Tilbage til RM: <a href="/rm">/rm</a>
 </p>
 
 <div class="panel">
@@ -56,23 +75,46 @@
   <form id="addEquipmentForm" class="inline">
     <div>
       <label for="equipKey">Ny key</label>
-      <input type="text" id="equipKey" placeholder="fx resistance_band" required />
+      <input type="text" id="equipKey" placeholder="fx resistance_band" required data-admin-only="true" />
     </div>
     <div>
       <label for="equipLabel">Label</label>
-      <input type="text" id="equipLabel" placeholder="Visningsnavn" />
+      <input type="text" id="equipLabel" placeholder="Visningsnavn" data-admin-only="true" />
     </div>
     <div>
       <label for="equipTags">Tags</label>
-      <input type="text" id="equipTags" placeholder="fx travel,assist" />
+      <input type="text" id="equipTags" placeholder="fx travel,assist" data-admin-only="true" />
     </div>
-    <button type="submit">+ Tilføj / opdater</button>
+    <button type="submit" data-admin-only="true">+ Tilføj / opdater</button>
   </form>
 </div>
 
 <div id="status"></div>
 
 <script>
+const {
+  ensureActiveProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  toggleAdminMode,
+  applyAdminState,
+  isAdminMode,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+applyAdminState();
+
+const adminToggleBtn = document.querySelector("[data-admin-toggle]");
+if (adminToggleBtn) {
+  adminToggleBtn.addEventListener("click", () => {
+    toggleAdminMode();
+    applyAdminState();
+  });
+}
+
+syncActiveProfileMeta();
+
 let equipmentCatalog = [];
 
 function setStatus(msg) {
@@ -147,18 +189,19 @@ function renderEquipmentTable(errorMessage) {
       return `
         <tr data-equip-key="${item.key}" id="equip-${item.key}">
           <td><input type="text" value="${item.key}" disabled /></td>
-          <td><input type="text" value="${item.label || ""}" data-field="label" /></td>
-          <td><input type="text" value="${tags}" data-field="tags" placeholder="comma,separeret" /></td>
+          <td><input type="text" value="${item.label || ""}" data-field="label" data-admin-only="true" /></td>
+          <td><input type="text" value="${tags}" data-field="tags" placeholder="comma,separeret" data-admin-only="true" /></td>
           <td>
             <div class="equip-actions">
-              <button type="button" data-action="save">Gem</button>
-              <button type="button" data-action="delete">Slet</button>
+              <button type="button" data-action="save" data-admin-only="true">Gem</button>
+              <button type="button" data-action="delete" data-admin-only="true">Slet</button>
             </div>
           </td>
         </tr>
       `;
     })
     .join("");
+  applyAdminState();
 }
 
 async function loadEquipmentCatalog() {
@@ -203,6 +246,10 @@ async function deleteEquipment(key) {
 
 document.getElementById("addEquipmentForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (!isAdminMode()) {
+    setStatus("Aktivér admin-tilstand for at opdatere udstyr");
+    return;
+  }
   const keyInput = document.getElementById("equipKey");
   const key = slugKey(keyInput.value);
   const label = document.getElementById("equipLabel").value.trim();
@@ -231,6 +278,10 @@ document.addEventListener("click", async (event) => {
   const row = event.target.closest("tr[data-equip-key]");
   if (!row) return;
   const key = row.dataset.equipKey;
+  if (!isAdminMode()) {
+    setStatus("Aktivér admin-tilstand for at ændre udstyr");
+    return;
+  }
 
   if (action === "save") {
     const labelInput = row.querySelector('input[data-field="label"]');

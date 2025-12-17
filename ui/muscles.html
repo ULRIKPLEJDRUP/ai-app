@@ -17,10 +17,32 @@
     form.inline label { font-size:12px; color:#555; display:block; margin-bottom:4px; }
     form.inline input { width:auto; min-width:140px; }
     #status { margin-top:12px; font-size:13px; color:#444; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    body.admin-locked [data-admin-only] { pointer-events:none; }
+    [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
+    .admin-disabled { opacity:0.6; }
   </style>
+  <script src="/common.js"></script>
 </head>
 <body>
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles" class="active">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/profiles">Profiler</a>
+</nav>
 
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
+  <a href="/profiles">skift</a>
+  <button type="button" data-admin-toggle>Admin-tilstand: låst</button>
+</div>
 <h1>Muskelgrupper</h1>
 <p class="muted">Disse labels bruges til både RM-tabellen og profilen (skade/øvelses-tags). Rediger eller tilføj nye efter behov.</p>
 
@@ -40,18 +62,41 @@
 <form id="addMuscleForm" class="inline">
   <div>
     <label for="muscleKey">Ny key</label>
-    <input type="text" id="muscleKey" required placeholder="fx core" />
+    <input type="text" id="muscleKey" required placeholder="fx core" data-admin-only="true" />
   </div>
   <div>
     <label for="muscleLabel">Label</label>
-    <input type="text" id="muscleLabel" placeholder="Visningsnavn" />
+    <input type="text" id="muscleLabel" placeholder="Visningsnavn" data-admin-only="true" />
   </div>
-  <button type="submit">+ Tilføj / opdater</button>
+  <button type="submit" data-admin-only="true">+ Tilføj / opdater</button>
 </form>
 
 <div id="status"></div>
 
 <script>
+const {
+  ensureActiveProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  toggleAdminMode,
+  applyAdminState,
+  isAdminMode,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+applyAdminState();
+
+const adminToggleBtn = document.querySelector("[data-admin-toggle]");
+if (adminToggleBtn) {
+  adminToggleBtn.addEventListener("click", () => {
+    toggleAdminMode();
+    applyAdminState();
+  });
+}
+
+syncActiveProfileMeta();
+
 let muscleCatalog = [];
 
 function setStatus(msg) {
@@ -86,16 +131,17 @@ function renderTable() {
     .map((item) => `
       <tr data-key="${item.key}">
         <td><input type="text" value="${item.key}" disabled /></td>
-        <td><input type="text" value="${item.label || ""}" data-field="label" /></td>
+        <td><input type="text" value="${item.label || ""}" data-field="label" data-admin-only="true" /></td>
         <td>
           <div class="actions">
-            <button type="button" data-action="save" data-key="${item.key}">Gem</button>
-            <button type="button" data-action="delete" data-key="${item.key}">Slet</button>
+            <button type="button" data-action="save" data-key="${item.key}" data-admin-only="true">Gem</button>
+            <button type="button" data-action="delete" data-key="${item.key}" data-admin-only="true">Slet</button>
           </div>
         </td>
       </tr>
     `)
     .join("");
+  applyAdminState();
 }
 
 async function upsertMuscle(payload) {
@@ -120,6 +166,10 @@ async function deleteMuscle(key) {
 
 document.getElementById("addMuscleForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (!isAdminMode()) {
+    setStatus("Aktivér admin-tilstand for at opdatere muskelkataloget");
+    return;
+  }
   const key = document.getElementById("muscleKey").value.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "_");
   const label = document.getElementById("muscleLabel").value.trim();
   if (!key) {
@@ -141,6 +191,10 @@ document.getElementById("muscleRows").addEventListener("click", async (e) => {
   const action = e.target.dataset?.action;
   const key = e.target.dataset?.key;
   if (!action || !key) return;
+  if (!isAdminMode()) {
+    setStatus("Aktivér admin-tilstand for at redigere muskelgrupper");
+    return;
+  }
   if (action === "save") {
     const row = document.querySelector(`tr[data-key="${key}"]`);
     if (!row) return;

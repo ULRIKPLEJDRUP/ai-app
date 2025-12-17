@@ -17,13 +17,11 @@
         "barbell",
         "bench"
       ],
-      "rm": {
-        "1": 105,
-        "3": 97.5,
-        "5": 90,
-        "8": 82,
-        "10": 77.5
-      }
+      "muscleGroups": [
+        "chest",
+        "shoulder",
+        "triceps"
+      ]
     },
     {
       "key": "incline_dumbbell_press",
@@ -42,7 +40,11 @@
         "dumbbell",
         "bench"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "chest",
+        "shoulder",
+        "triceps"
+      ]
     },
     {
       "key": "overhead_press",
@@ -59,8 +61,7 @@
       ],
       "equipment": [
         "barbell"
-      ],
-      "rm": {}
+      ]
     },
     {
       "key": "dips",
@@ -77,7 +78,11 @@
       "equipment": [
         "bodyweight"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "chest",
+        "shoulder",
+        "triceps"
+      ]
     },
     {
       "key": "triceps_pushdown",
@@ -93,8 +98,7 @@
       ],
       "equipment": [
         "cable"
-      ],
-      "rm": {}
+      ]
     },
     {
       "key": "pull_ups",
@@ -112,8 +116,7 @@
       "equipment": [
         "bodyweight",
         "pullup_bar"
-      ],
-      "rm": {}
+      ]
     },
     {
       "key": "barbell_row",
@@ -131,13 +134,9 @@
       "equipment": [
         "barbell"
       ],
-      "rm": {
-        "1": 113.5,
-        "3": 103,
-        "5": 97,
-        "8": 89.5,
-        "10": 85
-      }
+      "muscleGroups": [
+        "upper_back"
+      ]
     },
     {
       "key": "lat_pulldown",
@@ -155,7 +154,10 @@
         "cable",
         "machine"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "biceps",
+        "upper_back"
+      ]
     },
     {
       "key": "dumbbell_row",
@@ -173,7 +175,9 @@
         "dumbbell",
         "bench"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "upper_back"
+      ]
     },
     {
       "key": "face_pull",
@@ -190,7 +194,9 @@
       "equipment": [
         "cable"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "upper_back"
+      ]
     },
     {
       "key": "biceps_curl",
@@ -207,7 +213,9 @@
       "equipment": [
         "dumbbell"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "biceps"
+      ]
     },
     {
       "key": "hammer_curl",
@@ -224,7 +232,9 @@
       "equipment": [
         "dumbbell"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "biceps"
+      ]
     },
     {
       "key": "back_squat",
@@ -240,8 +250,7 @@
       "equipment": [
         "barbell",
         "rack"
-      ],
-      "rm": {}
+      ]
     },
     {
       "key": "deadlift",
@@ -258,13 +267,11 @@
       "equipment": [
         "barbell"
       ],
-      "rm": {
-        "1": 148,
-        "3": 134.5,
-        "5": 127,
-        "8": 117,
-        "10": 111
-      }
+      "muscleGroups": [
+        "leg",
+        "lower_back",
+        "upper_back"
+      ]
     },
     {
       "key": "romanian_deadlift",
@@ -281,8 +288,7 @@
       "equipment": [
         "barbell",
         "dumbbell"
-      ],
-      "rm": {}
+      ]
     },
     {
       "key": "hip_thrust",
@@ -300,7 +306,10 @@
         "barbell",
         "bench"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "core",
+        "glute"
+      ]
     },
     {
       "key": "leg_press",
@@ -315,7 +324,9 @@
       "equipment": [
         "machine"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "leg"
+      ]
     },
     {
       "key": "calf_raise",
@@ -333,13 +344,9 @@
         "rack",
         "barbell"
       ],
-      "rm": {
-        "1": 185.5,
-        "3": 168.5,
-        "5": 159,
-        "8": 146.5,
-        "10": 139
-      }
+      "muscleGroups": [
+        "calf"
+      ]
     },
     {
       "key": "plank",
@@ -354,7 +361,9 @@
       "equipment": [
         "bodyweight"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "core"
+      ]
     },
     {
       "key": "ab_wheel",
@@ -370,7 +379,9 @@
       "equipment": [
         "ab_wheel"
       ],
-      "rm": {}
+      "muscleGroups": [
+        "core"
+      ]
     }
   ]
 }

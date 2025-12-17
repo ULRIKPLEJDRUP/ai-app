@@ -1,0 +1,15 @@
+{
+  "username": "",
+  "gender": "",
+  "age": "",
+  "bodyType": "",
+  "weightKg": "",
+  "heightCm": "",
+  "waistCm": "",
+  "trainingExperience": "",
+  "trainingFrequency": "",
+  "profileImagePath": "",
+  "progressPhotos": [],
+  "injuries": [],
+  "injuryNotes": ""
+}

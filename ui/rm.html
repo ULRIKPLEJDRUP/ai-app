@@ -47,9 +47,44 @@
     .hide-col-10 .col-10 {
       display:none !important;
     }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    body.admin-locked [data-admin-only] {
+      pointer-events: none;
+    }
+    .rep-quick-buttons { display:flex; gap:8px; margin:6px 0 10px; flex-wrap:wrap; }
+    .rep-quick-buttons button { padding:5px 10px; font-size:12px; cursor:pointer; }
+    .metric-col input { width:110px; padding:6px; }
+    .metric-col .muted { color:#999; font-size:12px; }
+    [data-admin-toggle] {
+      margin-left: 12px;
+      padding:4px 10px;
+      font-size:12px;
+    }
+    .admin-disabled {
+      opacity:0.6;
+    }
   </style>
+  <script src="/common.js"></script>
 </head>
 <body>
+<nav class="tabs">
+  <a href="/rm" class="active">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/profiles">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
+  <a href="/profiles">skift</a>
+  <button type="button" data-admin-toggle>Admin-tilstand: låst</button>
+</div>
 
 <h1>RM – baseline</h1>
 <p class="muted">
@@ -62,6 +97,10 @@
 </p>
 
 <div class="rep-toggle-panel" id="repTogglePanel"></div>
+<div class="rep-quick-buttons">
+  <button type="button" id="onlyOneRM">Vis kun 1RM</button>
+  <button type="button" id="showAllRM">Vis alle</button>
+</div>
 <button id="togglePct" type="button">Vis % af 1RM</button>
 
 <table>
@@ -76,6 +115,8 @@
       <th class="col col-5">5RM</th>
       <th class="col col-8">8RM</th>
       <th class="col col-10">10RM</th>
+      <th class="metric-col">Max antal</th>
+      <th class="metric-col">Max tid (sek)</th>
       <th class="pct-col">10%</th>
       <th class="pct-col">20%</th>
       <th class="pct-col">30%</th>
@@ -89,15 +130,44 @@
     </tr>
   </thead>
   <tbody id="rows">
-    <tr><td colspan="19">Loader…</td></tr>
+    <tr><td colspan="21">Loader…</td></tr>
   </tbody>
 </table>
 
 <div id="status"></div>
 
 <script>
+const {
+  ensureActiveProfileId,
+  getStoredProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  withProfileParam,
+  toggleAdminMode,
+  applyAdminState,
+  isAdminMode,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+applyAdminState();
+
+const adminToggleBtn = document.querySelector("[data-admin-toggle]");
+if (adminToggleBtn) {
+  adminToggleBtn.addEventListener("click", () => {
+    toggleAdminMode();
+    applyAdminState();
+  });
+}
+
+syncActiveProfileMeta();
+
 const reps = [1,3,5,8,10];
 const pctSteps = [10,20,30,40,50,60,70,80,90,100];
+const metricColumns = [
+  { key: "count", label: "Max antal", placeholder: "antal", step: "1" },
+  { key: "time", label: "Max tid (sek)", placeholder: "sek", step: "0.1" },
+];
 let muscleCatalog = [];
 let muscleLabelMap = {};
 const repVisibilityKey = "rmRepVisibility";
@@ -141,6 +211,20 @@ function parseNumber(str) {
 function toFiniteNumber(val) {
   const n = Number(val);
   return Number.isFinite(n) ? n : null;
+}
+
+function getPctBase(rm, metrics) {
+  const baseRm = toFiniteNumber(rm?.[1]);
+  if (baseRm !== null) return baseRm;
+  if (metrics && metrics.count !== undefined) {
+    const countVal = toFiniteNumber(metrics.count);
+    if (countVal !== null) return countVal;
+  }
+  if (metrics && metrics.time !== undefined) {
+    const timeVal = toFiniteNumber(metrics.time);
+    if (timeVal !== null) return timeVal;
+  }
+  return null;
 }
 
 function loadRepVisibility() {
@@ -205,7 +289,7 @@ function applyPctVisibility() {
 }
 
 async function saveCell(exerciseKey, rep, value) {
-  const r = await fetch("/api/rm", {
+  const r = await fetch(withProfileParam("/api/rm"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ exerciseKey, rep, value })
@@ -220,6 +304,19 @@ async function saveAll(exerciseKey, rmObj) {
   for (const r of reps) {
     const v = rmObj[r] ?? null;
     await saveCell(exerciseKey, r, v);
+  }
+}
+
+async function saveMetric(exerciseKey, metric, value) {
+  const payload = { exerciseKey, metric, value };
+  const res = await fetch(withProfileParam("/api/rm-metric"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(msg || "Kunne ikke gemme måling");
   }
 }
 
@@ -280,7 +377,7 @@ function renderEquipmentCell(ex) {
           <div class="equip-summary-text">${summaryChips(list)}</div>
         </summary>
         <div class="equip-editor-body">
-          <select data-role="equipment" data-key="${ex.exerciseKey}" class="equip-select" multiple size="5">
+          <select data-role="equipment" data-admin-only="true" data-key="${ex.exerciseKey}" class="equip-select" multiple size="5">
             ${options}
           </select>
           <a href="/equipment" target="_blank" class="equip-edit-link">Rediger tags/labels</a>
@@ -304,7 +401,7 @@ function renderMuscleCell(ex) {
       const checked = selectedSet.has(opt.key) ? "checked" : "";
       return `
         <label class="muscle-option">
-          <input type="checkbox" data-role="muscle" data-key="${ex.exerciseKey}" value="${opt.key}" ${checked} />
+          <input type="checkbox" data-admin-only="true" data-role="muscle" data-key="${ex.exerciseKey}" value="${opt.key}" ${checked} />
           ${opt.label}
         </label>
       `;
@@ -323,19 +420,43 @@ function renderMuscleCell(ex) {
   `;
 }
 
-function renderPctCells(oneRM) {
+function renderPctCells(baseValue) {
   return pctSteps
     .map((pct) => {
-      if (oneRM === null) return `<td class="pct-col"></td>`;
-      const val = roundTo(oneRM * (pct / 100), 0.5);
+      if (baseValue === null) return `<td class="pct-col"></td>`;
+      const val = roundTo(baseValue * (pct / 100), 0.5);
       return `<td class="pct-col">${val}</td>`;
+    })
+    .join("");
+}
+
+function renderMetricCells(metricTypes, metricValues, exerciseKey) {
+  const types = metricTypes || {};
+  const values = metricValues || {};
+  return metricColumns
+    .map(({ key, placeholder, step }) => {
+      if (!types[key]) {
+        return `<td class="metric-col"><span class="muted">-</span></td>`;
+      }
+      const val = values[key] ?? "";
+      return `<td class="metric-col">
+        <input
+          type="number"
+          step="${step}"
+          data-metric="${key}"
+          data-key="${exerciseKey}"
+          placeholder="${placeholder}"
+          value="${val}"
+        />
+      </td>`;
     })
     .join("");
 }
 async function loadRM() {
   const tbody = document.getElementById("rows");
   try {
-    const res = await fetch("/api/rm");
+    const profileId = getStoredProfileId();
+    const res = await fetch(withProfileParam("/api/rm", profileId));
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
 
@@ -349,7 +470,7 @@ async function loadRM() {
 
     for (const ex of data) {
       const rm = ex.rm || {};
-      const oneRMValue = toFiniteNumber(rm[1]);
+      const pctBase = getPctBase(rm, ex.metrics);
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${ex.name}</td>
@@ -366,11 +487,13 @@ async function loadRM() {
             >
           </td>
         `).join("")}
-        ${renderPctCells(oneRMValue)}
+        ${renderMetricCells(ex.metricTypes, ex.metrics, ex.exerciseKey)}
+        ${renderPctCells(pctBase)}
       `;
       tbody.appendChild(tr);
     }
 
+    applyAdminState();
     setStatus("Klar ✅");
   } catch (e) {
     console.error(e);
@@ -435,6 +558,11 @@ document.addEventListener("change", async (e) => {
     e.target.matches && e.target.matches('input[data-role="muscle"]') ? e.target : null;
 
   if (muscleCheckbox) {
+    if (!isAdminMode()) {
+      setStatus("Aktivér admin-tilstand for at ændre muskelgrupper");
+      muscleCheckbox.checked = !muscleCheckbox.checked;
+      return;
+    }
     const editor = muscleCheckbox.closest(".muscle-editor");
     if (!editor) return;
     const exerciseKey = editor.dataset.key;
@@ -458,6 +586,10 @@ document.addEventListener("change", async (e) => {
     e.target.matches && e.target.matches('select[data-role="equipment"]') ? e.target : null;
 
   if (equipmentSelect) {
+    if (!isAdminMode()) {
+      setStatus("Aktivér admin-tilstand for at ændre udstyr");
+      return;
+    }
     const exerciseKey = equipmentSelect.dataset.key;
     const equipmentKeys = Array.from(equipmentSelect.selectedOptions).map((opt) => opt.value);
     try {
@@ -474,6 +606,27 @@ document.addEventListener("change", async (e) => {
     } catch (err) {
       console.error(err);
       setStatus("Gemning af udstyr fejlede ❌");
+    }
+    return;
+  }
+
+  const metricInput = e.target.matches && e.target.dataset?.metric ? e.target : null;
+  if (metricInput) {
+    const exerciseKey = metricInput.dataset.key;
+    const metric = metricInput.dataset.metric;
+    const parsed = parseNumber(metricInput.value);
+    if (Number.isNaN(parsed)) {
+      setStatus("Ugyldig værdi ❌");
+      return;
+    }
+    const value = parsed === null ? null : parsed;
+    try {
+      setStatus("Gemmer måling…");
+      await saveMetric(exerciseKey, metric, value);
+      setStatus("Måling gemt ✅");
+    } catch (err) {
+      console.error(err);
+      setStatus("Gemning af måling fejlede ❌");
     }
     return;
   }
@@ -540,6 +693,27 @@ async function init() {
         if (!target.matches || !target.matches('input[data-rep-toggle]')) return;
         const rep = Number(target.dataset.repToggle);
         repVisibility[rep] = target.checked;
+        applyRepVisibility();
+        saveRepVisibility();
+      });
+    }
+
+    const onlyBtn = document.getElementById("onlyOneRM");
+    if (onlyBtn) {
+      onlyBtn.addEventListener("click", () => {
+        reps.forEach((rep) => {
+          repVisibility[rep] = rep === 1;
+        });
+        applyRepVisibility();
+        saveRepVisibility();
+      });
+    }
+    const allBtn = document.getElementById("showAllRM");
+    if (allBtn) {
+      allBtn.addEventListener("click", () => {
+        reps.forEach((rep) => {
+          repVisibility[rep] = true;
+        });
         applyRepVisibility();
         saveRepVisibility();
       });

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Vision &amp; mål</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; background:#fafafa; }
+    h1 { margin:0 0 8px; font-size:24px; }
+    p.muted { color:#666; font-size:13px; margin:4px 0 16px; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    form { background:#fff; border:1px solid #ddd; padding:20px; max-width:760px; }
+    label { display:block; font-size:13px; color:#555; margin-bottom:4px; }
+    input, textarea, select { width:100%; padding:8px; margin-bottom:14px; font-size:14px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+    textarea { min-height:80px; resize:vertical; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; }
+    .row > div { flex:1; min-width:180px; }
+    button { padding:8px 14px; font-size:14px; cursor:pointer; }
+    .section { margin-top:16px; }
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    th, td { border:1px solid #e3e3e3; padding:8px; font-size:14px; text-align:left; }
+    th { background:#f5f5f5; }
+    .habits { margin-top:8px; }
+    .habit-card { border:1px solid #ddd; border-radius:6px; padding:10px; background:#fafafa; margin-bottom:8px; }
+    .habit-card header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    .habit-card button { padding:4px 8px; font-size:12px; }
+    #status { margin-top:12px; font-size:13px; color:#444; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    body.admin-locked [data-admin-only] { pointer-events:none; }
+    [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
+    .admin-disabled { opacity:0.6; }
+  </style>
+  <script src="/common.js"></script>
+</head>
+<body>
+
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision" class="active">Vision</a>
+  <a href="/profiles">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
+  <a href="/profiles">skift</a>
+  <button type="button" data-admin-toggle>Admin-tilstand: låst</button>
+</div>
+
+<h1>Vision &amp; mål</h1>
+<p class="muted">
+  Brug denne side til at beskrive retningen for personen og konkrete mål. Du kan hente inspiration fra
+  <a href="/profile">profilen</a> (nuværende tal), <a href="/rm">RM-tabellen</a> (styrkemål), og
+  <a href="/equipment">udstyr</a>/<a href="/muscles">muskelgrupper</a> når programmer skal bygges.
+</p>
+
+<form id="visionForm">
+  <div>
+    <label for="headline">Overordnet vision</label>
+    <input type="text" id="headline" placeholder="fx 'Stærkere og mere atletisk til sommer'">
+  </div>
+
+  <div>
+    <label for="deadline">Deadline / næste milepæl</label>
+    <input type="date" id="deadline">
+  </div>
+
+  <div>
+    <label for="motivation">Hvorfor er målet vigtigt?</label>
+    <textarea id="motivation" placeholder="Sæt ord på motivation og ønsket følelse."></textarea>
+  </div>
+
+  <div class="section">
+    <h3>Kvantitative mål</h3>
+    <p class="muted">Tallene kan kobles til oplysninger fra <a href="/profile">profilen</a> og <a href="/rm">RM</a>.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Mål</th>
+          <th>Værdi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Vægt (kg)</td>
+          <td><input type="number" step="0.1" id="targetWeight"></td>
+        </tr>
+        <tr>
+          <td>Taljemål (cm)</td>
+          <td><input type="number" step="0.1" id="targetWaist"></td>
+        </tr>
+        <tr>
+          <td>Bænkpres 1RM (kg)</td>
+          <td><input type="number" step="1" id="targetBench"></td>
+        </tr>
+        <tr>
+          <td>Squat 1RM (kg)</td>
+          <td><input type="number" step="1" id="targetSquat"></td>
+        </tr>
+        <tr>
+          <td>Dødløft 1RM (kg)</td>
+          <td><input type="number" step="1" id="targetDeadlift"></td>
+        </tr>
+        <tr>
+          <td>Kondition / andet (fx 5 km, VO2max)</td>
+          <td><input type="text" id="targetCardio" placeholder="fx 5 km på 23:00"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Vaner og fokusområder</h3>
+    <p class="muted">Notér små handlinger der støtter visionen (fx søvn, kost, ekstra mobilitet).</p>
+    <div class="habits" id="habitsList"></div>
+    <div class="row">
+      <div>
+        <label for="newHabitTitle">Ny vane</label>
+        <input type="text" id="newHabitTitle" placeholder="fx Morgenstræk">
+      </div>
+      <div>
+        <label for="newHabitCadence">Hyppighed</label>
+        <input type="text" id="newHabitCadence" placeholder="fx dagligt, 3x/uge">
+      </div>
+      <div>
+        <label for="newHabitLink">Reference / link</label>
+        <input type="text" id="newHabitLink" placeholder="valgfri URL eller note">
+      </div>
+    </div>
+    <button type="button" id="addHabitBtn">Tilføj vane</button>
+  </div>
+
+  <div class="section">
+    <h3>Noter</h3>
+    <textarea id="notes" placeholder="Andre tanker, samarbejdspartnere, inspiration fra Shred-app m.m."></textarea>
+  </div>
+
+  <button type="submit">Gem vision</button>
+  <div id="status"></div>
+</form>
+
+<script>
+const {
+  ensureActiveProfileId,
+  getStoredProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  withProfileParam,
+  toggleAdminMode,
+  applyAdminState,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+applyAdminState();
+
+const adminToggleBtn = document.querySelector("[data-admin-toggle]");
+if (adminToggleBtn) {
+  adminToggleBtn.addEventListener("click", () => {
+    toggleAdminMode();
+    applyAdminState();
+  });
+}
+
+let activeProfileId = getStoredProfileId();
+let habits = [];
+
+function setStatus(msg) {
+  document.getElementById("status").textContent = msg;
+}
+
+function renderHabits() {
+  const list = document.getElementById("habitsList");
+  if (!habits.length) {
+    list.innerHTML = "<p class='muted'>Ingen vaner endnu</p>";
+    return;
+  }
+  list.innerHTML = habits
+    .map(
+      (habit, idx) => `
+        <div class="habit-card" data-index="${idx}">
+          <header>
+            <strong>${habit.title}</strong>
+            <button type="button" data-action="remove" data-index="${idx}">Fjern</button>
+          </header>
+          <p class="muted">${habit.cadence || "Hyppighed ikke angivet"}</p>
+          ${habit.link ? `<a href="${habit.link}" target="_blank" rel="noopener">Link / note</a>` : ""}
+        </div>
+      `
+    )
+    .join("");
+}
+
+function fillForm(data) {
+  document.getElementById("headline").value = data.headline || "";
+  document.getElementById("motivation").value = data.motivation || "";
+  document.getElementById("deadline").value = data.deadline || "";
+  document.getElementById("notes").value = data.notes || "";
+  const targets = data.targets || {};
+  document.getElementById("targetWeight").value = targets.weightKg || "";
+  document.getElementById("targetWaist").value = targets.waistCm || "";
+  document.getElementById("targetBench").value = targets.benchKg || "";
+  document.getElementById("targetSquat").value = targets.squatKg || "";
+  document.getElementById("targetDeadlift").value = targets.deadliftKg || "";
+  document.getElementById("targetCardio").value = targets.cardioGoal || "";
+  habits = Array.isArray(data.habits) ? data.habits : [];
+  renderHabits();
+}
+
+async function loadVision() {
+  try {
+    setStatus("Loader vision…");
+    const currentId = getStoredProfileId();
+    activeProfileId = currentId;
+    const res = await fetch(withProfileParam("/api/vision", currentId));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    fillForm(data || {});
+    setStatus("Klar ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Kunne ikke hente vision ❌");
+  }
+}
+
+document.getElementById("addHabitBtn").addEventListener("click", () => {
+  const titleInput = document.getElementById("newHabitTitle");
+  const cadenceInput = document.getElementById("newHabitCadence");
+  const linkInput = document.getElementById("newHabitLink");
+  const title = titleInput.value.trim();
+  if (!title) {
+    setStatus("Navngiv vanen først");
+    return;
+  }
+  habits.push({
+    title,
+    cadence: cadenceInput.value.trim(),
+    link: linkInput.value.trim(),
+  });
+  titleInput.value = "";
+  cadenceInput.value = "";
+  linkInput.value = "";
+  renderHabits();
+  setStatus("Vane tilføjet (husk Gem)");
+});
+
+document.getElementById("habitsList").addEventListener("click", (e) => {
+  if (e.target.dataset?.action === "remove") {
+    const idx = Number(e.target.dataset.index);
+    habits.splice(idx, 1);
+    renderHabits();
+  }
+});
+
+document.getElementById("visionForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const payload = {
+    headline: document.getElementById("headline").value.trim(),
+    motivation: document.getElementById("motivation").value.trim(),
+    deadline: document.getElementById("deadline").value,
+    notes: document.getElementById("notes").value.trim(),
+    targets: {
+      weightKg: document.getElementById("targetWeight").value,
+      waistCm: document.getElementById("targetWaist").value,
+      benchKg: document.getElementById("targetBench").value,
+      squatKg: document.getElementById("targetSquat").value,
+      deadliftKg: document.getElementById("targetDeadlift").value,
+      cardioGoal: document.getElementById("targetCardio").value.trim(),
+    },
+    habits,
+  };
+  try {
+    setStatus("Gemmer…");
+    const res = await fetch(withProfileParam("/api/vision", activeProfileId), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(msg || "Fejl ved gem");
+    }
+    setStatus("Vision gemt ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Kunne ikke gemme vision ❌");
+  }
+});
+
+syncActiveProfileMeta()
+  .catch(() => {})
+  .finally(() => {
+    activeProfileId = getStoredProfileId();
+    loadVision();
+  });
+</script>
+
+</body>
+</html>

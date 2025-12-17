@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Profiler</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; background:#fafafa; }
+    h1 { margin:0 0 8px; font-size:22px; }
+    p.muted { color:#666; font-size:13px; margin:4px 0 16px; }
+    table { border-collapse:collapse; width:100%; max-width:700px; background:#fff; }
+    th,td { border:1px solid #ddd; padding:8px 10px; font-size:14px; text-align:left; }
+    th { background:#f5f5f5; }
+    button { padding:6px 10px; font-size:13px; cursor:pointer; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    form { background:#fff; border:1px solid #ddd; padding:16px; margin-top:20px; max-width:500px; }
+    form label { display:block; font-size:13px; color:#555; margin-bottom:4px; }
+    form input, form select { width:100%; padding:8px; font-size:14px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px; }
+    #status { margin-top:12px; font-size:13px; color:#444; }
+    .active-row { background:#eef4ff; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    body.admin-locked [data-admin-only] { pointer-events:none; }
+    [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
+  </style>
+  <script src="/common.js"></script>
+</head>
+<body>
+
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/profiles" class="active">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
+  <span>brug knapperne herunder for at skifte</span>
+  <button type="button" data-admin-toggle>Admin-tilstand: låst</button>
+</div>
+
+<h1>Profiler</h1>
+<p class="muted">
+  Brug profiler til at skifte mellem personer (dig, familie, klienter). Når du vælger en aktiv profil,
+  bruges den automatisk på siderne Profil og Vision.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:150px;">ID</th>
+      <th>Navn</th>
+      <th style="width:220px;">Handling</th>
+    </tr>
+  </thead>
+  <tbody id="profileRows">
+    <tr><td colspan="3">Loader…</td></tr>
+  </tbody>
+</table>
+
+<form id="newProfileForm">
+  <h3>Ny profil</h3>
+  <label for="profileLabel">Navn</label>
+  <input type="text" id="profileLabel" placeholder="fx Ulrik" required />
+
+  <label for="profileId">ID (valgfrit)</label>
+  <input type="text" id="profileId" placeholder="brug kun bogstaver/tal" />
+
+  <label for="cloneFrom">Kopier data fra (valgfrit)</label>
+  <select id="cloneFrom">
+    <option value="">Start tom</option>
+  </select>
+
+  <button type="submit">+ Opret profil</button>
+</form>
+
+<div id="status"></div>
+
+<script>
+const {
+  ensureActiveProfileId,
+  getStoredProfileId,
+  getStoredProfileLabel,
+  setActiveProfileMeta,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  toggleAdminMode,
+  applyAdminState,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+applyAdminState();
+
+const adminToggleBtn = document.querySelector("[data-admin-toggle]");
+if (adminToggleBtn) {
+  adminToggleBtn.addEventListener("click", () => {
+    toggleAdminMode();
+    applyAdminState();
+  });
+}
+
+let profilesData = [];
+
+function setStatus(msg) {
+  document.getElementById("status").textContent = msg || "";
+}
+
+function renderProfiles() {
+  const tbody = document.getElementById("profileRows");
+  if (!profilesData.length) {
+    tbody.innerHTML = "<tr><td colspan='3'>Ingen profiler endnu</td></tr>";
+    return;
+  }
+  const activeId = getStoredProfileId();
+  tbody.innerHTML = profilesData
+    .map(
+      (p) => `
+        <tr class="${p.id === activeId ? "active-row" : ""}">
+          <td>${p.id}</td>
+          <td>${p.label || p.id}</td>
+          <td>
+            <button type="button" data-action="set-active" data-id="${p.id}">Sæt som aktiv</button>
+            <button type="button" data-action="rename" data-id="${p.id}">Omdøb</button>
+          </td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+function renderCloneOptions() {
+  const select = document.getElementById("cloneFrom");
+  if (!select) return;
+  const options = [
+    '<option value="">Start tom</option>',
+    ...profilesData.map((p) => `<option value="${p.id}">${p.label || p.id}</option>`),
+  ];
+  select.innerHTML = options.join("");
+}
+
+async function loadProfiles() {
+  setStatus("Henter profiler…");
+  try {
+    const res = await fetch("/api/profiles");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    profilesData = await res.json();
+    renderProfiles();
+    renderCloneOptions();
+    setStatus("Klar ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Kunne ikke hente profiler ❌");
+  }
+}
+
+document.getElementById("profileRows").addEventListener("click", async (e) => {
+  const action = e.target.dataset?.action;
+  const id = e.target.dataset?.id;
+  if (!action || !id) return;
+  const profile = profilesData.find((p) => p.id === id);
+  if (action === "set-active" && profile) {
+    setActiveProfileMeta(profile.id, profile.label || profile.id);
+    updateActiveProfileBadge(profile.label || profile.id);
+    setStatus(`Aktiv profil: ${profile.label || profile.id}`);
+    renderProfiles();
+    await loadProfiles();
+  } else if (action === "rename") {
+    const currentLabel = profile?.label || id;
+    const newLabel = prompt("Nyt navn", currentLabel);
+    if (!newLabel || newLabel.trim() === currentLabel) return;
+    try {
+      setStatus("Omdøber…");
+      const res = await fetch("/api/profiles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, label: newLabel }),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      await loadProfiles();
+      if (getStoredProfileId() === id) {
+        setActiveProfileMeta(id, newLabel);
+        updateActiveProfileBadge(newLabel);
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Kunne ikke omdøbe profil ❌");
+    }
+  }
+});
+
+document.getElementById("newProfileForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const label = document.getElementById("profileLabel").value.trim();
+  const id = document.getElementById("profileId").value.trim();
+  const cloneFrom = document.getElementById("cloneFrom").value.trim();
+  if (!label) {
+    alert("Angiv et navn");
+    return;
+  }
+  try {
+    setStatus("Opretter profil…");
+    const payload = { label };
+    if (id) payload.id = id;
+    if (cloneFrom) payload.cloneFrom = cloneFrom;
+    const res = await fetch("/api/profiles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(msg || "Kunne ikke oprette");
+    }
+    const created = await res.json().catch(() => null);
+    e.target.reset();
+    await loadProfiles();
+    if (created?.id) {
+      const labelText = created.label || created.id;
+      setActiveProfileMeta(created.id, labelText);
+      updateActiveProfileBadge(labelText);
+      setStatus(`Profil oprettet og sat som aktiv: ${labelText}`);
+    } else {
+      setStatus("Profil oprettet ✅");
+    }
+  } catch (err) {
+    console.error(err);
+    setStatus("Kunne ikke oprette profil ❌");
+  }
+});
+
+syncActiveProfileMeta()
+  .catch(() => {})
+  .finally(() => {
+    loadProfiles();
+  });
+</script>
+
+</body>
+</html>
