@@ -2,10 +2,6 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 
-const app = express();
-app.use(express.json({ limit: "200mb" }));
-app.use("/uploads", express.static(UPLOAD_DIR));
-
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 const DATA_PATH = path.join(__dirname, "..", "data", "exercises.json");
 const EQUIPMENT_PATH = path.join(__dirname, "..", "data", "equipmentCatalog.json");
@@ -14,6 +10,9 @@ const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
 const AVATAR_DIR = path.join(UPLOAD_DIR, "avatar");
 const PROGRESS_DIR = path.join(UPLOAD_DIR, "progress");
 
+const app = express();
+app.use(express.json({ limit: "200mb" }));
+
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
@@ -21,6 +20,7 @@ function ensureDir(dir) {
 ensureDir(UPLOAD_DIR);
 ensureDir(AVATAR_DIR);
 ensureDir(PROGRESS_DIR);
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 function readDb() {
   try {
@@ -88,6 +88,19 @@ function absoluteFromPublic(publicPath) {
   if (!abs.startsWith(UPLOAD_DIR)) return null;
   return abs;
 }
+
+const MUSCLE_GROUP_KEYS = [
+  "shoulder",
+  "knee",
+  "lower_back",
+  "upper_back",
+  "hip",
+  "ankle",
+  "elbow",
+  "wrist",
+  "cardio",
+  "other",
+];
 
 function normalizeEquipmentEntry(entry) {
   if (!entry) return null;
@@ -212,6 +225,7 @@ app.get("/api/rm", (req, res) => {
       name: ex.name || ex.key,
       type: inferType(ex),
       equipment: Array.isArray(ex.equipment) ? ex.equipment : [],
+      muscleGroups: Array.isArray(ex.muscleGroups) ? ex.muscleGroups : [],
       rm: ex.rm || {},
     }))
     .sort((a, b) => a.name.localeCompare(b.name, "da"));
@@ -391,6 +405,29 @@ app.delete("/api/profile/progress-photo", (req, res) => {
   if (!absPath) return res.status(400).json({ error: "Ugyldig sti" });
   deleteFileIfExists(absPath);
   res.json({ ok: true });
+});
+
+app.post("/api/exercise-muscles", (req, res) => {
+  const { exerciseKey, muscles } = req.body || {};
+  if (!exerciseKey || !Array.isArray(muscles)) {
+    return res.status(400).json({ error: "Missing exerciseKey/muscles" });
+  }
+
+  const sanitized = Array.from(
+    new Set(
+      muscles
+        .map((key) => slugKey(key))
+        .filter((key) => key && MUSCLE_GROUP_KEYS.includes(key))
+    )
+  );
+
+  const db = readDb();
+  const ex = (db.exercises || []).find((x) => x.key === exerciseKey);
+  if (!ex) return res.status(404).json({ error: "Exercise not found" });
+
+  ex.muscleGroups = sanitized;
+  writeDb(db);
+  res.json({ ok: true, muscleGroups: sanitized });
 });
 
 // Gem én celle tilbage i exercises.json

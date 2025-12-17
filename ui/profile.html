@@ -169,8 +169,15 @@ function fillForm(data) {
   document.getElementById("waistCm").value = data.waistCm || "";
   document.getElementById("trainingExperience").value = data.trainingExperience || "";
   document.getElementById("trainingFrequency").value = data.trainingFrequency || "";
-  profileImagePath = data.profileImagePath || "";
-  progressPhotos = Array.isArray(data.progressPhotos) ? data.progressPhotos : [];
+  profileImagePath = data.profileImagePath || data.profileImageData || "";
+  progressPhotos = Array.isArray(data.progressPhotos)
+    ? data.progressPhotos
+        .map((p) => ({
+          date: p?.date || "",
+          path: p?.path || p?.data || "",
+        }))
+        .filter((p) => p.date && p.path)
+    : [];
   renderInjuryOptions(Array.isArray(data.injuries) ? data.injuries : []);
   document.getElementById("injuryNotes").value = data.injuryNotes || "";
   renderProfileImage();
@@ -213,7 +220,7 @@ function renderProgressPhotos() {
       (p, idx) => `
       <div class="photo-card" data-index="${idx}">
         <strong>${p.date}</strong>
-        <img src="${p.path}" alt="Progress ${p.date}" />
+        <img src="${p.path || ""}" alt="Progress ${p.date}" />
         <button type="button" data-action="remove-photo" data-index="${idx}" data-path="${p.path}">Fjern</button>
       </div>
     `

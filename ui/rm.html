@@ -27,9 +27,26 @@
     .equip-summary-text { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
     .equip-summary-empty { color:#777; font-size:12px; }
     .equip-editor-body { margin-top:10px; }
+    .muscle-cell { min-width:220px; }
+    .muscle-tags { font-size:12px; color:#555; margin-bottom:6px; display:flex; flex-wrap:wrap; gap:6px; }
+    .muscle-tag { background:#eef4ff; border:1px solid #d2e3ff; padding:4px 8px; border-radius:10px; font-size:12px; }
+    .muscle-editor summary { cursor:pointer; color:#0b72ff; font-size:12px; }
+    .muscle-options { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .muscle-option { display:flex; align-items:center; gap:4px; font-size:12px; border:1px solid #ddd; padding:4px 8px; border-radius:14px; background:#fafafa; }
     .pct-col { display:none; }
     body.show-pct .pct-col { display:table-cell; }
     #togglePct { margin: 10px 0 14px; padding:6px 12px; font-size:13px; }
+    .rep-toggle-panel { margin:12px 0; display:flex; flex-wrap:wrap; gap:8px; font-size:12px; }
+    .rep-toggle-panel label { display:flex; align-items:center; gap:4px; border:1px solid #ddd; padding:4px 8px; border-radius:12px; background:#fff; }
+    .rep-toggle-panel input { width:auto; }
+    .col { transition:opacity 0.2s ease; }
+    .hide-col-1 .col-1,
+    .hide-col-3 .col-3,
+    .hide-col-5 .col-5,
+    .hide-col-8 .col-8,
+    .hide-col-10 .col-10 {
+      display:none !important;
+    }
   </style>
 </head>
 <body>
@@ -44,6 +61,7 @@
   Udstyr redigeres nu på <a href="/equipment" target="_blank">/equipment</a>.
 </p>
 
+<div class="rep-toggle-panel" id="repTogglePanel"></div>
 <button id="togglePct" type="button">Vis % af 1RM</button>
 
 <table>
@@ -52,11 +70,12 @@
       <th>Øvelse</th>
       <th>Type</th>
       <th>Udstyr / tags</th>
-      <th>1RM</th>
-      <th>3RM</th>
-      <th>5RM</th>
-      <th>8RM</th>
-      <th>10RM</th>
+      <th>Muskelgrupper</th>
+      <th class="col col-1">1RM</th>
+      <th class="col col-3">3RM</th>
+      <th class="col col-5">5RM</th>
+      <th class="col col-8">8RM</th>
+      <th class="col col-10">10RM</th>
       <th class="pct-col">10%</th>
       <th class="pct-col">20%</th>
       <th class="pct-col">30%</th>
@@ -70,7 +89,7 @@
     </tr>
   </thead>
   <tbody id="rows">
-    <tr><td colspan="18">Loader…</td></tr>
+    <tr><td colspan="19">Loader…</td></tr>
   </tbody>
 </table>
 
@@ -79,6 +98,21 @@
 <script>
 const reps = [1,3,5,8,10];
 const pctSteps = [10,20,30,40,50,60,70,80,90,100];
+const muscleOptionsData = [
+  { key: "shoulder", label: "Skulder" },
+  { key: "knee", label: "Knæ" },
+  { key: "lower_back", label: "Nedre ryg" },
+  { key: "upper_back", label: "Øvre ryg/nakke" },
+  { key: "hip", label: "Hofte" },
+  { key: "ankle", label: "Ankel/fod" },
+  { key: "elbow", label: "Albue" },
+  { key: "wrist", label: "Håndled" },
+  { key: "cardio", label: "Kredsløb/lunger" },
+  { key: "other", label: "Andet" },
+];
+const muscleLabelMap = Object.fromEntries(muscleOptionsData.map((m) => [m.key, m.label]));
+const repVisibilityKey = "rmRepVisibility";
+let repVisibility = { 1: true, 3: true, 5: true, 8: true, 10: true };
 let equipmentCatalog = [];
 let equipmentMap = new Map();
 let showPctColumns = false;
@@ -118,6 +152,58 @@ function parseNumber(str) {
 function toFiniteNumber(val) {
   const n = Number(val);
   return Number.isFinite(n) ? n : null;
+}
+
+function loadRepVisibility() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(repVisibilityKey) || "{}");
+    if (stored && typeof stored === "object") {
+      repVisibility = { ...repVisibility, ...stored };
+    }
+  } catch {}
+}
+
+function saveRepVisibility() {
+  try {
+    localStorage.setItem(repVisibilityKey, JSON.stringify(repVisibility));
+  } catch {}
+}
+
+function applyRepVisibility() {
+  for (const rep of reps) {
+    const hidden = repVisibility[rep] === false;
+    document.body.classList.toggle(`hide-col-${rep}`, hidden);
+  }
+  const panel = document.getElementById("repTogglePanel");
+  if (panel) {
+    for (const input of panel.querySelectorAll('input[data-rep-toggle]')) {
+      const rep = Number(input.dataset.repToggle);
+      input.checked = repVisibility[rep] !== false;
+    }
+  }
+}
+
+function renderRepTogglePanel() {
+  const panel = document.getElementById("repTogglePanel");
+  if (!panel) return;
+  panel.innerHTML = reps
+    .map(
+      (rep) => `
+        <label>
+          <input type="checkbox" data-rep-toggle="${rep}" ${repVisibility[rep] === false ? "" : "checked"} />
+          Vis ${rep === 1 ? "1RM" : rep + "RM"}
+        </label>
+      `
+    )
+    .join("");
+}
+
+function muscleChips(list) {
+  if (!list.length) return `<span class="muted">Ingen valgt</span>`;
+  return list
+    .map((key) => muscleLabelMap[key] || key)
+    .map((label) => `<span class="muscle-tag">${label}</span>`)
+    .join("");
 }
 
 function applyPctVisibility() {
@@ -215,6 +301,33 @@ function renderEquipmentCell(ex) {
   `;
 }
 
+function renderMuscleCell(ex) {
+  const list = Array.isArray(ex.muscleGroups) ? ex.muscleGroups : [];
+  const selectedSet = new Set(list);
+  const options = muscleOptionsData
+    .map((opt) => {
+      const checked = selectedSet.has(opt.key) ? "checked" : "";
+      return `
+        <label class="muscle-option">
+          <input type="checkbox" data-role="muscle" data-key="${ex.exerciseKey}" value="${opt.key}" ${checked} />
+          ${opt.label}
+        </label>
+      `;
+    })
+    .join("");
+  return `
+    <td class="muscle-cell">
+      <div class="muscle-tags">${muscleChips(list)}</div>
+      <details class="muscle-editor" data-key="${ex.exerciseKey}">
+        <summary>Rediger muskelgrupper</summary>
+        <div class="muscle-options">
+          ${options}
+        </div>
+      </details>
+    </td>
+  `;
+}
+
 function renderPctCells(oneRM) {
   return pctSteps
     .map((pct) => {
@@ -234,7 +347,7 @@ async function loadRM() {
     tbody.innerHTML = "";
 
     if (!data.length) {
-      tbody.innerHTML = "<tr><td colspan='18'>Ingen data</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='19'>Ingen data</td></tr>";
       setStatus("Tom liste");
       return;
     }
@@ -247,8 +360,9 @@ async function loadRM() {
         <td>${ex.name}</td>
         <td>${ex.type || ""}</td>
         ${renderEquipmentCell(ex)}
+        ${renderMuscleCell(ex)}
         ${reps.map(r => `
-          <td>
+          <td class="col col-${r}">
             <input
               value="${rm[r] ?? ""}"
               data-key="${ex.exerciseKey}"
@@ -265,7 +379,7 @@ async function loadRM() {
     setStatus("Klar ✅");
   } catch (e) {
     console.error(e);
-    tbody.innerHTML = "<tr><td colspan='18'>Fejl ved hentning</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='19'>Fejl ved hentning</td></tr>";
     setStatus("Fejl ❌");
   }
 }
@@ -295,7 +409,42 @@ async function saveEquipmentSelection(exerciseKey, equipmentKeys) {
   }
 }
 
+async function saveMuscleSelection(exerciseKey, muscles) {
+  const res = await fetch("/api/exercise-muscles", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ exerciseKey, muscles }),
+  });
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error("Kunne ikke gemme muskelgrupper: " + msg);
+  }
+}
+
 document.addEventListener("change", async (e) => {
+  const muscleCheckbox =
+    e.target.matches && e.target.matches('input[data-role="muscle"]') ? e.target : null;
+
+  if (muscleCheckbox) {
+    const editor = muscleCheckbox.closest(".muscle-editor");
+    if (!editor) return;
+    const exerciseKey = editor.dataset.key;
+    const muscles = Array.from(editor.querySelectorAll('input[data-role="muscle"]:checked')).map(
+      (el) => el.value
+    );
+    try {
+      setStatus("Gemmer muskelgrupper…");
+      await saveMuscleSelection(exerciseKey, muscles);
+      const tagsEl = editor.parentElement.querySelector(".muscle-tags");
+      if (tagsEl) tagsEl.innerHTML = muscleChips(muscles);
+      setStatus("Muskelgrupper gemt ✅");
+    } catch (err) {
+      console.error(err);
+      setStatus("Gemning af muskelgrupper fejlede ❌");
+    }
+    return;
+  }
+
   const equipmentSelect =
     e.target.matches && e.target.matches('select[data-role="equipment"]') ? e.target : null;
 
@@ -372,6 +521,21 @@ document.addEventListener("change", async (e) => {
 
 async function init() {
   try {
+    loadRepVisibility();
+    renderRepTogglePanel();
+    applyRepVisibility();
+    const repPanel = document.getElementById("repTogglePanel");
+    if (repPanel) {
+      repPanel.addEventListener("change", (event) => {
+        const target = event.target;
+        if (!target.matches || !target.matches('input[data-rep-toggle]')) return;
+        const rep = Number(target.dataset.repToggle);
+        repVisibility[rep] = target.checked;
+        applyRepVisibility();
+        saveRepVisibility();
+      });
+    }
+
     showPctColumns = (typeof localStorage !== "undefined" && localStorage.getItem("rmShowPct") === "1");
     applyPctVisibility();
     const toggleBtn = document.getElementById("togglePct");
