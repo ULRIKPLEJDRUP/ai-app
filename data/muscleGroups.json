@@ -1,15 +1,72 @@
 {
   "muscles": [
-    { "key": "shoulder", "label": "Skulder" },
-    { "key": "knee", "label": "Knæ" },
-    { "key": "lower_back", "label": "Nedre ryg" },
-    { "key": "upper_back", "label": "Øvre ryg/nakke" },
-    { "key": "hip", "label": "Hofte" },
-    { "key": "ankle", "label": "Ankel/fod" },
-    { "key": "elbow", "label": "Albue" },
-    { "key": "wrist", "label": "Håndled" },
-    { "key": "core", "label": "Core" },
-    { "key": "cardio", "label": "Kredsløb/lunger" },
-    { "key": "other", "label": "Andet" }
+    {
+      "key": "shoulder",
+      "label": "Skulder"
+    },
+    {
+      "key": "knee",
+      "label": "Knæ"
+    },
+    {
+      "key": "lower_back",
+      "label": "Nedre ryg"
+    },
+    {
+      "key": "upper_back",
+      "label": "Øvre ryg/nakke"
+    },
+    {
+      "key": "hip",
+      "label": "Hofte"
+    },
+    {
+      "key": "ankle",
+      "label": "Ankel/fod"
+    },
+    {
+      "key": "elbow",
+      "label": "Albue"
+    },
+    {
+      "key": "wrist",
+      "label": "Håndled"
+    },
+    {
+      "key": "core",
+      "label": "Core"
+    },
+    {
+      "key": "cardio",
+      "label": "Kredsløb/lunger"
+    },
+    {
+      "key": "other",
+      "label": "Andet"
+    },
+    {
+      "key": "chest",
+      "label": "Bryst"
+    },
+    {
+      "key": "biceps",
+      "label": "Biceps"
+    },
+    {
+      "key": "triceps",
+      "label": "Triceps"
+    },
+    {
+      "key": "glute",
+      "label": "Glute"
+    },
+    {
+      "key": "leg",
+      "label": "Ben"
+    },
+    {
+      "key": "calf",
+      "label": "Læg"
+    }
   ]
 }

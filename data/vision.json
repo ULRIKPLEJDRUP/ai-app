@@ -1,0 +1,26 @@
+{
+  "headline": "Tab fedt og opyg muskelmasse samt blive langt sundere med vedvarende vaner!",
+  "motivation": "Målet er vigtigt for at sikre en smukkere og sundere krop",
+  "targets": {
+    "weightKg": "82",
+    "waistCm": "",
+    "benchKg": "130",
+    "squatKg": "150",
+    "deadliftKg": "150",
+    "cardioGoal": "5 km på 22,5"
+  },
+  "habits": [
+    {
+      "title": "Vitaminer og kreatin",
+      "cadence": "Dagligt",
+      "link": ""
+    },
+    {
+      "title": "Morgenstræk",
+      "cadence": "dagligt 10 min.",
+      "link": ""
+    }
+  ],
+  "deadline": "2026-02-09",
+  "notes": ""
+}
