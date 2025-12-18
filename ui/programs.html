@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Programarkiv</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; margin:0; background:#f5f6fb; color:#10182b; }
+    h1 { margin:0 0 8px; font-size:24px; }
+    p.muted { color:#667086; font-size:13px; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:0 0 16px; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 16px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    section { background:#fff; border:1px solid #e2e6f2; border-radius:10px; padding:16px; box-shadow:0 4px 12px rgba(15,20,60,0.05); }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { border:1px solid #e4e8f5; padding:10px; font-size:13px; text-align:left; }
+    th { background:#f3f5fb; font-size:12px; letter-spacing:0.03em; text-transform:uppercase; color:#4a4f6b; }
+    .status { font-size:13px; margin-top:10px; color:#444; }
+    .tag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-size:12px; background:#e8efff; color:#102a5c; }
+    .actions { display:flex; flex-wrap:wrap; gap:6px; }
+    .actions a, .actions button { border:1px solid #d0d6ee; background:#fff; border-radius:18px; padding:6px 12px; font-size:12px; cursor:pointer; color:#1c2a4a; }
+    .actions button.danger { border-color:#f5c4c4; color:#a20000; }
+    .badge-active { background:#0b72ff; color:#fff; border-radius:999px; padding:2px 8px; font-size:11px; margin-left:8px; }
+    .empty { padding:30px 0; text-align:center; color:#5a627b; font-size:14px; }
+    .list-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .list-header button { border:none; background:#0b72ff; color:#fff; border-radius:20px; padding:8px 16px; font-size:14px; cursor:pointer; }
+    .goal-label { font-weight:600; color:#111a35; }
+    @media (max-width:720px) {
+      table, thead, tbody, th, td, tr { display:block; }
+      th { display:none; }
+      td { border:none; border-bottom:1px solid #eceff7; padding:8px 0; }
+      td::before { content: attr(data-label); font-weight:600; display:block; color:#4a4f6b; margin-bottom:4px; }
+      tr { border-bottom:1px solid #e5e8f5; margin-bottom:10px; padding-bottom:10px; }
+    }
+  </style>
+  <script src="/common.js"></script>
+</head>
+<body>
+
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/program">Programbygger</a>
+  <a href="/programs" class="active">Programarkiv</a>
+  <a href="/warmup">Opvarmning</a>
+  <a href="/execute">Eksekvering</a>
+  <a href="/profiles">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
+</div>
+
+<section>
+  <div class="list-header">
+    <div>
+      <h1>Programarkiv</h1>
+      <p class="muted">
+        Arkivet viser alle gemte programmer for den aktive profil. Brug knapperne for at redigere i Programbyggeren, sætte et program som aktivt eller fjerne det.
+      </p>
+    </div>
+    <button id="newProgramBtn">Nyt program i Programbygger</button>
+  </div>
+
+  <div id="programList"></div>
+  <div class="status" id="archiveStatus"></div>
+</section>
+
+<script>
+const {
+  ensureActiveProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  withProfileParam,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+syncActiveProfileMeta();
+
+let archiveData = { programs: [], activeProgramId: null };
+
+function formatDate(value) {
+  if (!value) return "ukendt";
+  try {
+    const d = new Date(value);
+    return d.toLocaleString("da-DK", { dateStyle: "medium", timeStyle: "short" });
+  } catch {
+    return value;
+  }
+}
+
+function renderPrograms() {
+  const container = document.getElementById("programList");
+  if (!archiveData.programs.length) {
+    container.innerHTML = `<div class="empty">Ingen programmer gemt endnu. Hop til <a href="/program">Programbyggeren</a> for at skabe dit første blueprint.</div>`;
+    return;
+  }
+  const rows = archiveData.programs
+    .map((program) => {
+      const builderLink = withProfileParam(`/program?programId=${encodeURIComponent(program.id)}`);
+      const active = archiveData.activeProgramId === program.id;
+      const statusLabel = active ? '<span class="badge-active">Aktiv</span>' : "";
+      return `
+        <tr data-id="${program.id}">
+          <td data-label="Navn">
+            <div class="goal-label">${program.name || "Uden navn"}</div>
+            ${statusLabel}
+          </td>
+          <td data-label="Mål">${program.goalLabel || "-"}</td>
+          <td data-label="Struktur">${program.structureLabel || "-"}</td>
+          <td data-label="Sidst gemt">${formatDate(program.savedAt)}</td>
+          <td data-label="Handlinger">
+            <div class="actions">
+              <a href="${builderLink}">Åbn i builder</a>
+              <button type="button" data-action="activate" data-id="${program.id}" ${active ? "disabled" : ""}>Sæt aktiv</button>
+              <button type="button" class="danger" data-action="delete" data-id="${program.id}">Slet</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+  container.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Navn</th>
+          <th>Mål</th>
+          <th>Struktur</th>
+          <th>Sidst gemt</th>
+          <th>Handlinger</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+async function loadArchive() {
+  const statusEl = document.getElementById("archiveStatus");
+  statusEl.textContent = "Indlæser programmer…";
+  try {
+    const res = await fetch(withProfileParam("/api/programs"));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (data?.profileId && data?.profileLabel) {
+      window.AppState.setActiveProfileMeta(data.profileId, data.profileLabel);
+      updateActiveProfileBadge();
+    }
+    archiveData = data || { programs: [], activeProgramId: null };
+    if (!Array.isArray(archiveData.programs)) {
+      archiveData.programs = [];
+    }
+    if (!archiveData.activeProgramId) {
+      archiveData.activeProgramId = null;
+    }
+    renderPrograms();
+    if (!archiveData.programs.length) {
+      statusEl.textContent = "Ingen programmer endnu.";
+    } else {
+      statusEl.textContent = `Viser ${archiveData.programs.length} program${archiveData.programs.length === 1 ? "" : "mer"}.`;
+    }
+  } catch (err) {
+    console.error("Kunne ikke hente programmer", err);
+    statusEl.textContent = "Kunne ikke hente programmene ❌";
+  }
+}
+
+async function activateProgram(id) {
+  const statusEl = document.getElementById("archiveStatus");
+  statusEl.textContent = "Sætter aktivt program…";
+  try {
+    const res = await fetch(withProfileParam(`/api/programs/${encodeURIComponent(id)}/activate`), {
+      method: "POST",
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    await loadArchive();
+    statusEl.textContent = "Aktivt program opdateret ✅";
+  } catch (err) {
+    console.error("Kunne ikke aktivere", err);
+    statusEl.textContent = "Kunne ikke sætte aktivt program ❌";
+  }
+}
+
+async function deleteProgram(id) {
+  if (!confirm("Vil du slette programmet? Dette kan ikke fortrydes.")) return;
+  const statusEl = document.getElementById("archiveStatus");
+  statusEl.textContent = "Sletter program…";
+  try {
+    const res = await fetch(withProfileParam(`/api/programs/${encodeURIComponent(id)}`), {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    await loadArchive();
+    statusEl.textContent = "Program slettet ✅";
+  } catch (err) {
+    console.error("Kunne ikke slette", err);
+    statusEl.textContent = "Kunne ikke slette program ❌";
+  }
+}
+
+document.getElementById("programList").addEventListener("click", (event) => {
+  const btn = event.target.closest("button[data-action]");
+  if (!btn) return;
+  const id = btn.dataset.id;
+  if (!id) return;
+  if (btn.dataset.action === "activate") {
+    activateProgram(id);
+  } else if (btn.dataset.action === "delete") {
+    deleteProgram(id);
+  }
+});
+
+document.getElementById("newProgramBtn").addEventListener("click", () => {
+  window.location.href = withProfileParam("/program");
+});
+
+loadArchive();
+</script>
+
+</body>
+</html>

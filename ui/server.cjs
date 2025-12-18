@@ -1,17 +1,20 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const { randomUUID } = require("crypto");
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 const DATA_PATH = path.join(__dirname, "..", "data", "exercises.json");
 const EQUIPMENT_PATH = path.join(__dirname, "..", "data", "equipmentCatalog.json");
 const PROFILE_PATH = path.join(__dirname, "..", "data", "profile.json");
 const VISION_PATH = path.join(__dirname, "..", "data", "vision.json");
+const WARMUP_PATH = path.join(__dirname, "..", "data", "warmupExercises.json");
 const PROFILES_DIR = path.join(__dirname, "..", "data", "profiles");
 const PROFILE_INDEX_PATH = path.join(PROFILES_DIR, "profiles.json");
 const DEFAULT_PROFILE_ID = "default";
 const DEFAULT_PROFILE_META = { id: DEFAULT_PROFILE_ID, label: "Standard" };
 const MUSCLE_PATH = path.join(__dirname, "..", "data", "muscleGroups.json");
+const PROGRAM_DIR = path.join(__dirname, "..", "data", "programs");
 const DEFAULT_MUSCLES = [
   { key: "shoulder", label: "Skulder" },
   { key: "knee", label: "Knæ" },
@@ -66,6 +69,7 @@ const DEFAULT_VISION = {
   deadline: "",
   notes: "",
 };
+const DEFAULT_PROGRAM_ARCHIVE = { activeProgramId: null, programs: [] };
 
 const app = express();
 app.use(express.json({ limit: "200mb" }));
@@ -77,6 +81,7 @@ function ensureDir(dir) {
 ensureDir(UPLOAD_DIR);
 ensureDir(AVATAR_DIR);
 ensureDir(PROGRESS_DIR);
+ensureDir(PROGRAM_DIR);
 app.use("/uploads", express.static(UPLOAD_DIR));
 
 function readDb() {
@@ -183,6 +188,124 @@ function profileRMPath(profileId = DEFAULT_PROFILE_ID) {
 
 function profileMetricsPath(profileId = DEFAULT_PROFILE_ID) {
   return path.join(profileDir(profileId), PROFILE_METRICS_FILE);
+}
+
+function programFilePath(profileId = DEFAULT_PROFILE_ID) {
+  const id = profileId || DEFAULT_PROFILE_ID;
+  return path.join(PROGRAM_DIR, `${id}.json`);
+}
+
+function guessProgramName(blueprint) {
+  if (!blueprint || typeof blueprint !== "object") return "Program";
+  if (blueprint.name) return String(blueprint.name).trim();
+  if (blueprint.programName) return String(blueprint.programName).trim();
+  if (blueprint.goal && typeof blueprint.goal === "object" && blueprint.goal.label) {
+    return `${blueprint.goal.label} program`;
+  }
+  if (blueprint.goal && blueprint.goal.key) {
+    return `${blueprint.goal.key} program`;
+  }
+  return "Program";
+}
+
+function normalizeArchiveEntry(entry) {
+  if (!entry || typeof entry !== "object") return null;
+  const id = entry.id || randomUUID();
+  const name = String(entry.name || guessProgramName(entry.blueprint)).trim() || "Program";
+  const savedAt = entry.savedAt || new Date().toISOString();
+  const blueprint = entry.blueprint && typeof entry.blueprint === "object" ? entry.blueprint : null;
+  if (!blueprint) return null;
+  return { id, name, savedAt, blueprint };
+}
+
+function writeProgramArchive(profileId = DEFAULT_PROFILE_ID, archive) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const file = programFilePath(id);
+  ensureDir(PROGRAM_DIR);
+  const safeArchive = {
+    activeProgramId: archive?.activeProgramId || null,
+    programs: Array.isArray(archive?.programs) ? archive.programs : [],
+  };
+  fs.writeFileSync(file, JSON.stringify(safeArchive, null, 2), "utf8");
+}
+
+function readProgramArchive(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const file = programFilePath(id);
+  try {
+    if (!fs.existsSync(file)) return { ...DEFAULT_PROGRAM_ARCHIVE };
+    const raw = fs.readFileSync(file, "utf8");
+    const data = JSON.parse(raw);
+    if (data && typeof data === "object" && Array.isArray(data.programs)) {
+      const programs = data.programs
+        .map((entry) => normalizeArchiveEntry(entry))
+        .filter(Boolean);
+      const archive = {
+        activeProgramId: data.activeProgramId || (programs[0] ? programs[0].id : null),
+        programs,
+      };
+      if (archive.activeProgramId && !programs.some((p) => p.id === archive.activeProgramId)) {
+        archive.activeProgramId = programs[0] ? programs[0].id : null;
+      }
+      return archive;
+    }
+    if (data && typeof data === "object") {
+      const legacyBlueprint = data;
+      if (Object.keys(legacyBlueprint).length) {
+        const legacyEntry = normalizeArchiveEntry({
+          id: randomUUID(),
+          name: guessProgramName(legacyBlueprint),
+          savedAt: legacyBlueprint.savedAt || new Date().toISOString(),
+          blueprint: legacyBlueprint,
+        });
+        if (legacyEntry) {
+          const archive = {
+            activeProgramId: legacyEntry.id,
+            programs: [legacyEntry],
+          };
+          writeProgramArchive(id, archive);
+          return archive;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Kunne ikke læse program-arkiv", err);
+  }
+  return { ...DEFAULT_PROGRAM_ARCHIVE };
+}
+
+function summarizeProgram(entry) {
+  if (!entry) return null;
+  const goalKey =
+    entry.blueprint && entry.blueprint.goal ? entry.blueprint.goal.key || "" : "";
+  const structureKey =
+    entry.blueprint && entry.blueprint.structure ? entry.blueprint.structure.key || "" : "";
+  return {
+    id: entry.id,
+    name: entry.name,
+    savedAt: entry.savedAt,
+    goalKey,
+    structureKey,
+    goalLabel:
+      entry.blueprint && entry.blueprint.goal ? entry.blueprint.goal.label || goalKey : goalKey,
+    structureLabel:
+      entry.blueprint && entry.blueprint.structure
+        ? entry.blueprint.structure.label || structureKey
+        : structureKey,
+  };
+}
+
+function getProfileMeta(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  const list = readProfileIndex();
+  return (
+    list.find((meta) => meta.id === id) || {
+      id,
+      label: DEFAULT_PROFILE_META.label,
+    }
+  );
 }
 
 function ensureProfileIndex() {
@@ -409,6 +532,26 @@ function equipmentKeySet() {
   return new Set(readEquipmentCatalog().map((item) => item.key));
 }
 
+function readWarmupCatalog() {
+  try {
+    if (!fs.existsSync(WARMUP_PATH)) {
+      writeWarmupCatalog([]);
+      return [];
+    }
+    const raw = fs.readFileSync(WARMUP_PATH, "utf8");
+    const data = JSON.parse(raw);
+    return Array.isArray(data?.exercises) ? data.exercises : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeWarmupCatalog(items) {
+  const payload = { exercises: Array.isArray(items) ? items : [] };
+  fs.mkdirSync(path.dirname(WARMUP_PATH), { recursive: true });
+  fs.writeFileSync(WARMUP_PATH, JSON.stringify(payload, null, 2), "utf8");
+}
+
 function readMuscleCatalog() {
   try {
     if (!fs.existsSync(MUSCLE_PATH)) {
@@ -498,6 +641,84 @@ function writeVision(profileId = DEFAULT_PROFILE_ID, vision) {
   fs.writeFileSync(visionFilePath(id), JSON.stringify(vision, null, 2), "utf8");
 }
 
+function readProgramBlueprint(profileId = DEFAULT_PROFILE_ID) {
+  const archive = readProgramArchive(profileId);
+  if (!archive.programs.length) return null;
+  let entry = archive.programs.find((p) => p.id === archive.activeProgramId);
+  if (!entry) entry = archive.programs[0];
+  if (!entry) return null;
+  return {
+    ...entry.blueprint,
+    programId: entry.id,
+    programName: entry.name,
+    savedAt: entry.savedAt,
+  };
+}
+
+function writeProgramBlueprint(profileId = DEFAULT_PROFILE_ID, blueprint) {
+  const archive = readProgramArchive(profileId);
+  if (!blueprint) {
+    writeProgramArchive(profileId, { ...DEFAULT_PROGRAM_ARCHIVE });
+    return null;
+  }
+  const updatedBlueprint = { ...blueprint, savedAt: blueprint.savedAt || new Date().toISOString() };
+  updatedBlueprint.programName = guessProgramName(updatedBlueprint);
+  let targetId = archive.activeProgramId;
+  if (!targetId && archive.programs.length) {
+    targetId = archive.programs[0].id;
+  }
+  if (!targetId) {
+    targetId = randomUUID();
+    archive.programs.push({
+      id: targetId,
+      name: updatedBlueprint.programName,
+      savedAt: updatedBlueprint.savedAt,
+      blueprint: updatedBlueprint,
+    });
+    archive.activeProgramId = targetId;
+  } else {
+    const idx = archive.programs.findIndex((p) => p.id === targetId);
+    if (idx >= 0) {
+      archive.programs[idx] = {
+        ...archive.programs[idx],
+        name: updatedBlueprint.programName,
+        savedAt: updatedBlueprint.savedAt,
+        blueprint: updatedBlueprint,
+      };
+    } else {
+      archive.programs.push({
+        id: targetId,
+        name: updatedBlueprint.programName,
+        savedAt: updatedBlueprint.savedAt,
+        blueprint: updatedBlueprint,
+      });
+      archive.activeProgramId = targetId;
+    }
+  }
+  writeProgramArchive(profileId, archive);
+  return archive.programs.find((p) => p.id === targetId) || null;
+}
+
+function getProgramEntry(profileId = DEFAULT_PROFILE_ID, programId) {
+  if (!programId) return null;
+  const archive = readProgramArchive(profileId);
+  return archive.programs.find((entry) => entry.id === programId) || null;
+}
+
+function sanitizeProgramSavePayload(body) {
+  if (!body || typeof body !== "object") throw new Error("Payload mangler");
+  const programId = body.programId ? String(body.programId).trim() || null : null;
+  const setActive = Boolean(body.setActive);
+  const nameInput = String(body.name || "").trim();
+  const blueprint = body.blueprint && typeof body.blueprint === "object" ? body.blueprint : body;
+  if (!blueprint || typeof blueprint !== "object" || !blueprint.goal || !blueprint.structure) {
+    throw new Error("Blueprint mangler mål og struktur");
+  }
+  const name =
+    nameInput || guessProgramName(blueprint) || (blueprint.goal?.label || "Program");
+  return { programId, setActive, name, blueprint };
+}
+
 function inferType(ex) {
   if (ex.type) return ex.type;
   const tags = ex.tags || [];
@@ -541,6 +762,77 @@ app.get("/api/muscles", (req, res) => {
     return (a.label || a.key).localeCompare(b.label || b.key, "da");
   });
   res.json(catalog);
+});
+
+function normalizeWarmupPayload(body) {
+  const key = slugKey(body?.key || body?.name);
+  if (!key) throw new Error("Key/navn er påkrævet");
+  const name = String(body?.name || body?.label || key).trim();
+  const type = String(body?.type || "").trim();
+  let equipment = [];
+  if (Array.isArray(body?.equipment)) {
+    equipment = body.equipment.map((eq) => slugKey(eq) || "").filter(Boolean);
+  } else if (typeof body?.equipment === "string") {
+    equipment = body.equipment
+      .split(",")
+      .map((eq) => slugKey(eq))
+      .filter(Boolean);
+  }
+  const reps = body?.reps === "" || body?.reps === null ? null : Number(body?.reps);
+  const timeSeconds =
+    body?.timeSeconds === "" || body?.timeSeconds === null ? null : Number(body?.timeSeconds);
+  const durationSeconds =
+    body?.durationSeconds === "" || body?.durationSeconds === null
+      ? null
+      : Number(body?.durationSeconds);
+  const sets =
+    body?.sets === "" || body?.sets === null || body?.sets === undefined
+      ? null
+      : Number(body?.sets);
+  const restSeconds =
+    body?.restSeconds === "" || body?.restSeconds === null || body?.restSeconds === undefined
+      ? null
+      : Number(body?.restSeconds);
+  return {
+    key,
+    name,
+    type,
+    equipment,
+    reps: Number.isFinite(reps) ? reps : null,
+    timeSeconds: Number.isFinite(timeSeconds) ? timeSeconds : null,
+    durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : null,
+    sets: Number.isFinite(sets) ? Math.max(1, Math.round(sets)) : null,
+    restSeconds: Number.isFinite(restSeconds) ? Math.max(0, restSeconds) : null,
+  };
+}
+
+app.get("/api/warmup", (req, res) => {
+  const list = readWarmupCatalog().sort((a, b) => (a.name || a.key).localeCompare(b.name || b.key, "da"));
+  res.json(list);
+});
+
+app.post("/api/warmup", (req, res) => {
+  try {
+    const payload = normalizeWarmupPayload(req.body || {});
+    const current = readWarmupCatalog();
+    const idx = current.findIndex((item) => item.key === payload.key);
+    if (idx >= 0) current[idx] = { ...current[idx], ...payload };
+    else current.push(payload);
+    writeWarmupCatalog(current);
+    res.json(payload);
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Ugyldigt opvarmningsdata" });
+  }
+});
+
+app.delete("/api/warmup/:key", (req, res) => {
+  const key = slugKey(req.params.key);
+  if (!key) return res.status(400).json({ error: "Key mangler" });
+  const list = readWarmupCatalog();
+  const filtered = list.filter((item) => item.key !== key);
+  if (filtered.length === list.length) return res.status(404).json({ error: "Øvelse findes ikke" });
+  writeWarmupCatalog(filtered);
+  res.json({ ok: true });
 });
 
 function normalizeEquipmentPayload(body) {
@@ -767,6 +1059,122 @@ app.post("/api/vision", (req, res) => {
   }
 });
 
+app.get("/api/program-blueprint", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  const blueprint = readProgramBlueprint(meta.id);
+  res.json({
+    profileId: meta.id,
+    profileLabel: meta.label,
+    activeProgramId: blueprint?.programId || null,
+    blueprint,
+  });
+});
+
+app.post("/api/program-blueprint", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  const payload = req.body && typeof req.body === "object" ? req.body : null;
+  if (!payload || !payload.goal || !payload.structure) {
+    return res.status(400).json({ error: "Blueprint mangler mål og struktur" });
+  }
+  const toSave = {
+    ...payload,
+    savedAt: payload.savedAt || new Date().toISOString(),
+  };
+  writeProgramBlueprint(meta.id, toSave);
+  res.json({ ok: true, profileId: meta.id, profileLabel: meta.label, blueprint: toSave });
+});
+
+app.get("/api/programs", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  const archive = readProgramArchive(meta.id);
+  res.json({
+    profileId: meta.id,
+    profileLabel: meta.label,
+    activeProgramId: archive.activeProgramId,
+    programs: archive.programs.map((entry) => summarizeProgram(entry)),
+  });
+});
+
+app.get("/api/programs/:programId", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  const entry = getProgramEntry(meta.id, req.params.programId);
+  if (!entry) return res.status(404).json({ error: "Program findes ikke" });
+  res.json({ profileId: meta.id, profileLabel: meta.label, program: entry });
+});
+
+app.post("/api/programs", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  try {
+    const payload = sanitizeProgramSavePayload(req.body || {});
+    const archive = readProgramArchive(meta.id);
+    const now = new Date().toISOString();
+    const id = payload.programId || randomUUID();
+    const entry = {
+      id,
+      name: payload.name,
+      savedAt: now,
+      blueprint: { ...payload.blueprint, savedAt: now, programName: payload.name },
+    };
+    const idx = archive.programs.findIndex((p) => p.id === id);
+    if (idx >= 0) archive.programs[idx] = entry;
+    else archive.programs.push(entry);
+    if (payload.setActive || !archive.activeProgramId) {
+      archive.activeProgramId = id;
+    }
+    writeProgramArchive(meta.id, archive);
+    res.json({
+      ok: true,
+      profileId: meta.id,
+      activeProgramId: archive.activeProgramId,
+      program: entry,
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Kunne ikke gemme program" });
+  }
+});
+
+app.delete("/api/programs/:programId", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  const archive = readProgramArchive(meta.id);
+  const id = req.params.programId;
+  const idx = archive.programs.findIndex((p) => p.id === id);
+  if (idx < 0) return res.status(404).json({ error: "Program findes ikke" });
+  archive.programs.splice(idx, 1);
+  if (archive.activeProgramId === id) {
+    archive.activeProgramId = archive.programs[0] ? archive.programs[0].id : null;
+  }
+  writeProgramArchive(meta.id, archive);
+  res.json({
+    ok: true,
+    profileId: meta.id,
+    activeProgramId: archive.activeProgramId,
+    programs: archive.programs.map((entry) => summarizeProgram(entry)),
+  });
+});
+
+app.post("/api/programs/:programId/activate", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const meta = getProfileMeta(profileId);
+  const archive = readProgramArchive(meta.id);
+  const id = req.params.programId;
+  if (!archive.programs.some((p) => p.id === id)) {
+    return res.status(404).json({ error: "Program findes ikke" });
+  }
+  archive.activeProgramId = id;
+  writeProgramArchive(meta.id, archive);
+  res.json({
+    ok: true,
+    profileId: meta.id,
+    activeProgramId: archive.activeProgramId,
+  });
+});
+
 app.post("/api/profile/avatar", express.raw({ limit: "50mb", type: "*/*" }), (req, res) => {
   const profileId = getProfileIdFromRequest(req);
   const originalName = req.headers["x-filename"] || "avatar";
@@ -967,6 +1375,22 @@ app.get("/profiles", (req, res) => {
 
 app.get("/vision", (req, res) => {
   res.sendFile(path.join(__dirname, "vision.html"));
+});
+
+app.get("/program", (req, res) => {
+  res.sendFile(path.join(__dirname, "program.html"));
+});
+
+app.get("/programs", (req, res) => {
+  res.sendFile(path.join(__dirname, "programs.html"));
+});
+
+app.get("/execute", (req, res) => {
+  res.sendFile(path.join(__dirname, "execute.html"));
+});
+
+app.get("/warmup", (req, res) => {
+  res.sendFile(path.join(__dirname, "warmup.html"));
 });
 
 app.listen(PORT, () => {

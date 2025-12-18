@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Program – eksekvering</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; background:#f5f6fb; color:#1b1f2b; }
+    h1 { margin:0 0 8px; font-size:24px; }
+    p.muted { color:#666; font-size:13px; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    .layout { display:grid; grid-template-columns: 3fr 1fr; gap:18px; }
+    section { background:#fff; border:1px solid #e0e0f4; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 4px 12px rgba(10,20,60,0.05); }
+    section h2 { margin:0 0 10px; font-size:18px; }
+    .control-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+    label { display:block; font-size:12px; color:#4a4e66; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+    select, input[type="number"] { width:100%; padding:8px; font-size:14px; border:1px solid #cfd5ea; border-radius:8px; }
+    .session-buttons { display:flex; flex-wrap:wrap; gap:8px; }
+    .session-buttons button { padding:8px 14px; border:1px solid #ccd7ef; border-radius:20px; background:#fff; cursor:pointer; font-size:13px; }
+    .session-buttons button.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { border:1px solid #e5e8f5; padding:8px; font-size:13px; text-align:left; }
+    th { background:#f3f5fb; font-size:12px; text-transform:uppercase; letter-spacing:0.03em; color:#495169; }
+    .time-control { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    input[type="range"] { flex:1; }
+    .time-status { margin-top:8px; font-size:13px; }
+    .notes-list { margin:8px 0 0; padding-left:18px; font-size:13px; }
+    .notes-list li { margin-bottom:4px; }
+    .summary { background:#111529; color:#fff; border-radius:12px; padding:18px; position:sticky; top:20px; }
+    .summary h2 { margin-top:0; color:#fff; }
+    .summary p, .summary li { color:#cfd6ff; font-size:13px; }
+    .hidden { display:none; }
+    .badge { display:inline-flex; align-items:center; gap:6px; background:#eef3ff; border-radius:999px; padding:4px 10px; font-size:12px; color:#1c2b55; margin-right:8px; }
+    .warning { color:#a20000; font-weight:600; }
+    .session-note { background:#f8f9ff; border-left:3px solid #0b72ff; padding:10px; border-radius:8px; font-size:13px; color:#3b4060; margin-top:12px; }
+    .warmup-banner { background:#fff4e5; border:1px solid #ffd9b3; border-radius:8px; padding:10px; margin:12px 0; font-size:13px; color:#7a4b00; display:flex; gap:10px; align-items:center; }
+    .warmup-banner strong { font-size:14px; }
+    .warmup-plan { background:#fff; border:1px solid #f6d9b7; border-radius:8px; padding:10px; margin-bottom:12px; }
+    .warmup-plan ul { margin:8px 0 0; padding-left:18px; font-size:13px; color:#4a3b24; }
+    .warmup-plan li { margin-bottom:4px; }
+    .warmup-equip { font-size:12px; color:#7a4b00; }
+  </style>
+  <script src="/common.js"></script>
+</head>
+<body>
+
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/program">Programbygger</a>
+  <a href="/programs">Programarkiv</a>
+  <a href="/warmup">Opvarmning</a>
+  <a href="/execute" class="active">Eksekvering</a>
+  <a href="/profiles">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
+</div>
+
+<h1>Eksekvering af program</h1>
+<p class="muted">
+  Vælg uge, dag og tilgængelig tid – så justeres sættene automatisk for at matche tidsbudgettet og dine registrerede RM-tal.
+</p>
+
+<section id="emptyState" class="">
+  <h2>Intet blueprint fundet</h2>
+  <p>
+    Vi kunne ikke finde et aktivt blueprint for profilen
+    <strong data-empty-profile>ukendt</strong>. Hop til
+    <a href="/program">Programbyggeren</a> og gem et program eller brug
+    <a href="/programs">Programarkivet</a> til at aktivere et tidligere blueprint.
+  </p>
+</section>
+
+<div id="executionPanel" class="hidden">
+  <div class="layout">
+    <div>
+      <section>
+        <h2>Planvalg</h2>
+        <div class="control-grid">
+          <div>
+            <label for="weekSelect">Uge</label>
+            <select id="weekSelect"></select>
+          </div>
+          <div>
+            <label for="timeInput">Tilgængelig tid (minutter)</label>
+            <div class="time-control">
+              <input type="number" id="timeInput" min="20" max="120" step="5" />
+              <input type="range" id="timeSlider" min="20" max="120" step="5" />
+            </div>
+          </div>
+        </div>
+        <div class="session-note" id="sessionSummary">Vælg en dag for at se plan.</div>
+        <div class="session-buttons" id="sessionButtons"></div>
+      </section>
+
+      <section>
+        <h2 id="sessionTitle">Session</h2>
+        <div class="warmup-banner">
+          <strong>Fast opvarmning</strong>
+          <span>Der er altid indlagt 10 minutters generel opvarmning før programmet.</span>
+        </div>
+        <div class="warmup-plan" id="warmupPlan">
+          <strong>Opvarmningsforslag:</strong>
+          <p class="muted">Indlæser øvelser…</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Øvelse</th>
+              <th>Sæt × Reps</th>
+              <th>Forslag (kg)</th>
+              <th>Est. tid</th>
+              <th>Noter</th>
+            </tr>
+          </thead>
+          <tbody id="planRows">
+            <tr><td colspan="5">Vælg dag…</td></tr>
+          </tbody>
+        </table>
+        <div class="time-status" id="timeStatus"></div>
+        <div>
+          <strong>Justeringer</strong>
+          <ul class="notes-list" id="adjustNotes"></ul>
+        </div>
+      </section>
+    </div>
+
+    <aside class="summary" id="blueprintSummary">
+      <h2>Blueprint</h2>
+      <p>Indlæser…</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+const {
+  ensureActiveProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  getStoredProfileId,
+  getStoredProfileLabel,
+  withProfileParam,
+  setActiveProfileMeta,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+syncActiveProfileMeta();
+
+const SESSION_TEMPLATES = {
+  upper_lower: ["Upper A", "Lower A", "Upper B", "Lower B"],
+  push_pull_legs: ["Push", "Pull", "Legs", "Push", "Pull", "Legs"],
+  full_body: ["Full body A", "Full body B", "Full body C"],
+  power4: ["ME Upper", "ME Lower", "DE Upper", "DE Lower"],
+  full_power: ["Full A", "Full B", "Full C"],
+  polar4: ["Zone 2", "Intervals", "Zone 2 Long", "Threshold"],
+  tri_split: ["Swim", "Bike", "Run", "Brick"],
+};
+
+const EXECUTION_PRESETS = {
+  hypertrophy: {
+    label: "Hypertrofi",
+    defaultMinutes: 65,
+    repText: { compound: "6-10 reps", isolation: "10-15 reps", default: "8-12 reps" },
+    targetReps: { compound: 8, isolation: 12, default: 10 },
+    baseSets: { compound: 4, isolation: 3, default: 3 },
+    minSets: { compound: 2, isolation: 1, default: 1 },
+    minutesPerSet: { compound: 3.5, isolation: 2.5, default: 3 },
+    loadPct: { compound: 0.72, isolation: 0.65, default: 0.7 },
+  },
+  strength: {
+    label: "Maksimal styrke",
+    defaultMinutes: 70,
+    repText: { compound: "3-5 reps", isolation: "8-10 reps", default: "3-5 reps" },
+    targetReps: { compound: 4, isolation: 8, default: 4 },
+    baseSets: { compound: 5, isolation: 3, default: 4 },
+    minSets: { compound: 3, isolation: 1, default: 2 },
+    minutesPerSet: { compound: 4, isolation: 3, default: 3.5 },
+    loadPct: { compound: 0.87, isolation: 0.7, default: 0.8 },
+  },
+  conditioning: {
+    label: "Kondition",
+    defaultMinutes: 55,
+    repText: { default: "Tidsblok / intervaller" },
+    targetReps: { default: 12 },
+    baseSets: { default: 4 },
+    minSets: { default: 1 },
+    minutesPerSet: { default: 3 },
+    loadPct: { default: 0.6 },
+  },
+  default: {
+    label: "Generel",
+    defaultMinutes: 60,
+    repText: { default: "8-12 reps" },
+    targetReps: { default: 10 },
+    baseSets: { default: 3 },
+    minSets: { default: 1 },
+    minutesPerSet: { default: 3 },
+    loadPct: { default: 0.7 },
+  },
+};
+
+const WARMUP_MINUTES = 10;
+const MAX_WARMUP_EXERCISES = 6;
+const REST_BETWEEN_EXERCISES = 12;
+const DEFAULT_SET_REST = 5;
+
+let blueprint = null;
+let sessionLabels = [];
+let rmRows = [];
+let rmMap = {};
+let currentSessionIndex = 0;
+let currentWeek = 1;
+let availableMinutes = 60;
+let warmupCatalog = [];
+let equipmentMap = {};
+
+initExecution();
+
+async function initExecution() {
+  updateActiveProfileBadge();
+  currentSessionIndex = 0;
+  currentWeek = 1;
+  blueprint = await fetchBlueprintFromServer();
+  if (blueprint) {
+    persistLocalBlueprint(blueprint);
+  } else {
+    blueprint = loadBlueprintFromLocal();
+  }
+
+  if (!blueprint) {
+    const emptyLabelEl = document.querySelector("[data-empty-profile]");
+    if (emptyLabelEl) {
+      emptyLabelEl.textContent = getStoredProfileLabel();
+    }
+    document.getElementById("emptyState").classList.remove("hidden");
+    document.getElementById("executionPanel").classList.add("hidden");
+    return;
+  }
+
+  const preset = getPreset();
+  availableMinutes = preset.defaultMinutes;
+  sessionLabels = getSessionLabels();
+
+  setupWeekSelect();
+  setupSessionButtons();
+  setupTimeControls();
+  renderBlueprintSummary();
+
+  document.getElementById("emptyState").classList.add("hidden");
+  document.getElementById("executionPanel").classList.remove("hidden");
+
+  Promise.all([loadRmData(), loadWarmupData(), loadEquipmentCatalog()])
+    .then(() => {
+      renderPlan();
+    })
+    .catch(() => renderPlan());
+}
+
+function loadBlueprintFromLocal() {
+  try {
+    const profileId = getStoredProfileId();
+    const raw = localStorage.getItem(`programBlueprint_${profileId}`);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function getPreset() {
+  return EXECUTION_PRESETS[blueprint?.goal] || EXECUTION_PRESETS.default;
+}
+
+function getSessionLabels() {
+  if (!blueprint?.structure) return ["Session A", "Session B"];
+  const labels = SESSION_TEMPLATES[blueprint.structure];
+  if (Array.isArray(labels) && labels.length) return labels;
+  return ["Session A", "Session B"];
+}
+
+function setupWeekSelect() {
+  const select = document.getElementById("weekSelect");
+  const weeks = getStructureWeeks();
+  const options = [];
+  for (let i = 1; i <= weeks; i++) {
+    options.push(`<option value="${i}">Uge ${i}</option>`);
+  }
+  select.innerHTML = options.join("");
+  select.value = "1";
+  select.onchange = () => {
+    currentWeek = Number(select.value) || 1;
+    renderPlan();
+  };
+}
+
+function setupSessionButtons() {
+  const container = document.getElementById("sessionButtons");
+  container.innerHTML = sessionLabels
+    .map((label, idx) => `<button type="button" data-session="${idx}">${label}</button>`)
+    .join("");
+  container.onclick = (event) => {
+    if (!event.target.dataset.session) return;
+    currentSessionIndex = Number(event.target.dataset.session);
+    updateSessionButtonState();
+    renderPlan();
+  };
+  updateSessionButtonState();
+}
+
+function updateSessionButtonState() {
+  document.querySelectorAll("#sessionButtons button").forEach((btn) => {
+    btn.classList.toggle("active", Number(btn.dataset.session) === currentSessionIndex);
+  });
+}
+
+function setupTimeControls() {
+  const input = document.getElementById("timeInput");
+  const slider = document.getElementById("timeSlider");
+  input.value = availableMinutes;
+  slider.value = availableMinutes;
+  input.oninput = () => {
+    availableMinutes = Number(input.value) || 45;
+    slider.value = availableMinutes;
+    renderPlan();
+  };
+  slider.oninput = () => {
+    availableMinutes = Number(slider.value) || 45;
+    input.value = availableMinutes;
+    renderPlan();
+  };
+}
+
+async function loadRmData() {
+  const res = await fetch(withProfileParam("/api/rm"));
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  rmRows = await res.json();
+  rmMap = {};
+  rmRows.forEach((row) => {
+    rmMap[row.exerciseKey] = row;
+  });
+}
+
+async function loadWarmupData() {
+  try {
+    const res = await fetch("/api/warmup");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    warmupCatalog = await res.json();
+  } catch (err) {
+    console.warn("Kunne ikke hente opvarmningsøvelser", err);
+    warmupCatalog = [];
+  }
+}
+
+async function loadEquipmentCatalog() {
+  try {
+    const res = await fetch("/api/equipment");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    equipmentMap = {};
+    data.forEach((item) => {
+      equipmentMap[item.key] = item.label || item.key;
+    });
+  } catch (err) {
+    console.warn("Kunne ikke hente udstyr", err);
+    equipmentMap = {};
+  }
+}
+
+function getStructureWeeks() {
+  const goal = blueprint?.goal && GOAL_STRUCTURES[blueprint.goal];
+  if (goal) {
+    const struct = goal.structures.find((s) => s.key === blueprint.structure);
+    if (struct?.weeks) return struct.weeks;
+  }
+  return 12;
+}
+
+const GOAL_STRUCTURES = {
+  hypertrophy: {
+    structures: [
+      { key: "upper_lower", weeks: 12 },
+      { key: "push_pull_legs", weeks: 12 },
+      { key: "full_body", weeks: 12 },
+    ],
+  },
+  strength: {
+    structures: [
+      { key: "power4", weeks: 12 },
+      { key: "full_power", weeks: 12 },
+    ],
+  },
+  conditioning: {
+    structures: [
+      { key: "polar4", weeks: 12 },
+      { key: "tri_split", weeks: 12 },
+    ],
+  },
+};
+
+async function fetchBlueprintFromServer() {
+  try {
+    const res = await fetch(withProfileParam("/api/program-blueprint"));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (data?.profileId && data?.profileLabel) {
+      setActiveProfileMeta(data.profileId, data.profileLabel);
+      updateActiveProfileBadge();
+    }
+    return data?.blueprint || null;
+  } catch (err) {
+    console.warn("Kunne ikke hente blueprint fra server", err);
+    return null;
+  }
+}
+
+function persistLocalBlueprint(bp) {
+  try {
+    const profileId = getStoredProfileId();
+    localStorage.setItem(`programBlueprint_${profileId}`, JSON.stringify(bp));
+  } catch {
+    // ignore
+  }
+}
+
+function renderBlueprintSummary() {
+  const summary = document.getElementById("blueprintSummary");
+  const preset = getPreset();
+  const goalLabel = preset.label;
+  const structureLabel = sessionLabels.length ? blueprint.structure : "Ukendt";
+  const profileLabel = getStoredProfileLabel();
+  const programName = blueprint?.programName || "Ukendt program";
+
+  const list = [
+    `<li><strong>Aktivt program:</strong> ${programName}</li>`,
+    `<li><strong>Profil:</strong> ${profileLabel}</li>`,
+    `<li><strong>Mål:</strong> ${goalLabel}</li>`,
+    `<li><strong>Struktur:</strong> ${structureLabel}</li>`,
+    `<li><strong>Uger:</strong> ${getStructureWeeks()}</li>`,
+    `<li><strong>Default tid (program):</strong> ${preset.defaultMinutes} min</li>`,
+    `<li><strong>Fast opvarmning:</strong> ${WARMUP_MINUTES} min ekstra</li>`,
+  ];
+
+  summary.innerHTML = `
+    <h2>Blueprint</h2>
+    <p>${goalLabel}</p>
+    <ul>${list.join("")}</ul>
+    <p class="muted">Blueprint gemt: ${formatDate(blueprint.savedAt)}</p>
+  `;
+}
+
+function formatDate(value) {
+  if (!value) return "ukendt";
+  try {
+    const d = new Date(value);
+    return d.toLocaleString("da-DK", { dateStyle: "medium", timeStyle: "short" });
+  } catch {
+    return value;
+  }
+}
+
+function renderPlan() {
+  if (!blueprint) return;
+  const basePlan = buildBasePlan(currentSessionIndex);
+  const adjusted = adjustPlanForTime(basePlan, availableMinutes);
+  renderPlanTable(adjusted.plan);
+  updateTimeStatus(basePlan, adjusted);
+  renderAdjustmentNotes(adjusted.notes);
+  renderSessionSummary();
+  renderWarmupPlan();
+}
+
+function buildBasePlan(index) {
+  const preset = getPreset();
+  const sessionData = (blueprint.sessions && blueprint.sessions[index]) || {};
+  let exercises = Array.isArray(sessionData.exercises) ? sessionData.exercises : [];
+  if (!exercises.length) {
+    exercises = rmRows.slice(0, 4).map((row) => ({
+      exerciseKey: row.exerciseKey,
+      name: row.name,
+      type: row.type,
+    }));
+  }
+  return exercises.map((ex) => {
+    const rmRow = rmMap[ex.exerciseKey];
+    const type = ex.type || rmRow?.type || inferTypeFromTags(rmRow);
+    const sets = pickPresetValue(preset.baseSets, type);
+    const repsText = pickPresetValue(preset.repText, type);
+    const targetReps = pickPresetValue(preset.targetReps, type);
+    const minutesPerSet = pickPresetValue(preset.minutesPerSet, type);
+    const minSets = pickPresetValue(preset.minSets, type);
+    const loadPct = pickPresetValue(preset.loadPct, type);
+    return {
+      name: ex.name || rmRow?.name || ex.exerciseKey,
+      exerciseKey: ex.exerciseKey,
+      type: type || "compound",
+      sets,
+      minSets,
+      repsText,
+      targetReps,
+      minutesPerSet,
+      loadSuggestion: formatLoadSuggestion(rmRow, targetReps, loadPct),
+      estimatedMinutes: sets * minutesPerSet,
+      note: rmRow?.metricTypes ? metricNote(rmRow.metricTypes) : "",
+      rmAvailable: Boolean(rmRow),
+    };
+  });
+}
+
+function pickPresetValue(presetSection, type) {
+  if (!presetSection) return undefined;
+  if (type && presetSection[type] !== undefined) return presetSection[type];
+  return presetSection.default !== undefined ? presetSection.default : Object.values(presetSection)[0];
+}
+
+function inferTypeFromTags(row) {
+  if (!row?.type && Array.isArray(row?.muscleGroups)) {
+    return row.muscleGroups.length > 1 ? "compound" : "isolation";
+  }
+  return row?.type || "compound";
+}
+
+function metricNote(metricTypes) {
+  if (metricTypes.count && metricTypes.time) return "Track tid og antal i RM";
+  if (metricTypes.count) return "Track max reps";
+  if (metricTypes.time) return "Track max tid";
+  return "";
+}
+
+function formatLoadSuggestion(row, reps, pct) {
+  if (!row) return "Brug RPE 7-8";
+  const rmData = row.rm;
+  const percent = pct || 0.7;
+  if (rmData) {
+    const oneRM = rmData["1"];
+    if (typeof oneRM === "number") {
+      const load = roundLoad(oneRM * percent);
+      return `${load} kg (~${Math.round(percent * 100)}% af 1RM)`;
+    }
+    const available = Object.keys(rmData);
+    if (available.length) {
+      const desired = Number(reps) || 8;
+      let bestKey = available[0];
+      let bestDiff = Math.abs(Number(bestKey) - desired);
+      for (const key of available) {
+        const diff = Math.abs(Number(key) - desired);
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          bestKey = key;
+        }
+      }
+      const value = rmData[bestKey];
+      if (typeof value === "number") {
+        return `${value} kg (@${bestKey}RM)`;
+      }
+    }
+  }
+
+  const metrics = row.metrics || {};
+  const types = row.metricTypes || {};
+  const metricPct = pctToPercent(pct);
+  if (types.count && typeof metrics.count === "number") {
+    const rec = Math.max(1, Math.round(metrics.count * metricPct));
+    return `${rec} reps (~${Math.round(metricPct * 100)}% af max ${metrics.count})`;
+  }
+  if (types.time && typeof metrics.time === "number") {
+    const seconds = Math.max(5, Math.round(metrics.time * metricPct));
+    return `${seconds} sek (~${Math.round(metricPct * 100)}% af max ${metrics.time} sek)`;
+  }
+
+  if (types.count && types.time) {
+    return "Brug seneste max tid/reps fra RM-siden";
+  }
+  if (types.count) {
+    return "Brug seneste max reps (kropsvægt)";
+  }
+  if (types.time) {
+    return "Arbejd efter max tid fra RM-siden";
+  }
+
+  return "Brug RPE 7-8";
+}
+
+function pctToPercent(value) {
+  if (!value && value !== 0) return 0.7;
+  return Number(value);
+}
+
+function roundLoad(value) {
+  return Math.round((value || 0) / 0.5) * 0.5;
+}
+
+function adjustPlanForTime(plan, minutesAvailable) {
+  const adjusted = plan.map((item) => ({ ...item }));
+  const notes = [];
+  let total = estimateTotalMinutes(adjusted);
+  const target = Number(minutesAvailable) || total;
+
+  if (total <= target) {
+    return { plan: adjusted, totalMinutes: total, notes };
+  }
+
+  const order = adjusted
+    .map((item, idx) => ({ idx, priority: item.type === "isolation" ? 1 : 2 }))
+    .sort((a, b) => a.priority - b.priority);
+
+  for (const candidate of order) {
+    const entry = adjusted[candidate.idx];
+    while (entry.sets > entry.minSets && total > target) {
+      entry.sets -= 1;
+      total -= entry.minutesPerSet;
+      notes.push(`Fjernede ét sæt fra ${entry.name}`);
+    }
+    if (total <= target) break;
+  }
+
+  if (total > target) {
+    notes.push("Nåede ikke helt tidsmålet – overvej at fjerne en øvelse eller forhåndskort huller.");
+  }
+
+  return { plan: adjusted, totalMinutes: Math.max(total, 0), notes };
+}
+
+function estimateTotalMinutes(entries) {
+  return entries.reduce((sum, item) => sum + item.sets * item.minutesPerSet, 0);
+}
+
+function renderPlanTable(entries) {
+  const tbody = document.getElementById("planRows");
+  if (!entries.length) {
+    tbody.innerHTML = `<tr><td colspan="5">Ingen øvelser valgt på blueprintet endnu. Tilføj dem på <a href="/program">Programbyggeren</a>.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = entries
+    .map((item) => `
+      <tr>
+        <td>${item.name}${item.rmAvailable ? "" : "<br><span class='warning'>Manglende RM-data</span>"}</td>
+        <td>${item.sets} sæt · ${item.repsText}</td>
+        <td>${item.loadSuggestion}</td>
+        <td>${Math.round(item.sets * item.minutesPerSet)} min</td>
+        <td>${item.note || ""}</td>
+      </tr>
+    `)
+    .join("");
+}
+
+function updateTimeStatus(basePlan, adjusted) {
+  const baseMinutes = estimateTotalMinutes(basePlan);
+  const status = document.getElementById("timeStatus");
+  const diff = Math.round((adjusted.totalMinutes - baseMinutes) * 10) / 10;
+  const totalWithWarmup = adjusted.totalMinutes + WARMUP_MINUTES;
+  status.innerHTML = `
+    Opvarmning: ${WARMUP_MINUTES} min · Program (efter tilpasning): ${Math.round(adjusted.totalMinutes)} min ·
+    Total: ${Math.round(totalWithWarmup)} min · Tilgængelig tid (program): ${availableMinutes} min
+    ${diff !== 0 ? `<span class="badge">${diff > 0 ? "+" : ""}${diff} min vs. original</span>` : ""}
+  `;
+}
+
+function renderAdjustmentNotes(notes) {
+  const list = document.getElementById("adjustNotes");
+  if (!notes.length) {
+    list.innerHTML = "<li>Ingen automatisk trimming nødvendig.</li>";
+    return;
+  }
+  list.innerHTML = notes.map((note) => `<li>${note}</li>`).join("");
+}
+
+function renderSessionSummary() {
+  const title = document.getElementById("sessionTitle");
+  const sessionName = sessionLabels[currentSessionIndex] || `Session ${currentSessionIndex + 1}`;
+  title.textContent = `${sessionName} – uge ${currentWeek}`;
+  const summary = document.getElementById("sessionSummary");
+  const sessionData = (blueprint.sessions && blueprint.sessions[currentSessionIndex]) || {};
+  const notes = sessionData.notes ? sessionData.notes.trim() : "";
+  summary.textContent = notes ? notes : "Ingen noter for denne dag endnu.";
+}
+
+function renderWarmupPlan() {
+  const container = document.getElementById("warmupPlan");
+  if (!container) return;
+  if (!warmupCatalog.length) {
+    container.innerHTML = `<strong>Opvarmningsforslag:</strong>
+      <p class="muted">Tilføj øvelser på <a href="/warmup">/warmup</a> for at få automatisk forslag.</p>`;
+    return;
+  }
+  const plan = buildWarmupPlan();
+  if (!plan.length) {
+    container.innerHTML = `<strong>Opvarmningsforslag:</strong>
+      <p class="muted">Kunne ikke generere — tilføj flere øvelser.</p>`;
+    return;
+  }
+  const listItems = plan
+    .map((item) => {
+      const detail = describeWarmupItem(item);
+      const equip = formatWarmupEquipment(item.equipment);
+      return `<li><strong>${item.name}</strong> — ${detail}${equip ? `<br><span class="warmup-equip">${equip}</span>` : ""}</li>`;
+    })
+    .join("");
+  const totalSeconds = plan.reduce((sum, item) => sum + (item.seconds || 0), 0);
+  container.innerHTML = `
+    <strong>Opvarmningsforslag:</strong>
+    <ul>${listItems}</ul>
+    <p class="muted">
+      Varighed ca. ${Math.round(totalSeconds / 60)} min (del af de 10 min). Beregning: (tid pr. sæt + pauser ${
+        DEFAULT_SET_REST
+      } sek) × antal sæt + ${REST_BETWEEN_EXERCISES} sek mellem øvelser.
+    </p>
+  `;
+}
+
+function describeWarmupItem(item) {
+  const parts = [];
+  if (item.reps) parts.push(`${item.reps} reps`);
+  if (item.timeSeconds) parts.push(`${item.timeSeconds} sek`);
+  if (item.durationSeconds) parts.push(`${Math.round(item.durationSeconds / 60)} min`);
+  const sets = item.sets && item.sets > 1 ? `${item.sets} sæt` : null;
+  if (sets) parts.push(sets);
+  if (!parts.length) return "Arbejd i eget tempo";
+  return parts.join(" · ");
+}
+
+function formatWarmupEquipment(list) {
+  if (!Array.isArray(list) || !list.length) return "";
+  return list
+    .map((key) => equipmentMap[key] || key)
+    .filter(Boolean)
+    .join(", ");
+}
+
+function buildWarmupPlan(targetMinutes = WARMUP_MINUTES) {
+  if (!warmupCatalog.length) return [];
+  const shuffled = [...warmupCatalog].sort(() => Math.random() - 0.5);
+  const plan = [];
+  let remainingSeconds = targetMinutes * 60;
+  for (const entry of shuffled) {
+    if (plan.length >= MAX_WARMUP_EXERCISES) break;
+    const seconds = estimateWarmupSeconds(entry);
+    if (!seconds) continue;
+    const withRest = seconds + (plan.length ? REST_BETWEEN_EXERCISES : 0);
+    if (remainingSeconds - withRest < -15 && plan.length) continue;
+    plan.push({ ...entry, seconds });
+    remainingSeconds -= withRest;
+    if (remainingSeconds <= 0) break;
+  }
+  return plan;
+}
+
+function estimateWarmupSeconds(entry) {
+  const perSet = Number.isFinite(entry.durationSeconds)
+    ? entry.durationSeconds
+    : Number.isFinite(entry.timeSeconds)
+    ? entry.timeSeconds
+    : Number.isFinite(entry.reps)
+    ? entry.reps * 3
+    : 60;
+  const sets = entry.sets && entry.sets > 0 ? entry.sets : 1;
+  const rest = Number.isFinite(entry.restSeconds) ? entry.restSeconds : DEFAULT_SET_REST;
+  return sets * perSet + (sets > 1 ? (sets - 1) * rest : 0);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Programbygger</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; padding:20px; background:#f7f7f7; color:#1c1c1c; }
+    h1 { margin:0 0 6px; font-size:24px; }
+    .muted { color:#666; font-size:13px; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; list-style:none; padding:0; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 16px; font-size:13px; }
+    .active-profile strong { color:#000; }
+    section { background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:16px; margin-bottom:16px; }
+    section h2 { margin:0 0 10px; font-size:18px; }
+    .option-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+    .option-card { border:1px solid #d8d8d8; border-radius:8px; padding:10px; cursor:pointer; background:#fafafa; transition: border-color 0.2s, background 0.2s; }
+    .option-card.selected { border-color:#0b72ff; background:#e8f1ff; }
+    .option-card h3 { margin:0 0 6px; font-size:15px; }
+    .option-card p { margin:0; font-size:13px; color:#555; }
+    .summary { background:#10131a; color:#fff; border-radius:10px; padding:18px; position:sticky; top:20px; box-shadow:0 6px 16px rgba(0,0,0,0.2); }
+    .layout { display:grid; grid-template-columns: 3fr 1fr; gap:18px; }
+    .summary h2 { margin-top:0; color:#fff; }
+    .summary ul { margin:0; padding-left:20px; font-size:13px; }
+    .design-table { width:100%; border-collapse:collapse; }
+    .design-table th, .design-table td { border:1px solid #ddd; padding:6px; font-size:13px; text-align:left; }
+    .timeline { display:flex; gap:12px; flex-wrap:wrap; }
+    .phase { flex:1 1 180px; border:1px solid #ddd; border-radius:8px; padding:10px; }
+    .phase h3 { margin:0 0 4px; font-size:14px; }
+    .session-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; }
+    .session-card { border:1px solid #ddd; border-radius:8px; padding:10px; background:#fafafa; }
+    .session-card textarea { width:100%; min-height:80px; border:1px solid #ccc; border-radius:6px; padding:8px; font-size:13px; resize:vertical; }
+    .exercise-selector { margin-top:10px; }
+    .exercise-selector label { font-weight:600; font-size:12px; display:block; margin-bottom:4px; color:#444; }
+    .exercise-selector select { width:100%; padding:6px; font-size:13px; margin-bottom:6px; }
+    .exercise-selector button { font-size:12px; padding:6px 10px; }
+    .exercise-list { margin-top:8px; display:flex; flex-direction:column; gap:6px; }
+    .exercise-chip { border:1px solid #c8d4ff; border-radius:6px; padding:6px; background:#eef3ff; font-size:12px; display:flex; justify-content:space-between; gap:6px; align-items:flex-start; }
+    .exercise-chip strong { display:block; font-size:13px; color:#102040; }
+    .exercise-meta { color:#46506b; font-size:11px; margin-top:3px; }
+    .exercise-chip button { border:none; background:#f44336; color:#fff; border-radius:4px; font-size:11px; padding:4px 6px; cursor:pointer; }
+    .tag-pill { display:inline-block; background:#dfe7ff; color:#1d2a54; border-radius:999px; padding:2px 6px; font-size:11px; margin-right:4px; margin-top:2px; }
+    .btn-save { display:inline-block; margin-top:10px; padding:8px 16px; border:none; border-radius:6px; background:#0b72ff; color:#fff; font-size:14px; cursor:pointer; }
+    .program-meta { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; margin:12px 0 20px; }
+    .program-meta label { font-size:13px; color:#555; display:block; margin-bottom:4px; }
+    .program-meta input[type="text"] { padding:8px 10px; border:1px solid #ccd3e4; border-radius:8px; font-size:14px; min-width:240px; }
+    .program-meta .meta-note { font-size:13px; color:#666; max-width:360px; }
+    .save-controls { margin-top:8px; font-size:13px; color:#444; display:flex; align-items:center; gap:8px; }
+    .save-controls label { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; }
+    @media (max-width:960px) { .layout { grid-template-columns:1fr; } .summary { position:static; } }
+  </style>
+  <script src="/common.js"></script>
+</head>
+<body>
+
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/program" class="active">Programbygger</a>
+  <a href="/programs">Programarkiv</a>
+  <a href="/warmup">Opvarmning</a>
+  <a href="/execute">Eksekvering</a>
+  <a href="/profiles">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
+</div>
+
+<h1>Byg et træningsprogram</h1>
+<p class="muted">
+  Brug flowet herunder til at gå fra mål → ramme → arketype → programstruktur. Hvert valg låser de næste trin og bygger en forklarlig plan.
+</p>
+<div class="program-meta">
+  <div>
+    <label for="programName">Programnavn</label>
+    <input type="text" id="programName" placeholder="fx Hypertrofi blok 1" />
+  </div>
+  <div class="meta-note">
+    Gem så mange variationer du vil. De vises i <a href="/programs">Programarkivet</a>, hvor du kan gøre et program aktivt eller åbne det til redigering.
+  </div>
+</div>
+
+<div class="layout">
+  <div>
+    <section id="stepGoal">
+      <h2>1. Definér træningsmål</h2>
+      <p class="muted">Strategisk niveau – hvilken adaptation ønsker vi primært?</p>
+      <div class="option-grid" data-step="goal"></div>
+    </section>
+
+    <section id="stepTheory" class="hidden">
+      <h2>2. Teoretisk ramme</h2>
+      <p class="muted">Hvilke træningsprincipper og forskningskilder styrer programmet?</p>
+      <div id="theoryContent"></div>
+    </section>
+
+    <section id="stepArchetype" class="hidden">
+      <h2>3. Programarketype</h2>
+      <p class="muted">Vælg den taktiske strategi, der bedst matcher målet.</p>
+      <div class="option-grid" data-step="archetype"></div>
+    </section>
+
+    <section id="stepDesign" class="hidden">
+      <h2>4. Designprincipper</h2>
+      <p class="muted">Program-DNA for volumen, frekvens, intensitet osv.</p>
+      <table class="design-table" id="designTable"></table>
+    </section>
+
+    <section id="stepStructure" class="hidden">
+      <h2>5. Programstruktur</h2>
+      <p class="muted">Fordel ugen, vælg split og definér antal uger.</p>
+      <div class="option-grid" data-step="structure"></div>
+    </section>
+
+    <section id="stepTimeline" class="hidden">
+      <h2>6. Progression over tid (12 uger)</h2>
+      <p class="muted">Fordel faser for opbygning, overload, deload og resensitisering.</p>
+      <div class="timeline" id="timelineContainer"></div>
+    </section>
+
+    <section id="stepSessions" class="hidden">
+      <h2>7. Session-niveau</h2>
+      <p class="muted">Notér fokus for hver dag. Senere kan vi importere konkrete øvelser.</p>
+      <div class="session-grid" id="sessionGrid"></div>
+      <button class="btn-save" id="saveProgram">Gem program</button>
+      <div class="save-controls">
+        <label><input type="checkbox" id="setActiveProgram" checked /> Sæt som aktivt program</label>
+      </div>
+      <div id="saveStatus" class="muted"></div>
+    </section>
+  </div>
+
+  <aside class="summary" id="summaryPanel">
+    <h2>Opsummering</h2>
+    <div id="summaryContent">Vælg et mål for at begynde.</div>
+  </aside>
+</div>
+
+<script>
+const {
+  ensureActiveProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  getStoredProfileId,
+  withProfileParam,
+} = window.AppState;
+
+ensureActiveProfileId();
+updateActiveProfileBadge();
+syncActiveProfileMeta();
+
+const STATE = {
+  goal: null,
+  archetype: null,
+  structure: null,
+  sessions: {},
+  programId: null,
+  programName: "",
+};
+
+let RM_EXERCISES = [];
+let EQUIPMENT_MAP = {};
+let MUSCLE_MAP = {};
+
+const GOALS = {
+  hypertrophy: {
+    label: "Hypertrofi",
+    description: "Øg muskelmasse via mekanisk spænding, volumen og overload.",
+    theory: [
+      "Mekanisk spænding, volumen og stress-recovery-adaptation (Schoenfeld)",
+      "Volume landmarks (MEV/MAV/MRV) – Mike Israetel",
+      "Autoregulering (RIR/RPE) – Eric Helms",
+    ],
+    archetypes: [
+      {
+        key: "volume_focus",
+        label: "Volumen-fokuseret",
+        text: "12–20 sæt pr. muskel pr. uge, moderat intensitet, double progression.",
+        design: {
+          Frekvens: "2x pr. muskel/uge",
+          Volumen: "12–18 sæt/uge",
+          Reps: "6–15",
+          Intensitet: "RIR 1–3",
+          Pauser: "60–120 sek",
+          Øvelsesvalg: "Compound før isolation",
+          Progression: "Double progression / øget volumen",
+        },
+      },
+      {
+        key: "auto_hypertrophy",
+        label: "Autoreguleret intensitet",
+        text: "RIR/RPE styret, moderat volumen, tæt på failure.",
+        design: {
+          Frekvens: "2–3x pr. muskel/uge",
+          Volumen: "10–16 sæt/uge",
+          Reps: "5–12",
+          Intensitet: "RIR 0–2",
+          Pauser: "90–180 sek",
+          Øvelsesvalg: "Prioriter øvelser med stabil RIR-feedback",
+          Progression: "Load styret via RPE",
+        },
+      },
+      {
+        key: "minimal_hypertrophy",
+        label: "Minimalistisk tilgang",
+        text: "5–8 sæt pr. muskel/uge, fokus på compliance.",
+        design: {
+          Frekvens: "2x full-body/uge",
+          Volumen: "6–10 sæt/uge",
+          Reps: "8–15",
+          Intensitet: "RIR 1–3",
+          Pauser: "60–90 sek",
+          Øvelsesvalg: "Få compound + få isolation",
+          Progression: "Minimum effective dose",
+        },
+      },
+    ],
+    structures: [
+      { key: "upper_lower", label: "Upper / Lower x4", weeks: 12 },
+      { key: "push_pull_legs", label: "Push/Pull/Legs x6", weeks: 12 },
+      { key: "full_body", label: "Full body x3", weeks: 12 },
+    ],
+    phases: [
+      { title: "Fase 1 – Opbygning", desc: "MEV, teknik, RIR 2–3" },
+      { title: "Fase 2 – Overload", desc: "Øg volumen/load, RIR 1–2" },
+      { title: "Fase 3 – Deload", desc: "Reducer volumen, RIR 3–4" },
+      { title: "Fase 4 – Resensitisering", desc: "Ny baseline, forbered næste blok" },
+    ],
+  },
+  strength: {
+    label: "Maksimal styrke",
+    description: "Forøg 1RM via høj intensitet og lavere volumen.",
+    theory: [
+      "Neuromuskulær tilpasning, høj load (%1RM)",
+      "Wave-periodisering (Bompa, Issurin)",
+      "Teknisk fokus med lave RIR",
+    ],
+    archetypes: [
+      {
+        key: "intensity_block",
+        label: "Intensitetsblok",
+        text: "Høj %1RM, lavere volumen, 3–5 gentagelser.",
+        design: {
+          Frekvens: "2–3 løft pr. uge pr. bevægelse",
+          Volumen: "6–10 hårde sæt/uge",
+          Reps: "1–5",
+          Intensitet: "85–95% 1RM",
+          Pauser: "2–4 min",
+          Øvelsesvalg: "Primært competition lifts",
+          Progression: "Wave (3/2/1) eller step loading",
+        },
+      },
+      {
+        key: "conjugate",
+        label: "Konjugeret",
+        text: "Mix af Max Effort + Dynamic Effort + accessory.",
+        design: {
+          Frekvens: "4 dage (ME/DE split)",
+          Volumen: "Varierende, accessories for volumen",
+          Reps: "1–5 (ME) / 8–12 (accessory)",
+          Intensitet: "ME 90%+, DE 60% med hastighed",
+          Pauser: "2–4 min",
+          Øvelsesvalg: "Rotation af specialøvelser",
+          Progression: "Udskift topøvelse ugentligt",
+        },
+      },
+    ],
+    structures: [
+      { key: "power4", label: "4-dages styrke split", weeks: 12 },
+      { key: "full_power", label: "3-dages full strength", weeks: 12 },
+    ],
+    phases: [
+      { title: "Fase 1 – Akkumulation", desc: "Volumen-arbejde, 70–80% 1RM" },
+      { title: "Fase 2 – Intensifikation", desc: "Øg load til 85–95%" },
+      { title: "Fase 3 – Peaking/Deload", desc: "Reducér volumen, hold intensitet" },
+    ],
+  },
+  conditioning: {
+    label: "Kondition & performance",
+    description: "Forbedr VO2max, tempo og kapacitet.",
+    theory: [
+      "Polariseret træning (80/20 intensitet)",
+      "VO2max og tempo-zone arbejde",
+      "Progression via volumen, intensitet eller densitet",
+    ],
+    archetypes: [
+      {
+        key: "polarized",
+        label: "Polariseret model",
+        text: "Høj andel af let zone 2 + enkelte hårde pas.",
+        design: {
+          Frekvens: "4–5 pas/uge",
+          Volumen: "3–6 timer/uge",
+          Intensitet: "80% i zone 2, 20% hårdt",
+          Progression: "Øg minutter i zone 2 + intervaller",
+          Øvelsesvalg: "Løb, cykel, row",
+        },
+      },
+    ],
+    structures: [
+      { key: "polar4", label: "4-dages polariseret plan", weeks: 12 },
+      { key: "tri_split", label: "Triathlon-inspireret ugeplan", weeks: 12 },
+    ],
+    phases: [
+      { title: "Base", desc: "Opbyg aerobe minutter" },
+      { title: "Build", desc: "Flere intervaller + tempo" },
+      { title: "Peak/Deload", desc: "Reducér volumen, hold intensitet" },
+    ],
+  },
+};
+
+const SESSION_TEMPLATES = {
+  upper_lower: ["Upper A", "Lower A", "Upper B", "Lower B"],
+  push_pull_legs: ["Push", "Pull", "Legs", "Push", "Pull", "Legs"],
+  full_body: ["Full body A", "Full body B", "Full body C"],
+  power4: ["ME Upper", "ME Lower", "DE Upper", "DE Lower"],
+  full_power: ["Full A", "Full B", "Full C"],
+  polar4: ["Zone 2", "Intervals", "Zone 2 Long", "Threshold"],
+  tri_split: ["Swim", "Bike", "Run", "Brick"],
+};
+
+function ensureSessionState(index) {
+  if (!STATE.sessions[index]) {
+    STATE.sessions[index] = { notes: "", exercises: [] };
+  }
+  if (!Array.isArray(STATE.sessions[index].exercises)) {
+    STATE.sessions[index].exercises = [];
+  }
+  return STATE.sessions[index];
+}
+
+function formatTagPills(list, map) {
+  if (!Array.isArray(list) || !list.length) return "";
+  return list
+    .map((key) => {
+      const label = map[key] || key;
+      return `<span class="tag-pill">${label}</span>`;
+    })
+    .join("");
+}
+
+function renderSessionExercises(index) {
+  const holder = document.querySelector(`[data-session-exercises="${index}"]`);
+  if (!holder) return;
+  const session = ensureSessionState(index);
+  if (!session.exercises.length) {
+    holder.innerHTML = `<p class="muted">Ingen øvelser valgt endnu</p>`;
+    return;
+  }
+  holder.innerHTML = session.exercises
+    .map((item) => {
+      const eq = formatTagPills(item.equipment, EQUIPMENT_MAP);
+      const mus = formatTagPills(item.muscleGroups, MUSCLE_MAP);
+      const metaParts = [];
+      if (eq) metaParts.push(`Udstyr: ${eq}`);
+      if (mus) metaParts.push(`Muskelgrupper: ${mus}`);
+      const metaHtml = metaParts.length
+        ? `<div class="exercise-meta">${metaParts.join("<br />")}</div>`
+        : "";
+      return `
+        <div class="exercise-chip">
+          <div>
+            <strong>${item.name}</strong>
+            ${metaHtml}
+          </div>
+          <button type="button" data-action="remove-exercise" data-session="${index}" data-key="${item.exerciseKey}">Fjern</button>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function getExerciseOptionsHtml() {
+  if (!RM_EXERCISES.length) {
+    return '<option value="">Indlæser øvelser…</option>';
+  }
+  const options = RM_EXERCISES.map(
+    (ex) => `<option value="${ex.exerciseKey}">${ex.name}</option>`
+  );
+  return ['<option value="">Vælg øvelse…</option>', ...options].join("");
+}
+
+function updateExercisePickers() {
+  document.querySelectorAll('select[data-role="exercise-picker"]').forEach((select) => {
+    const current = select.value;
+    select.innerHTML = getExerciseOptionsHtml();
+    if (current && RM_EXERCISES.some((ex) => ex.exerciseKey === current)) {
+      select.value = current;
+    }
+  });
+}
+
+function renderGoalOptions() {
+  const container = document.querySelector('[data-step="goal"]');
+  container.innerHTML = Object.entries(GOALS)
+    .map(([key, goal]) => `
+      <div class="option-card" data-key="${key}">
+        <h3>${goal.label}</h3>
+        <p>${goal.description}</p>
+      </div>
+    `)
+    .join("");
+}
+
+function renderArchetypeOptions(goalKey) {
+  const section = document.getElementById("stepArchetype");
+  const container = section.querySelector('[data-step="archetype"]');
+  const goal = GOALS[goalKey];
+  container.innerHTML = goal.archetypes
+    .map((arch) => `
+      <div class="option-card" data-key="${arch.key}">
+        <h3>${arch.label}</h3>
+        <p>${arch.text}</p>
+      </div>
+    `)
+    .join("");
+  section.classList.remove("hidden");
+}
+
+function renderStructureOptions(goalKey) {
+  const section = document.getElementById("stepStructure");
+  const container = section.querySelector('[data-step="structure"]');
+  const goal = GOALS[goalKey];
+  container.innerHTML = goal.structures
+    .map((struct) => `
+      <div class="option-card" data-key="${struct.key}" data-weeks="${struct.weeks}">
+        <h3>${struct.label}</h3>
+        <p>${struct.weeks} uger blok</p>
+      </div>
+    `)
+    .join("");
+  section.classList.remove("hidden");
+}
+
+function renderDesignTable(goalKey, archetypeKey) {
+  const goal = GOALS[goalKey];
+  const arch = goal.archetypes.find((a) => a.key === archetypeKey);
+  const table = document.getElementById("designTable");
+  const rows = Object.entries(arch.design || {}).map(
+    ([label, value]) => `<tr><th>${label}</th><td>${value}</td></tr>`
+  );
+  table.innerHTML = `<tbody>${rows.join("")}</tbody>`;
+  document.getElementById("stepDesign").classList.remove("hidden");
+}
+
+function renderTheory(goalKey) {
+  const goal = GOALS[goalKey];
+  const container = document.getElementById("theoryContent");
+  container.innerHTML = `
+    <ul>
+      ${goal.theory.map((item) => `<li>${item}</li>`).join("")}
+    </ul>
+  `;
+  document.getElementById("stepTheory").classList.remove("hidden");
+}
+
+function renderTimeline(goalKey) {
+  const goal = GOALS[goalKey];
+  const container = document.getElementById("timelineContainer");
+  container.innerHTML = goal.phases
+    .map((phase) => `
+      <div class="phase">
+        <h3>${phase.title}</h3>
+        <p>${phase.desc}</p>
+      </div>
+    `)
+    .join("");
+  document.getElementById("stepTimeline").classList.remove("hidden");
+}
+
+function renderSessions(structKey) {
+  const container = document.getElementById("sessionGrid");
+  const sessions = SESSION_TEMPLATES[structKey] || ["Session A", "Session B"];
+  container.innerHTML = sessions
+    .map((name, index) => `
+      <div class="session-card">
+        <strong>${name}</strong>
+        <textarea data-session="${index}" placeholder="Noter fokus, nøgleøvelser, progression"></textarea>
+        <div class="exercise-selector">
+          <label>Øvelser fra RM-katalog</label>
+          <select data-role="exercise-picker" data-session="${index}">
+            ${getExerciseOptionsHtml()}
+          </select>
+          <button type="button" data-action="add-exercise" data-session="${index}">Tilføj øvelse</button>
+          <div class="exercise-list" data-session-exercises="${index}"></div>
+        </div>
+      </div>
+    `)
+    .join("");
+  document.getElementById("stepSessions").classList.remove("hidden");
+  sessions.forEach((_, index) => {
+    const textarea = container.querySelector(`textarea[data-session="${index}"]`);
+    const sessionState = ensureSessionState(index);
+    textarea.value = sessionState.notes || "";
+    renderSessionExercises(index);
+  });
+}
+
+function attachOptionEvents() {
+  document.addEventListener("click", (event) => {
+    const card = event.target.closest(".option-card");
+    if (!card) return;
+    const step = card.parentElement.dataset.step;
+    if (step === "goal") {
+      STATE.goal = card.dataset.key;
+      STATE.archetype = null;
+      STATE.structure = null;
+      highlightSelection(step, card.dataset.key);
+      renderTheory(STATE.goal);
+      renderArchetypeOptions(STATE.goal);
+      renderStructureOptions(STATE.goal);
+      renderTimeline(STATE.goal);
+      document.getElementById("stepArchetype").classList.add("hidden");
+      document.getElementById("stepStructure").classList.add("hidden");
+      document.getElementById("stepDesign").classList.add("hidden");
+      document.getElementById("stepSessions").classList.add("hidden");
+      STATE.sessions = {};
+      updateSummary();
+    } else if (step === "archetype") {
+      STATE.archetype = card.dataset.key;
+      highlightSelection(step, card.dataset.key);
+      renderDesignTable(STATE.goal, STATE.archetype);
+      updateSummary();
+    } else if (step === "structure") {
+      STATE.structure = card.dataset.key;
+      STATE.sessions = {};
+      highlightSelection(step, card.dataset.key);
+      renderSessions(STATE.structure);
+      updateSummary();
+    }
+  });
+
+  document.getElementById("sessionGrid").addEventListener("input", (event) => {
+    if (event.target.matches("textarea[data-session]")) {
+      const index = event.target.dataset.session;
+      const session = ensureSessionState(index);
+      session.notes = event.target.value;
+      updateSummary();
+    }
+  });
+
+document.getElementById("sessionGrid").addEventListener("click", (event) => {
+    const addBtn = event.target.closest('[data-action="add-exercise"]');
+    if (addBtn) {
+      const index = addBtn.dataset.session;
+      handleAddExercise(index);
+      return;
+    }
+    if (event.target.matches('[data-action="remove-exercise"]')) {
+      const index = event.target.dataset.session;
+      const key = event.target.dataset.key;
+      const session = ensureSessionState(index);
+      session.exercises = session.exercises.filter((item) => item.exerciseKey !== key);
+      renderSessionExercises(index);
+      updateSummary();
+    }
+  });
+
+document.getElementById("programName").addEventListener("input", (event) => {
+  STATE.programName = event.target.value;
+});
+
+function updateProgramNameInput(value) {
+  const input = document.getElementById("programName");
+  if (input) input.value = value || "";
+}
+
+function setProgramMeta(id, name) {
+  STATE.programId = id || null;
+  STATE.programName = name || "";
+  updateProgramNameInput(STATE.programName);
+}
+
+function deriveProgramName(blueprint) {
+  if (!blueprint) return "Program";
+  if (blueprint.programName) return blueprint.programName;
+  const goal = blueprint.goal && GOALS[blueprint.goal];
+  return goal ? `${goal.label} program` : "Program";
+}
+
+document.getElementById("saveProgram").addEventListener("click", async () => {
+  const profileId = getStoredProfileId();
+  const payload = buildBlueprintPayload();
+  try {
+    localStorage.setItem(`programBlueprint_${profileId}`, JSON.stringify(payload));
+  } catch {
+    // ignore localStorage failures
+  }
+  try {
+    const saveStatus = document.getElementById("saveStatus");
+    saveStatus.textContent = "Gemmer…";
+    const body = {
+      programId: STATE.programId,
+      name: STATE.programName,
+      blueprint: payload,
+      setActive: document.getElementById("setActiveProgram").checked,
+    };
+    const res = await fetch(withProfileParam("/api/programs"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(msg || "Serverfejl");
+    }
+    const data = await res.json();
+    if (data?.program) {
+      setProgramMeta(data.program.id, data.program.name);
+    }
+    saveStatus.textContent = `Programmet "${STATE.programName || "uden navn"}" er gemt ✅`;
+  } catch (err) {
+    console.error(err);
+    document.getElementById("saveStatus").textContent = "Kunne ikke gemme program ❌";
+  }
+});
+}
+
+function highlightSelection(step, key) {
+  document.querySelectorAll(`[data-step="${step}"] .option-card`).forEach((el) => {
+    el.classList.toggle("selected", el.dataset.key === key);
+  });
+}
+
+function updateSummary() {
+  const goal = STATE.goal ? GOALS[STATE.goal] : null;
+  const archetype = goal && STATE.archetype
+    ? goal.archetypes.find((a) => a.key === STATE.archetype)
+    : null;
+  const structure = goal && STATE.structure
+    ? goal.structures.find((s) => s.key === STATE.structure)
+    : null;
+  const sessionLabels = STATE.structure ? SESSION_TEMPLATES[STATE.structure] || [] : [];
+
+  const bullets = [];
+  if (goal) bullets.push(`<strong>Mål</strong>: ${goal.label}`);
+  if (archetype) bullets.push(`<strong>Arketype</strong>: ${archetype.label}`);
+  if (structure) bullets.push(`<strong>Struktur</strong>: ${structure.label}`);
+
+  const sessionNotes = sessionLabels
+    .map((label, index) => {
+      const session = STATE.sessions[index];
+      const infoParts = [];
+      if (session?.notes) infoParts.push(session.notes);
+      if (session?.exercises?.length) {
+        const names = session.exercises.map((ex) => ex.name).join(", ");
+        infoParts.push(`Øvelser: ${names}`);
+      }
+      if (!infoParts.length) return null;
+      return `<li><strong>${label}:</strong> ${infoParts.join(" — ")}</li>`;
+    })
+    .filter(Boolean);
+  const summaryEl = document.getElementById("summaryContent");
+
+  if (!bullets.length) {
+    summaryEl.textContent = "Vælg et mål for at begynde.";
+    return;
+  }
+
+  summaryEl.innerHTML = `
+    <ul>${bullets.map((b) => `<li>${b}</li>`).join("")}</ul>
+    <p><strong>Sessioner:</strong></p>
+    <ul>${sessionNotes.length ? sessionNotes.join("") : "<li>Ingen noter endnu</li>"}</ul>
+  `;
+}
+
+function handleAddExercise(index) {
+  const select = document.querySelector(`select[data-role="exercise-picker"][data-session="${index}"]`);
+  if (!select) return;
+  const key = select.value;
+  if (!key) return;
+  const exercise = RM_EXERCISES.find((ex) => ex.exerciseKey === key);
+  if (!exercise) return;
+  const session = ensureSessionState(index);
+  if (session.exercises.some((item) => item.exerciseKey === key)) {
+    return;
+  }
+  session.exercises.push({
+    exerciseKey: exercise.exerciseKey,
+    name: exercise.name,
+    equipment: exercise.equipment || [],
+    muscleGroups: exercise.muscleGroups || [],
+    type: exercise.type || "",
+  });
+  select.value = "";
+  renderSessionExercises(index);
+  updateSummary();
+}
+
+async function loadExercises() {
+  try {
+    const res = await fetch(withProfileParam("/api/rm"));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    RM_EXERCISES = await res.json();
+  } catch {
+    RM_EXERCISES = [];
+  }
+  updateExercisePickers();
+  Object.keys(STATE.sessions).forEach(renderSessionExercises);
+}
+
+async function loadEquipmentCatalog() {
+  try {
+    const res = await fetch("/api/equipment");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    EQUIPMENT_MAP = {};
+    data.forEach((item) => {
+      EQUIPMENT_MAP[item.key] = item.label || item.key;
+    });
+  } catch {
+    EQUIPMENT_MAP = {};
+  }
+  Object.keys(STATE.sessions).forEach(renderSessionExercises);
+}
+
+async function loadMuscleCatalog() {
+  try {
+    const res = await fetch("/api/muscles");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    MUSCLE_MAP = {};
+    data.forEach((item) => {
+      MUSCLE_MAP[item.key] = item.label || item.key;
+    });
+  } catch {
+    MUSCLE_MAP = {};
+  }
+  Object.keys(STATE.sessions).forEach(renderSessionExercises);
+}
+
+function buildBlueprintPayload() {
+  const cloneSessions = JSON.parse(JSON.stringify(STATE.sessions || {}));
+  return {
+    goal: STATE.goal,
+    archetype: STATE.archetype,
+    structure: STATE.structure,
+    sessions: cloneSessions,
+    profileId: getStoredProfileId(),
+    savedAt: new Date().toISOString(),
+    programId: STATE.programId,
+    programName: STATE.programName,
+  };
+}
+
+async function loadExistingBlueprint() {
+  try {
+    const res = await fetch(withProfileParam("/api/program-blueprint"));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (data?.profileId && data?.profileLabel) {
+      window.AppState.setActiveProfileMeta(data.profileId, data.profileLabel);
+      window.AppState.updateActiveProfileBadge();
+    }
+    if (data?.blueprint) {
+      applyBlueprintToState(data.blueprint);
+      document.getElementById("saveStatus").textContent = `Indlæste "${STATE.programName || "tidligere blueprint"}" ✅`;
+    }
+  } catch (err) {
+    console.warn("Kunne ikke hente blueprint", err);
+  }
+}
+
+async function loadProgramFromArchive(programId) {
+  if (!programId) return false;
+  try {
+    const res = await fetch(withProfileParam(`/api/programs/${encodeURIComponent(programId)}`));
+    if (!res.ok) {
+      if (res.status === 404) return false;
+      throw new Error("HTTP " + res.status);
+    }
+    const data = await res.json();
+    if (data?.profileId && data?.profileLabel) {
+      window.AppState.setActiveProfileMeta(data.profileId, data.profileLabel);
+      window.AppState.updateActiveProfileBadge();
+    }
+    if (data?.program?.blueprint) {
+      const blueprint = {
+        ...data.program.blueprint,
+        programId: data.program.id,
+        programName: data.program.name,
+        savedAt: data.program.savedAt,
+      };
+      applyBlueprintToState(blueprint);
+      document.getElementById("saveStatus").textContent = `Indlæste "${STATE.programName}" ✅`;
+      return true;
+    }
+  } catch (err) {
+    console.warn("Kunne ikke hente program", err);
+  }
+  return false;
+}
+
+function applyBlueprintToState(blueprint) {
+  setProgramMeta(blueprint.programId || null, deriveProgramName(blueprint));
+  STATE.goal = blueprint.goal || null;
+  STATE.archetype = blueprint.archetype || null;
+  STATE.structure = blueprint.structure || null;
+  STATE.sessions = blueprint.sessions ? JSON.parse(JSON.stringify(blueprint.sessions)) : {};
+  if (STATE.goal) {
+    renderTheory(STATE.goal);
+    renderArchetypeOptions(STATE.goal);
+    renderStructureOptions(STATE.goal);
+    renderTimeline(STATE.goal);
+    highlightSelection("goal", STATE.goal);
+  }
+  if (STATE.archetype) {
+    highlightSelection("archetype", STATE.archetype);
+    renderDesignTable(STATE.goal, STATE.archetype);
+  }
+  if (STATE.structure) {
+    highlightSelection("structure", STATE.structure);
+    renderSessions(STATE.structure);
+  }
+  updateSummary();
+}
+
+renderGoalOptions();
+attachOptionEvents();
+loadExercises();
+loadEquipmentCatalog();
+loadMuscleCatalog();
+const params = new URLSearchParams(window.location.search);
+const requestedProgramId = params.get("programId");
+if (requestedProgramId) {
+  loadProgramFromArchive(requestedProgramId).then((loaded) => {
+    if (!loaded) loadExistingBlueprint();
+  });
+} else {
+  loadExistingBlueprint();
+}
+</script>
+
+</body>
+</html>

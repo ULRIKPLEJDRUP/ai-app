@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Opvarmningsøvelser</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; background:#fafafa; }
+    h1 { margin:0 0 10px; font-size:22px; }
+    p.muted { color:#666; font-size:13px; margin:0 0 16px; }
+    table { border-collapse:collapse; width:100%; max-width:1200px; background:#fff; }
+    th,td { border:1px solid #ddd; padding:8px 10px; font-size:14px; text-align:left; vertical-align:top; }
+    th { background:#f5f5f5; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
+    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
+    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
+    .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
+    .active-profile strong { color:#000; }
+    form.inline { display:flex; flex-wrap:wrap; gap:12px; background:#fff; border:1px solid #ddd; padding:16px; max-width:1100px; margin-bottom:16px; }
+    form.inline label { display:block; font-size:12px; color:#555; margin-bottom:4px; }
+    form.inline input, form.inline textarea { padding:8px; font-size:14px; border:1px solid #ccc; border-radius:6px; min-width:160px; }
+    .equip-chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .equip-chip { background:#eef4ff; border:1px solid #d2e3ff; padding:4px 8px; border-radius:10px; font-size:12px; }
+    button { padding:6px 10px; font-size:13px; cursor:pointer; }
+    .actions button { margin-right:6px; }
+    #status { margin-top:12px; font-size:13px; color:#444; }
+    .note { font-size:12px; color:#666; }
+  </style>
+  <script src="/common.js"></script>
+</head>
+<body>
+
+<nav class="tabs">
+  <a href="/rm">RM</a>
+  <a href="/equipment">Udstyr</a>
+  <a href="/profile">Profil</a>
+  <a href="/muscles">Muskler</a>
+  <a href="/vision">Vision</a>
+  <a href="/program">Programbygger</a>
+  <a href="/programs">Programarkiv</a>
+  <a href="/warmup" class="active">Opvarmning</a>
+  <a href="/execute">Eksekvering</a>
+  <a href="/profiles">Profiler</a>
+</nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
+</div>
+
+<h1>Opvarmningsøvelser</h1>
+<p class="muted">
+  Vedligehold et lille bibliotek af opvarmningsøvelser. Senere trækker vi tilfældigt herfra til en 10-minutters blok.
+</p>
+
+<form id="warmupForm" class="inline">
+  <div>
+    <label for="warmupName">Øvelse</label>
+    <input type="text" id="warmupName" required placeholder="fx TRX rows" />
+    <input type="hidden" id="warmupKey" />
+  </div>
+  <div>
+    <label for="warmupType">Type / fokus</label>
+    <input type="text" id="warmupType" placeholder="mobilitet, puls, push/pull…" />
+  </div>
+  <div>
+    <label for="warmupEquipment">Udstyr (komma-separeret)</label>
+    <input type="text" id="warmupEquipment" placeholder="trx,kettlebell" />
+  </div>
+  <div>
+    <label for="warmupReps">Gentagelser</label>
+    <input type="number" id="warmupReps" min="0" placeholder="fx 12" />
+  </div>
+  <div>
+    <label for="warmupSets">Sæt</label>
+    <input type="number" id="warmupSets" min="1" placeholder="fx 2" />
+  </div>
+  <div>
+    <label for="warmupTime">Tid (sek)</label>
+    <input type="number" id="warmupTime" min="0" placeholder="fx 30" />
+  </div>
+  <div>
+    <label for="warmupDuration">Varighed (sek)</label>
+    <input type="number" id="warmupDuration" min="0" placeholder="fx 60" />
+  </div>
+  <div>
+    <label for="warmupRest">Pause mellem sæt (sek)</label>
+    <input type="number" id="warmupRest" min="0" placeholder="fx 5" />
+  </div>
+  <div style="align-self:flex-end;">
+    <button type="submit">Gem / opdater</button>
+    <button type="button" id="resetForm">Nulstil</button>
+  </div>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Øvelse</th>
+      <th>Type</th>
+      <th>Udstyr</th>
+      <th>Reps</th>
+      <th>Sæt</th>
+      <th>Tid (sek)</th>
+      <th>Varighed (sek)</th>
+      <th>Pause sæt (sek)</th>
+      <th style="width:140px;">Handling</th>
+    </tr>
+  </thead>
+  <tbody id="warmupRows">
+    <tr><td colspan="7">Loader…</td></tr>
+  </tbody>
+</table>
+
+<div id="status"></div>
+
+<script>
+const { ensureActiveProfileId, updateActiveProfileBadge } = window.AppState;
+ensureActiveProfileId();
+updateActiveProfileBadge();
+
+let warmupData = [];
+let equipmentLabels = {};
+
+async function bootstrap() {
+  await loadEquipmentLabels();
+  loadWarmup();
+}
+
+function setStatus(msg) {
+  document.getElementById("status").textContent = msg || "";
+}
+
+function formatEquipment(list) {
+  if (!Array.isArray(list) || !list.length) return "<span class='note'>Ingen</span>";
+  return `<div class="equip-chips">${list
+    .map((eq) => `<span class="equip-chip">${equipmentLabels[eq] || eq}</span>`)
+    .join("")}</div>`;
+}
+
+function renderTable() {
+  const tbody = document.getElementById("warmupRows");
+  if (!warmupData.length) {
+    tbody.innerHTML = "<tr><td colspan='9'>Ingen øvelser endnu</td></tr>";
+    return;
+  }
+  tbody.innerHTML = warmupData
+    .map(
+      (item) => `
+        <tr data-key="${item.key}">
+          <td>${item.name}</td>
+          <td>${item.type || "<span class='note'>-</span>"}</td>
+          <td>${formatEquipment(item.equipment)}</td>
+          <td>${item.reps ?? "<span class='note'>-</span>"}</td>
+          <td>${item.sets ?? "<span class='note'>1</span>"}</td>
+          <td>${item.timeSeconds ?? "<span class='note'>-</span>"}</td>
+          <td>${item.durationSeconds ?? "<span class='note'>-</span>"}</td>
+          <td>${item.restSeconds ?? "<span class='note'>5</span>"}</td>
+          <td class="actions">
+            <button type="button" data-action="edit" data-key="${item.key}">Rediger</button>
+            <button type="button" data-action="delete" data-key="${item.key}">Slet</button>
+          </td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+async function loadWarmup() {
+  setStatus("Henter…");
+  try {
+    const res = await fetch("/api/warmup");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    warmupData = await res.json();
+    renderTable();
+    setStatus("Klar ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Kunne ikke hente data ❌");
+  }
+}
+
+function resetFormFields() {
+  document.getElementById("warmupForm").reset();
+  document.getElementById("warmupKey").value = "";
+}
+
+document.getElementById("resetForm").addEventListener("click", () => {
+  resetFormFields();
+});
+
+document.getElementById("warmupForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const payload = {
+    key: document.getElementById("warmupKey").value.trim(),
+    name: document.getElementById("warmupName").value.trim(),
+    type: document.getElementById("warmupType").value.trim(),
+    equipment: document.getElementById("warmupEquipment").value.trim(),
+    reps: document.getElementById("warmupReps").value,
+    sets: document.getElementById("warmupSets").value,
+    timeSeconds: document.getElementById("warmupTime").value,
+    durationSeconds: document.getElementById("warmupDuration").value,
+    restSeconds: document.getElementById("warmupRest").value,
+  };
+  try {
+    setStatus("Gemmer…");
+    const res = await fetch("/api/warmup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    resetFormFields();
+    await loadWarmup();
+    setStatus("Gemt ✅");
+  } catch (err) {
+    console.error(err);
+    setStatus("Kunne ikke gemme ❌");
+  }
+});
+
+document.getElementById("warmupRows").addEventListener("click", async (event) => {
+  const key = event.target.dataset?.key;
+  if (!key) return;
+  if (event.target.dataset.action === "edit") {
+    const item = warmupData.find((row) => row.key === key);
+    if (!item) return;
+    document.getElementById("warmupKey").value = item.key;
+    document.getElementById("warmupName").value = item.name || "";
+    document.getElementById("warmupType").value = item.type || "";
+    document.getElementById("warmupEquipment").value = (item.equipment || []).join(",");
+    document.getElementById("warmupReps").value = item.reps ?? "";
+    document.getElementById("warmupSets").value = item.sets ?? "";
+    document.getElementById("warmupTime").value = item.timeSeconds ?? "";
+    document.getElementById("warmupDuration").value = item.durationSeconds ?? "";
+    document.getElementById("warmupRest").value = item.restSeconds ?? "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setStatus("Redigerer " + item.name);
+  } else if (event.target.dataset.action === "delete") {
+    if (!confirm("Slet denne øvelse?")) return;
+    try {
+      setStatus("Sletter…");
+      const res = await fetch(`/api/warmup/${key}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      await loadWarmup();
+      setStatus("Slettet ✅");
+    } catch (err) {
+      console.error(err);
+      setStatus("Kunne ikke slette ❌");
+    }
+  }
+});
+
+async function loadEquipmentLabels() {
+  try {
+    const res = await fetch("/api/equipment");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    equipmentLabels = {};
+    data.forEach((item) => {
+      equipmentLabels[item.key] = item.label || item.key;
+    });
+  } catch {
+    equipmentLabels = {};
+  }
+}
+
+bootstrap();
+</script>
+
+</body>
+</html>

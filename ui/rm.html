@@ -67,6 +67,27 @@
     .admin-disabled {
       opacity:0.6;
     }
+    th.sortable {
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      padding-right:20px;
+    }
+    th.sortable::after {
+      content:"";
+      position:absolute;
+      right:6px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:11px;
+      color:#777;
+    }
+    th.sortable[data-sort-dir="asc"]::after {
+      content:"▲";
+    }
+    th.sortable[data-sort-dir="desc"]::after {
+      content:"▼";
+    }
   </style>
   <script src="/common.js"></script>
 </head>
@@ -77,6 +98,10 @@
   <a href="/profile">Profil</a>
   <a href="/muscles">Muskler</a>
   <a href="/vision">Vision</a>
+  <a href="/program">Programbygger</a>
+  <a href="/programs">Programarkiv</a>
+  <a href="/warmup">Opvarmning</a>
+  <a href="/execute">Eksekvering</a>
   <a href="/profiles">Profiler</a>
 </nav>
 
@@ -103,20 +128,42 @@
 </div>
 <button id="togglePct" type="button">Vis % af 1RM</button>
 
+<div class="filters" style="margin:12px 0; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;">
+  <div>
+    <label for="filterType" style="font-size:12px; color:#555;">Filter: Type</label><br>
+    <select id="filterType">
+      <option value="">Alle typer</option>
+    </select>
+  </div>
+  <div>
+    <label for="filterEquipment" style="font-size:12px; color:#555;">Filter: Udstyr</label><br>
+    <select id="filterEquipment">
+      <option value="">Alt udstyr</option>
+    </select>
+  </div>
+  <div>
+    <label for="filterMuscle" style="font-size:12px; color:#555;">Filter: Muskelgruppe</label><br>
+    <select id="filterMuscle">
+      <option value="">Alle muskler</option>
+    </select>
+  </div>
+  <button type="button" id="clearFilters">Nulstil filtre</button>
+</div>
+
 <table>
   <thead>
     <tr>
-      <th>Øvelse</th>
-      <th>Type</th>
+      <th data-sort-key="name" class="sortable">Øvelse</th>
+      <th data-sort-key="type" class="sortable">Type</th>
       <th>Udstyr / tags</th>
       <th>Muskelgrupper</th>
-      <th class="col col-1">1RM</th>
-      <th class="col col-3">3RM</th>
-      <th class="col col-5">5RM</th>
-      <th class="col col-8">8RM</th>
-      <th class="col col-10">10RM</th>
-      <th class="metric-col">Max antal</th>
-      <th class="metric-col">Max tid (sek)</th>
+      <th class="col col-1 sortable" data-sort-key="rep-1">1RM</th>
+      <th class="col col-3 sortable" data-sort-key="rep-3">3RM</th>
+      <th class="col col-5 sortable" data-sort-key="rep-5">5RM</th>
+      <th class="col col-8 sortable" data-sort-key="rep-8">8RM</th>
+      <th class="col col-10 sortable" data-sort-key="rep-10">10RM</th>
+      <th class="metric-col sortable" data-sort-key="metric-count">Max antal</th>
+      <th class="metric-col sortable" data-sort-key="metric-time">Max tid (sek)</th>
       <th class="pct-col">10%</th>
       <th class="pct-col">20%</th>
       <th class="pct-col">30%</th>
@@ -168,6 +215,13 @@ const metricColumns = [
   { key: "count", label: "Max antal", placeholder: "antal", step: "1" },
   { key: "time", label: "Max tid (sek)", placeholder: "sek", step: "0.1" },
 ];
+let rmData = [];
+let currentSort = { key: "name", direction: "asc" };
+const filterState = {
+  type: "",
+  equipment: "",
+  muscle: "",
+};
 let muscleCatalog = [];
 let muscleLabelMap = {};
 const repVisibilityKey = "rmRepVisibility";
@@ -420,6 +474,35 @@ function renderMuscleCell(ex) {
   `;
 }
 
+function renderRow(ex) {
+  const rm = ex.rm || {};
+  const pctBase = getPctBase(rm, ex.metrics);
+  return `
+    <tr>
+      <td>${ex.name}</td>
+      <td>${ex.type || ""}</td>
+      ${renderEquipmentCell(ex)}
+      ${renderMuscleCell(ex)}
+      ${reps
+        .map(
+          (r) => `
+        <td class="col col-${r}">
+          <input
+            value="${rm[r] ?? ""}"
+            data-key="${ex.exerciseKey}"
+            data-rep="${r}"
+            inputmode="decimal"
+          >
+        </td>
+      `
+        )
+        .join("")}
+      ${renderMetricCells(ex.metricTypes, ex.metrics, ex.exerciseKey)}
+      ${renderPctCells(pctBase)}
+    </tr>
+  `;
+}
+
 function renderPctCells(baseValue) {
   return pctSteps
     .map((pct) => {
@@ -458,43 +541,10 @@ async function loadRM() {
     const profileId = getStoredProfileId();
     const res = await fetch(withProfileParam("/api/rm", profileId));
     if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
-
-    tbody.innerHTML = "";
-
-    if (!data.length) {
-      tbody.innerHTML = "<tr><td colspan='19'>Ingen data</td></tr>";
-      setStatus("Tom liste");
-      return;
-    }
-
-    for (const ex of data) {
-      const rm = ex.rm || {};
-      const pctBase = getPctBase(rm, ex.metrics);
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${ex.name}</td>
-        <td>${ex.type || ""}</td>
-        ${renderEquipmentCell(ex)}
-        ${renderMuscleCell(ex)}
-        ${reps.map(r => `
-          <td class="col col-${r}">
-            <input
-              value="${rm[r] ?? ""}"
-              data-key="${ex.exerciseKey}"
-              data-rep="${r}"
-              inputmode="decimal"
-            >
-          </td>
-        `).join("")}
-        ${renderMetricCells(ex.metricTypes, ex.metrics, ex.exerciseKey)}
-        ${renderPctCells(pctBase)}
-      `;
-      tbody.appendChild(tr);
-    }
-
-    applyAdminState();
-    setStatus("Klar ✅");
+    rmData = await res.json();
+    populateFilterOptions();
+    renderRMTable();
+    setStatus(rmData.length ? "Klar ✅" : "Tom liste");
   } catch (e) {
     console.error(e);
     tbody.innerHTML = "<tr><td colspan='19'>Fejl ved hentning</td></tr>";
@@ -512,6 +562,160 @@ async function loadEquipmentCatalog() {
     console.warn("Kunne ikke hente udstyr", err);
     equipmentCatalog = [];
     equipmentMap = new Map();
+  }
+}
+
+function renderRMTable() {
+  const tbody = document.getElementById("rows");
+  if (!rmData.length) {
+    tbody.innerHTML = "<tr><td colspan='21'>Ingen data</td></tr>";
+    updateSortIndicators();
+    return;
+  }
+  const filtered = rmData.filter(matchesFilters);
+  if (!filtered.length) {
+    tbody.innerHTML = "<tr><td colspan='21'>Ingen øvelser matcher filtrene</td></tr>";
+    updateSortIndicators();
+    return;
+  }
+  const sorted = [...filtered].sort((a, b) => compareRows(a, b, currentSort));
+  tbody.innerHTML = sorted.map((ex) => renderRow(ex)).join("");
+  applyAdminState();
+  updateSortIndicators();
+}
+
+function compareRows(a, b, sort) {
+  const dir = sort.direction === "desc" ? -1 : 1;
+  const valA = getSortValue(a, sort.key);
+  const valB = getSortValue(b, sort.key);
+  if (valA === null && valB === null) return 0;
+  if (valA === null) return 1 * dir;
+  if (valB === null) return -1 * dir;
+  if (typeof valA === "number" && typeof valB === "number") {
+    if (valA === valB) return 0;
+    return valA > valB ? dir : -dir;
+  }
+  const comp = String(valA).localeCompare(String(valB), "da", { numeric: true, sensitivity: "base" });
+  return comp * dir;
+}
+
+function getSortValue(ex, key) {
+  if (key === "name") return ex.name || "";
+  if (key === "type") return ex.type || "";
+  if (key.startsWith("rep-")) {
+    const rep = key.split("-")[1];
+    const val = ex.rm?.[rep];
+    return typeof val === "number" ? val : null;
+  }
+  if (key === "metric-count") {
+    const val = ex.metrics?.count;
+    return typeof val === "number" ? val : null;
+  }
+  if (key === "metric-time") {
+    const val = ex.metrics?.time;
+    return typeof val === "number" ? val : null;
+  }
+  return null;
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll("th[data-sort-key]").forEach((th) => {
+    if (th.dataset.sortKey === currentSort.key) {
+      th.dataset.sortDir = currentSort.direction;
+    } else {
+      th.dataset.sortDir = "";
+    }
+  });
+}
+
+function attachSortingHandlers() {
+  document.querySelectorAll("th[data-sort-key]").forEach((th) => {
+    th.classList.add("sortable");
+    th.addEventListener("click", () => {
+      const key = th.dataset.sortKey;
+      if (!key) return;
+      if (currentSort.key === key) {
+        currentSort.direction = currentSort.direction === "asc" ? "desc" : "asc";
+      } else {
+        currentSort.key = key;
+        currentSort.direction = key === "name" || key === "type" ? "asc" : "desc";
+      }
+      renderRMTable();
+    });
+  });
+  updateSortIndicators();
+}
+
+function matchesFilters(row) {
+  if (filterState.type && String(row.type || "").toLowerCase() !== filterState.type) {
+    return false;
+  }
+  if (filterState.equipment) {
+    const list = Array.isArray(row.equipment) ? row.equipment.map((item) => slugKey(item)) : [];
+    if (!list.includes(filterState.equipment)) return false;
+  }
+  if (filterState.muscle) {
+    const list = Array.isArray(row.muscleGroups) ? row.muscleGroups : [];
+    if (!list.includes(filterState.muscle)) return false;
+  }
+  return true;
+}
+
+function populateFilterOptions() {
+  const typeSelect = document.getElementById("filterType");
+  const equipmentSelect = document.getElementById("filterEquipment");
+  const muscleSelect = document.getElementById("filterMuscle");
+  if (typeSelect) {
+    const uniqueTypes = Array.from(new Set(rmData.map((row) => (row.type || "").toLowerCase()).filter(Boolean))).sort(
+      (a, b) => a.localeCompare(b, "da")
+    );
+    typeSelect.innerHTML = `<option value="">Alle typer</option>${uniqueTypes
+      .map((type) => `<option value="${type}" ${filterState.type === type ? "selected" : ""}>${type}</option>`)
+      .join("")}`;
+  }
+  if (equipmentSelect) {
+    const options = equipmentCatalog
+      .map(
+        (item) =>
+          `<option value="${slugKey(item.key)}" ${filterState.equipment === slugKey(item.key) ? "selected" : ""}>${
+            item.label || item.key
+          }</option>`
+      )
+      .join("");
+    equipmentSelect.innerHTML = `<option value="">Alt udstyr</option>${options}`;
+  }
+  if (muscleSelect) {
+    const options = muscleCatalog
+      .map(
+        (item) =>
+          `<option value="${item.key}" ${filterState.muscle === item.key ? "selected" : ""}>${item.label || item.key}</option>`
+      )
+      .join("");
+    muscleSelect.innerHTML = `<option value="">Alle muskler</option>${options}`;
+  }
+}
+
+function updateRmCache(exerciseKey, values) {
+  const entry = rmData.find((row) => row.exerciseKey === exerciseKey);
+  if (!entry) return;
+  entry.rm = { ...(entry.rm || {}) };
+  Object.keys(values).forEach((rep) => {
+    if (values[rep] === null || values[rep] === undefined) {
+      delete entry.rm[rep];
+    } else {
+      entry.rm[rep] = values[rep];
+    }
+  });
+}
+
+function updateMetricCache(exerciseKey, metric, value) {
+  const entry = rmData.find((row) => row.exerciseKey === exerciseKey);
+  if (!entry) return;
+  entry.metrics = { ...(entry.metrics || {}) };
+  if (value === null || value === undefined) {
+    delete entry.metrics[metric];
+  } else {
+    entry.metrics[metric] = value;
   }
 }
 
@@ -623,6 +827,7 @@ document.addEventListener("change", async (e) => {
     try {
       setStatus("Gemmer måling…");
       await saveMetric(exerciseKey, metric, value);
+      updateMetricCache(exerciseKey, metric, value);
       setStatus("Måling gemt ✅");
     } catch (err) {
       console.error(err);
@@ -647,6 +852,7 @@ document.addEventListener("change", async (e) => {
     try {
       setStatus("Gemmer…");
       await saveCell(exerciseKey, changedRep, null);
+      updateRmCache(exerciseKey, { [changedRep]: null });
       setStatus("Gemt ✅ (felt tømt)");
     } catch (err) {
       console.error(err);
@@ -674,6 +880,7 @@ document.addEventListener("change", async (e) => {
 
     setStatus("Gemmer alle felter…");
     await saveAll(exerciseKey, newRM);
+    updateRmCache(exerciseKey, newRM);
     setStatus("Gemt ✅ (alle felter opdateret)");
   } catch (err) {
     console.error(err);
@@ -726,6 +933,38 @@ async function init() {
       toggleBtn.addEventListener("click", () => {
         showPctColumns = !showPctColumns;
         applyPctVisibility();
+      });
+    }
+    attachSortingHandlers();
+    const typeFilter = document.getElementById("filterType");
+    const equipFilter = document.getElementById("filterEquipment");
+    const muscleFilter = document.getElementById("filterMuscle");
+    const clearBtn = document.getElementById("clearFilters");
+    if (typeFilter) {
+      typeFilter.addEventListener("change", () => {
+        filterState.type = typeFilter.value;
+        renderRMTable();
+      });
+    }
+    if (equipFilter) {
+      equipFilter.addEventListener("change", () => {
+        filterState.equipment = equipFilter.value;
+        renderRMTable();
+      });
+    }
+    if (muscleFilter) {
+      muscleFilter.addEventListener("change", () => {
+        filterState.muscle = muscleFilter.value;
+        renderRMTable();
+      });
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        filterState.type = "";
+        filterState.equipment = "";
+        filterState.muscle = "";
+        populateFilterOptions();
+        renderRMTable();
       });
     }
     setStatus("Loader udstyr…");
