@@ -7,9 +7,6 @@
     body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; background:#fafafa; }
     h1 { margin:0 0 8px; font-size:24px; }
     p.muted { color:#666; font-size:13px; margin:4px 0 16px; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
-    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
-    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     form { background:#fff; border:1px solid #ddd; padding:20px; max-width:760px; }
     label { display:block; font-size:13px; color:#555; margin-bottom:4px; }
     input, textarea, select { width:100%; padding:8px; margin-bottom:14px; font-size:14px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
@@ -32,22 +29,11 @@
     [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
     .admin-disabled { opacity:0.6; }
   </style>
+  <link rel="stylesheet" href="/nav.css" />
   <script src="/common.js"></script>
 </head>
-<body>
-
-<nav class="tabs">
-  <a href="/rm">RM</a>
-  <a href="/equipment">Udstyr</a>
-  <a href="/profile">Profil</a>
-  <a href="/muscles">Muskler</a>
-  <a href="/vision" class="active">Vision</a>
-  <a href="/program">Programbygger</a>
-  <a href="/programs">Programarkiv</a>
-  <a href="/warmup">Opvarmning</a>
-  <a href="/execute">Eksekvering</a>
-  <a href="/profiles">Profiler</a>
-</nav>
+<body data-page="vision">
+<nav class="global-nav" data-global-nav></nav>
 
 <div class="active-profile">
   Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
@@ -156,9 +142,11 @@ const {
   withProfileParam,
   toggleAdminMode,
   applyAdminState,
+  renderNavigation,
 } = window.AppState;
 
 ensureActiveProfileId();
+renderNavigation("vision");
 updateActiveProfileBadge();
 applyAdminState();
 

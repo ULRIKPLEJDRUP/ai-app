@@ -7,9 +7,6 @@
     body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; padding:20px; background:#f7f7f7; color:#1c1c1c; }
     h1 { margin:0 0 6px; font-size:24px; }
     .muted { color:#666; font-size:13px; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; list-style:none; padding:0; }
-    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
-    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     .active-profile { margin:0 0 16px; font-size:13px; }
     .active-profile strong { color:#000; }
     section { background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:16px; margin-bottom:16px; }
@@ -39,6 +36,10 @@
     .exercise-chip { border:1px solid #c8d4ff; border-radius:6px; padding:6px; background:#eef3ff; font-size:12px; display:flex; justify-content:space-between; gap:6px; align-items:flex-start; }
     .exercise-chip strong { display:block; font-size:13px; color:#102040; }
     .exercise-meta { color:#46506b; font-size:11px; margin-top:3px; }
+    .exercise-controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-top:6px; font-size:11px; color:#314161; }
+    .exercise-controls label { display:flex; flex-direction:column; gap:3px; font-weight:600; }
+    .exercise-controls input[type="number"] { width:100%; padding:5px; border:1px solid #bed0ff; border-radius:6px; font-size:12px; }
+    .superset-toggle { display:flex; align-items:center; gap:6px; font-weight:600; }
     .exercise-chip button { border:none; background:#f44336; color:#fff; border-radius:4px; font-size:11px; padding:4px 6px; cursor:pointer; }
     .tag-pill { display:inline-block; background:#dfe7ff; color:#1d2a54; border-radius:999px; padding:2px 6px; font-size:11px; margin-right:4px; margin-top:2px; }
     .btn-save { display:inline-block; margin-top:10px; padding:8px 16px; border:none; border-radius:6px; background:#0b72ff; color:#fff; font-size:14px; cursor:pointer; }
@@ -48,33 +49,30 @@
     .program-meta .meta-note { font-size:13px; color:#666; max-width:360px; }
     .save-controls { margin-top:8px; font-size:13px; color:#444; display:flex; align-items:center; gap:8px; }
     .save-controls label { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; }
+    .header-actions { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:flex-start; }
+    #resetProgramBtn { border:1px solid #d6dff5; background:#fff; color:#142a60; padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13px; }
     @media (max-width:960px) { .layout { grid-template-columns:1fr; } .summary { position:static; } }
   </style>
+  <link rel="stylesheet" href="/nav.css" />
   <script src="/common.js"></script>
 </head>
-<body>
+<body data-page="program">
 
-<nav class="tabs">
-  <a href="/rm">RM</a>
-  <a href="/equipment">Udstyr</a>
-  <a href="/profile">Profil</a>
-  <a href="/muscles">Muskler</a>
-  <a href="/vision">Vision</a>
-  <a href="/program" class="active">Programbygger</a>
-  <a href="/programs">Programarkiv</a>
-  <a href="/warmup">Opvarmning</a>
-  <a href="/execute">Eksekvering</a>
-  <a href="/profiles">Profiler</a>
-</nav>
+<nav class="global-nav" data-global-nav></nav>
 
 <div class="active-profile">
   Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
 </div>
 
-<h1>Byg et træningsprogram</h1>
-<p class="muted">
-  Brug flowet herunder til at gå fra mål → ramme → arketype → programstruktur. Hvert valg låser de næste trin og bygger en forklarlig plan.
-</p>
+<div class="header-actions">
+  <div>
+    <h1>Byg et træningsprogram</h1>
+    <p class="muted">
+      Brug flowet herunder til at gå fra mål → ramme → arketype → programstruktur. Hvert valg låser de næste trin og bygger en forklarlig plan.
+    </p>
+  </div>
+  <button type="button" id="resetProgramBtn">Start helt nyt</button>
+</div>
 <div class="program-meta">
   <div>
     <label for="programName">Programnavn</label>
@@ -148,11 +146,24 @@ const {
   syncActiveProfileMeta,
   getStoredProfileId,
   withProfileParam,
+  renderNavigation,
+  setActiveProfileMeta,
 } = window.AppState;
 
+const urlParams = new URLSearchParams(window.location.search);
+const requestedProgramId = urlParams.get("programId");
+const requestedProfileId = urlParams.get("profileId");
+const startFromScratchParam = urlParams.get("reset") === "1";
 ensureActiveProfileId();
+if (requestedProfileId && requestedProfileId !== getStoredProfileId()) {
+  setActiveProfileMeta(requestedProfileId, requestedProfileId);
+}
+renderNavigation("program");
 updateActiveProfileBadge();
 syncActiveProfileMeta();
+if (requestedProfileId && requestedProfileId !== getStoredProfileId()) {
+  updateActiveProfileBadge();
+}
 
 const STATE = {
   goal: null,
@@ -324,6 +335,43 @@ const SESSION_TEMPLATES = {
   tri_split: ["Swim", "Bike", "Run", "Brick"],
 };
 
+const PROGRAM_SESSION_TEMPLATES = {
+  hypertrophy: {
+    upper_lower: [
+      { note: "Fokus på bryst/ryg (tung)", exercises: ["bench_press", "barbell_row", "overhead_press", "lat_pulldown", "biceps_curl", "triceps_pushdown"] },
+      { note: "Quad + bagkæde", exercises: ["back_squat", "romanian_deadlift", "leg_press", "calf_raise", "plank"] },
+      { note: "Overkrop variation", exercises: ["incline_dumbbell_press", "dumbbell_row", "face_pull", "pull_ups", "hammer_curl", "dips"] },
+      { note: "Hofte/bagkæde", exercises: ["deadlift", "hip_thrust", "leg_press", "calf_raise", "ab_wheel"] },
+    ],
+    push_pull_legs: [
+      { note: "Push A", exercises: ["bench_press", "incline_dumbbell_press", "overhead_press", "dips", "triceps_pushdown"] },
+      { note: "Pull A", exercises: ["barbell_row", "lat_pulldown", "pull_ups", "face_pull", "biceps_curl"] },
+      { note: "Legs A", exercises: ["back_squat", "romanian_deadlift", "leg_press", "calf_raise", "plank"] },
+      { note: "Push B", exercises: ["incline_dumbbell_press", "bench_press", "overhead_press", "triceps_pushdown", "hammer_curl"] },
+      { note: "Pull B", exercises: ["dumbbell_row", "lat_pulldown", "pull_ups", "face_pull", "biceps_curl"] },
+      { note: "Legs B", exercises: ["deadlift", "hip_thrust", "leg_press", "calf_raise", "ab_wheel"] },
+    ],
+    full_body: [
+      { note: "Full body A", exercises: ["back_squat", "bench_press", "barbell_row", "calf_raise", "plank"] },
+      { note: "Full body B", exercises: ["deadlift", "overhead_press", "lat_pulldown", "dips", "hammer_curl"] },
+      { note: "Full body C", exercises: ["leg_press", "incline_dumbbell_press", "pull_ups", "hip_thrust", "face_pull"] },
+    ],
+  },
+  strength: {
+    power4: [
+      { note: "ME Upper", exercises: ["bench_press", "overhead_press", "barbell_row", "face_pull"] },
+      { note: "ME Lower", exercises: ["back_squat", "deadlift", "leg_press", "calf_raise"] },
+      { note: "DE Upper", exercises: ["incline_dumbbell_press", "dips", "pull_ups", "triceps_pushdown"] },
+      { note: "DE Lower", exercises: ["romanian_deadlift", "hip_thrust", "leg_press", "ab_wheel"] },
+    ],
+    full_power: [
+      { note: "Full A", exercises: ["back_squat", "bench_press", "barbell_row", "calf_raise"] },
+      { note: "Full B", exercises: ["deadlift", "overhead_press", "lat_pulldown", "dips"] },
+      { note: "Full C", exercises: ["romanian_deadlift", "incline_dumbbell_press", "pull_ups", "hip_thrust"] },
+    ],
+  },
+};
+
 function ensureSessionState(index) {
   if (!STATE.sessions[index]) {
     STATE.sessions[index] = { notes: "", exercises: [] };
@@ -332,6 +380,94 @@ function ensureSessionState(index) {
     STATE.sessions[index].exercises = [];
   }
   return STATE.sessions[index];
+}
+
+function lookupExerciseMeta(key) {
+  return RM_EXERCISES.find((ex) => ex.exerciseKey === key) || null;
+}
+
+function prettifyKey(key) {
+  return String(key || "")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
+function buildExerciseEntry(key) {
+  const meta = lookupExerciseMeta(key);
+  if (!meta) {
+    return {
+      exerciseKey: key,
+      name: prettifyKey(key),
+      equipment: [],
+      muscleGroups: [],
+      type: "",
+    };
+  }
+  return {
+    exerciseKey: meta.exerciseKey,
+    name: meta.name || prettifyKey(meta.exerciseKey),
+    equipment: meta.equipment || [],
+    muscleGroups: meta.muscleGroups || [],
+    type: meta.type || "",
+  };
+}
+
+function hydrateSessionExercises() {
+  Object.keys(STATE.sessions).forEach((idx) => {
+    const session = STATE.sessions[idx];
+    if (!session?.exercises) return;
+    session.exercises = session.exercises.map((item) => {
+      const meta = lookupExerciseMeta(item.exerciseKey);
+      if (!meta) return ensureExerciseFields(item);
+      return ensureExerciseFields({
+        ...item,
+        name: meta.name || item.name || prettifyKey(item.exerciseKey),
+        equipment: meta.equipment || [],
+        muscleGroups: meta.muscleGroups || [],
+        type: meta.type || item.type || "",
+      });
+    });
+  });
+}
+
+function defaultRestBetweenSets(entry) {
+  const type = entry?.type || "";
+  if (type === "compound") return 120;
+  if (type === "isolation") return 60;
+  return 75;
+}
+
+function defaultRestBetweenExercises(entry) {
+  const type = entry?.type || "";
+  if (type === "compound") return 45;
+  if (type === "isolation") return 30;
+  return 30;
+}
+
+function ensureExerciseFields(entry) {
+  const item = entry || {};
+  if (item.restBetweenSets === undefined || item.restBetweenSets === null) {
+    item.restBetweenSets = defaultRestBetweenSets(item);
+  }
+  if (item.restBetweenExercises === undefined || item.restBetweenExercises === null) {
+    item.restBetweenExercises = defaultRestBetweenExercises(item);
+  }
+  item.restBetweenSets = Number(item.restBetweenSets) || 0;
+  item.restBetweenExercises = Number(item.restBetweenExercises) || 0;
+  item.supersetWithNext = Boolean(item.supersetWithNext);
+  return item;
+}
+
+function applyTemplateSessionsIfEmpty() {
+  if (!STATE.goal || !STATE.structure) return;
+  const template = PROGRAM_SESSION_TEMPLATES[STATE.goal]?.[STATE.structure];
+  if (!template) return;
+  template.forEach((spec, index) => {
+    const session = ensureSessionState(index);
+    if (session.exercises && session.exercises.length) return;
+    if (spec.note && !session.notes) session.notes = spec.note;
+    session.exercises = spec.exercises.map((key) => ensureExerciseFields(buildExerciseEntry(key)));
+  });
 }
 
 function formatTagPills(list, map) {
@@ -353,22 +489,37 @@ function renderSessionExercises(index) {
     return;
   }
   holder.innerHTML = session.exercises
-    .map((item) => {
-      const eq = formatTagPills(item.equipment, EQUIPMENT_MAP);
-      const mus = formatTagPills(item.muscleGroups, MUSCLE_MAP);
+    .map((item, itemIndex) => {
+      const exercise = ensureExerciseFields(item);
+      const eq = formatTagPills(exercise.equipment, EQUIPMENT_MAP);
+      const mus = formatTagPills(exercise.muscleGroups, MUSCLE_MAP);
       const metaParts = [];
       if (eq) metaParts.push(`Udstyr: ${eq}`);
       if (mus) metaParts.push(`Muskelgrupper: ${mus}`);
       const metaHtml = metaParts.length
         ? `<div class="exercise-meta">${metaParts.join("<br />")}</div>`
         : "";
+      const restSets = Number(exercise.restBetweenSets ?? 0);
+      const restNext = Number(exercise.restBetweenExercises ?? 0);
       return `
-        <div class="exercise-chip">
+        <div class="exercise-chip" data-session="${index}" data-ex-index="${itemIndex}">
           <div>
-            <strong>${item.name}</strong>
+            <strong>${exercise.name}</strong>
             ${metaHtml}
+            <div class="exercise-controls">
+              <label>Pause mellem sæt (sek)
+                <input type="number" min="0" step="5" value="${restSets}" data-role="rest-sets" data-session="${index}" data-ex-index="${itemIndex}" />
+              </label>
+              <label>Pause til næste øvelse (sek)
+                <input type="number" min="0" step="5" value="${restNext}" data-role="rest-between" data-session="${index}" data-ex-index="${itemIndex}" />
+              </label>
+              <label class="superset-toggle">
+                <input type="checkbox" data-role="superset-next" data-session="${index}" data-ex-index="${itemIndex}" ${exercise.supersetWithNext ? "checked" : ""} />
+                Supersæt med næste øvelse
+              </label>
+            </div>
           </div>
-          <button type="button" data-action="remove-exercise" data-session="${index}" data-key="${item.exerciseKey}">Fjern</button>
+          <button type="button" data-action="remove-exercise" data-session="${index}" data-ex-index="${itemIndex}" data-key="${exercise.exerciseKey}">Fjern</button>
         </div>
       `;
     })
@@ -530,19 +681,43 @@ function attachOptionEvents() {
       STATE.structure = card.dataset.key;
       STATE.sessions = {};
       highlightSelection(step, card.dataset.key);
+      applyTemplateSessionsIfEmpty();
       renderSessions(STATE.structure);
       updateSummary();
     }
   });
+}
 
-  document.getElementById("sessionGrid").addEventListener("input", (event) => {
-    if (event.target.matches("textarea[data-session]")) {
-      const index = event.target.dataset.session;
-      const session = ensureSessionState(index);
-      session.notes = event.target.value;
+document.getElementById("sessionGrid").addEventListener("input", (event) => {
+  if (event.target.matches("textarea[data-session]")) {
+    const index = event.target.dataset.session;
+    const session = ensureSessionState(index);
+    session.notes = event.target.value;
+    updateSummary();
+    return;
+  }
+  if (event.target.matches('[data-role="rest-sets"]')) {
+    const sessionIndex = event.target.dataset.session;
+    const exIndex = event.target.dataset.exIndex;
+    const session = ensureSessionState(sessionIndex);
+    const exercise = session.exercises[exIndex];
+    if (exercise) {
+      const value = Number(event.target.value);
+      exercise.restBetweenSets = Number.isFinite(value) ? Math.max(0, value) : 0;
       updateSummary();
     }
-  });
+  } else if (event.target.matches('[data-role="rest-between"]')) {
+    const sessionIndex = event.target.dataset.session;
+    const exIndex = event.target.dataset.exIndex;
+    const session = ensureSessionState(sessionIndex);
+    const exercise = session.exercises[exIndex];
+    if (exercise) {
+      const value = Number(event.target.value);
+      exercise.restBetweenExercises = Number.isFinite(value) ? Math.max(0, value) : 0;
+      updateSummary();
+    }
+  }
+});
 
 document.getElementById("sessionGrid").addEventListener("click", (event) => {
     const addBtn = event.target.closest('[data-action="add-exercise"]');
@@ -553,13 +728,30 @@ document.getElementById("sessionGrid").addEventListener("click", (event) => {
     }
     if (event.target.matches('[data-action="remove-exercise"]')) {
       const index = event.target.dataset.session;
-      const key = event.target.dataset.key;
+      const exIndex = Number(event.target.dataset.exIndex);
       const session = ensureSessionState(index);
-      session.exercises = session.exercises.filter((item) => item.exerciseKey !== key);
+      if (!session.exercises) return;
+      session.exercises.splice(exIndex, 1);
+      if (exIndex - 1 >= 0 && session.exercises[exIndex - 1]) {
+        session.exercises[exIndex - 1].supersetWithNext = false;
+      }
       renderSessionExercises(index);
       updateSummary();
     }
   });
+
+document.getElementById("sessionGrid").addEventListener("change", (event) => {
+  if (event.target.matches('[data-role="superset-next"]')) {
+    const sessionIndex = event.target.dataset.session;
+    const exIndex = event.target.dataset.exIndex;
+    const session = ensureSessionState(sessionIndex);
+    const exercise = session.exercises[exIndex];
+    if (exercise) {
+      exercise.supersetWithNext = event.target.checked;
+      updateSummary();
+    }
+  }
+});
 
 document.getElementById("programName").addEventListener("input", (event) => {
   STATE.programName = event.target.value;
@@ -619,7 +811,17 @@ document.getElementById("saveProgram").addEventListener("click", async () => {
     document.getElementById("saveStatus").textContent = "Kunne ikke gemme program ❌";
   }
 });
+
+function confirmStartFromScratch() {
+  return window.confirm("Vil du starte et helt nyt program? Det overskriver ikke gemte programmer før du trykker Gem.");
 }
+
+document.getElementById("resetProgramBtn").addEventListener("click", () => {
+  if (!confirmStartFromScratch()) return;
+  const target = withProfileParam("/program");
+  const url = `${target}${target.includes("?") ? "&" : "?"}reset=1`;
+  window.location.href = url;
+});
 
 function highlightSelection(step, key) {
   document.querySelectorAll(`[data-step="${step}"] .option-card`).forEach((el) => {
@@ -674,19 +876,12 @@ function handleAddExercise(index) {
   if (!select) return;
   const key = select.value;
   if (!key) return;
-  const exercise = RM_EXERCISES.find((ex) => ex.exerciseKey === key);
-  if (!exercise) return;
+  const exercise = ensureExerciseFields(buildExerciseEntry(key));
   const session = ensureSessionState(index);
   if (session.exercises.some((item) => item.exerciseKey === key)) {
     return;
   }
-  session.exercises.push({
-    exerciseKey: exercise.exerciseKey,
-    name: exercise.name,
-    equipment: exercise.equipment || [],
-    muscleGroups: exercise.muscleGroups || [],
-    type: exercise.type || "",
-  });
+  session.exercises.push(exercise);
   select.value = "";
   renderSessionExercises(index);
   updateSummary();
@@ -700,6 +895,7 @@ async function loadExercises() {
   } catch {
     RM_EXERCISES = [];
   }
+  hydrateSessionExercises();
   updateExercisePickers();
   Object.keys(STATE.sessions).forEach(renderSessionExercises);
 }
@@ -766,10 +962,12 @@ async function loadExistingBlueprint() {
   }
 }
 
-async function loadProgramFromArchive(programId) {
+async function loadProgramFromArchive(programId, profileOverride) {
   if (!programId) return false;
   try {
-    const res = await fetch(withProfileParam(`/api/programs/${encodeURIComponent(programId)}`));
+    const res = await fetch(
+      withProfileParam(`/api/programs/${encodeURIComponent(programId)}`, profileOverride)
+    );
     if (!res.ok) {
       if (res.status === 404) return false;
       throw new Error("HTTP " + res.status);
@@ -815,6 +1013,7 @@ function applyBlueprintToState(blueprint) {
   }
   if (STATE.structure) {
     highlightSelection("structure", STATE.structure);
+    applyTemplateSessionsIfEmpty();
     renderSessions(STATE.structure);
   }
   updateSummary();
@@ -825,10 +1024,11 @@ attachOptionEvents();
 loadExercises();
 loadEquipmentCatalog();
 loadMuscleCatalog();
-const params = new URLSearchParams(window.location.search);
-const requestedProgramId = params.get("programId");
-if (requestedProgramId) {
-  loadProgramFromArchive(requestedProgramId).then((loaded) => {
+if (startFromScratchParam) {
+  document.getElementById("saveStatus").textContent = "Nyt program klar – vælg mål for at starte.";
+  history.replaceState({}, "", window.location.pathname);
+} else if (requestedProgramId) {
+  loadProgramFromArchive(requestedProgramId, requestedProfileId).then((loaded) => {
     if (!loaded) loadExistingBlueprint();
   });
 } else {

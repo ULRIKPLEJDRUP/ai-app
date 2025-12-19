@@ -123,6 +123,21 @@
         "travel",
         "strength"
       ]
+    },
+    {
+      "key": "dip-bar",
+      "label": "Dip stativ",
+      "tags": [
+        "Rack",
+        "bars"
+      ]
+    },
+    {
+      "key": "ski_reag",
+      "label": "Ski-maskine",
+      "tags": [
+        "Ski-reag"
+      ]
     }
   ]
 }

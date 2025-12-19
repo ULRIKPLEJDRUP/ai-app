@@ -25,30 +25,17 @@
     .injury-options { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
     .injury-option { border:1px solid #ddd; border-radius:20px; padding:6px 12px; font-size:13px; background:#f5f5f5; display:flex; align-items:center; gap:6px; }
     .injury-option input { width:auto; margin:0; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
-    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
-    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
     .active-profile strong { color:#000; }
     body.admin-locked [data-admin-only] { pointer-events:none; }
     [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
     .admin-disabled { opacity:0.6; }
   </style>
+  <link rel="stylesheet" href="/nav.css" />
   <script src="/common.js"></script>
 </head>
-<body>
-<nav class="tabs">
-  <a href="/rm">RM</a>
-  <a href="/equipment">Udstyr</a>
-  <a href="/profile" class="active">Profil</a>
-  <a href="/muscles">Muskler</a>
-  <a href="/vision">Vision</a>
-  <a href="/program">Programbygger</a>
-  <a href="/programs">Programarkiv</a>
-  <a href="/warmup">Opvarmning</a>
-  <a href="/execute">Eksekvering</a>
-  <a href="/profiles">Profiler</a>
-</nav>
+<body data-page="profile">
+<nav class="global-nav" data-global-nav></nav>
 
 <div class="active-profile">
   Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
@@ -175,9 +162,11 @@ const {
   withProfileParam,
   toggleAdminMode,
   applyAdminState,
+  renderNavigation,
 } = window.AppState;
 
 ensureActiveProfileId();
+renderNavigation("profile");
 updateActiveProfileBadge();
 applyAdminState();
 

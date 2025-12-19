@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <title>Træningslog</title>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; padding:20px; background:#f5f6fb; color:#11192b; }
+    h1 { margin:0 0 10px; font-size:24px; }
+    p.muted { color:#667086; font-size:13px; margin-top:4px; }
+    table { width:100%; border-collapse:collapse; margin-top:16px; background:#fff; }
+    th, td { border:1px solid #e0e4f5; padding:10px; font-size:13px; text-align:left; vertical-align:top; }
+    th { background:#f2f4fc; text-transform:uppercase; letter-spacing:0.03em; font-size:12px; color:#4b5074; }
+    .log-list { margin-top:18px; }
+    .status { margin-top:12px; font-size:13px; color:#444; }
+    .detail { margin-top:6px; font-size:12px; color:#5a5f7c; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; background:#e7ecff; color:#12205c; font-size:11px; margin-right:6px; }
+    .actions { display:flex; gap:6px; flex-wrap:wrap; }
+    .actions button { border:1px solid #d6ddf5; background:#fff; color:#14224c; padding:6px 12px; border-radius:20px; cursor:pointer; font-size:12px; }
+    dialog { border:none; border-radius:12px; padding:20px; max-width:500px; width:90%; }
+    dialog::backdrop { background:rgba(0,0,0,0.4); }
+    dialog h2 { margin-top:0; }
+    .detail-list { margin:0; padding-left:18px; font-size:13px; }
+  </style>
+  <link rel="stylesheet" href="/nav.css" />
+  <script src="/common.js"></script>
+</head>
+<body data-page="workouts">
+
+<nav class="global-nav" data-global-nav></nav>
+
+<div class="active-profile">
+  Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
+</div>
+
+<h1>Træningslog</h1>
+<p class="muted">Her kan du se gennemførte træningspas, inklusive noter og evalueringer. Loggen opdateres automatisk når du afslutter et pas i Eksekvering.</p>
+
+<div id="logTable"></div>
+<div class="status" id="logStatus">Indlæser…</div>
+
+<dialog id="logDetail">
+  <h2 id="detailTitle"></h2>
+  <p class="muted" id="detailMeta"></p>
+  <div id="detailExercises"></div>
+  <p><strong>Evaluering:</strong> <span id="detailEval"></span></p>
+  <p><strong>Noter:</strong> <span id="detailNotes"></span></p>
+  <button type="button" id="detailClose">Luk</button>
+</dialog>
+
+<script>
+const {
+  ensureActiveProfileId,
+  updateActiveProfileBadge,
+  syncActiveProfileMeta,
+  withProfileParam,
+  renderNavigation,
+} = window.AppState;
+
+ensureActiveProfileId();
+renderNavigation("workouts");
+updateActiveProfileBadge();
+syncActiveProfileMeta();
+
+const logStatusEl = document.getElementById("logStatus");
+const logTableEl = document.getElementById("logTable");
+const detailDialog = document.getElementById("logDetail");
+
+function formatDuration(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${mins}m ${String(sec).padStart(2, "0")}s`;
+}
+
+function formatDate(value) {
+  try {
+    return new Date(value).toLocaleString("da-DK", { dateStyle: "short", timeStyle: "short" });
+  } catch {
+    return value;
+  }
+}
+
+function renderLogs(logs) {
+  if (!logs.length) {
+    logTableEl.innerHTML = `<p class="muted">Ingen træningspas logget endnu.</p>`;
+    return;
+  }
+  const rows = logs
+    .map((entry, idx) => {
+      const tags = [];
+      if (entry.goal) tags.push(`<span class="pill">${entry.goal}</span>`);
+      if (entry.structure) tags.push(`<span class="pill">${entry.structure}</span>`);
+      return `
+        <tr data-index="${idx}">
+          <td>${formatDate(entry.startTime)}</td>
+          <td>${entry.sessionLabel || "Ukendt"}</td>
+          <td>${formatDuration(Math.round(entry.durationSeconds || 0))}</td>
+          <td>${tags.join("")}</td>
+          <td>
+            <div class="actions">
+              <button type="button" data-action="view" data-index="${idx}">Vis detaljer</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+  logTableEl.innerHTML = `
+    <table class="log-list">
+      <thead>
+        <tr>
+          <th>Dato</th>
+          <th>Session</th>
+          <th>Varighed</th>
+          <th>Tags</th>
+          <th>Handling</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderLogDetail(entry) {
+  document.getElementById("detailTitle").textContent = entry.sessionLabel || "Træningspas";
+  document.getElementById("detailMeta").textContent = `${formatDate(entry.startTime)} · ${formatDuration(Math.round(entry.durationSeconds || 0))}`;
+  const exerciseHtml = (entry.exercises || [])
+    .map((ex) => {
+      const phasePill = ex.phase === "warmup" ? `<span class="pill">Opvarmning</span>` : "";
+      const feedback = Array.isArray(ex.feedback)
+        ? `<ul class="detail-list">${ex.feedback
+            .map((item) => `<li>Sæt ${item.set}: ${item.reps || "-"} reps @ ${item.weight || "-"} kg – ${item.notes || "OK"}</li>`)
+            .join("")}</ul>`
+        : "";
+      return `
+        <div class="detail">
+          <strong>${ex.name || ex.exerciseKey}</strong> ${phasePill} (${ex.completedSets}/${ex.plannedSets} sæt)
+          ${feedback}
+        </div>
+      `;
+    })
+    .join("");
+  document.getElementById("detailExercises").innerHTML = exerciseHtml || "<p class='muted'>Ingen detaljer</p>";
+  const evalText = entry.evaluation?.rating
+    ? `Rating: ${entry.evaluation.rating}/10${entry.evaluation.comment ? " – " + entry.evaluation.comment : ""}`
+    : entry.evaluation?.comment || "Ingen";
+  document.getElementById("detailEval").textContent = evalText;
+  document.getElementById("detailNotes").textContent = entry.notes || "Ingen noter";
+}
+
+let cachedLogs = [];
+
+async function loadLogs() {
+  logStatusEl.textContent = "Indlæser…";
+  try {
+    const res = await fetch(withProfileParam("/api/workouts"));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    cachedLogs = (await res.json()).sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    renderLogs(cachedLogs);
+    logStatusEl.textContent = `Viser ${cachedLogs.length} pas`;
+  } catch (err) {
+    console.error(err);
+    logStatusEl.textContent = "Kunne ikke hente logdata ❌";
+  }
+}
+
+logTableEl.addEventListener("click", (event) => {
+  const btn = event.target.closest("button[data-action='view']");
+  if (!btn) return;
+  const idx = Number(btn.dataset.index);
+  if (!Number.isFinite(idx) || !cachedLogs[idx]) return;
+  renderLogDetail(cachedLogs[idx]);
+  detailDialog.showModal();
+});
+
+document.getElementById("detailClose").addEventListener("click", () => detailDialog.close());
+
+loadLogs();
+</script>
+
+</body>
+</html>

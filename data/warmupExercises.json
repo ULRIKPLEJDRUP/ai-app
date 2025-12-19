@@ -1,0 +1,1301 @@
+{
+  "exercises": [
+    {
+      "key": "jumping_jacks",
+      "name": "Englehop / jumping jacks",
+      "type": "puls",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null
+    },
+    {
+      "key": "burpees_light",
+      "name": "Rolige burpees",
+      "type": "puls/hele kroppen",
+      "equipment": [],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "pushup_knee",
+      "name": "Armstrækkere på knæ",
+      "type": "push",
+      "equipment": [],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "trx_row",
+      "name": "TRX rows",
+      "type": "mobilitet/pull",
+      "equipment": [
+        "trx"
+      ],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "arm_circles",
+      "name": "Arm-cirkler frem/tilbage",
+      "type": "skulder mobilitet",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_swing_light",
+      "name": "Lette kettlebell swings",
+      "type": "hinge/puls",
+      "equipment": [
+        "kettlebell"
+      ],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_snatch_light",
+      "name": "Kettlebell snatch let vægt",
+      "type": "explosiv",
+      "equipment": [
+        "kettlebell"
+      ],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_halo",
+      "name": "Kettlebell halo",
+      "type": "skulder/kernestabilitet",
+      "equipment": [
+        "kettlebell"
+      ],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "windmill_kb",
+      "name": "Kettlebell windmill",
+      "type": "mobilitet/kernestyrke",
+      "equipment": [
+        "kettlebell"
+      ],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "worlds_greatest_stretch",
+      "name": "World's greatest stretch",
+      "type": "mobilitet",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 60,
+      "durationSeconds": null
+    },
+    {
+      "key": "bear_crawl",
+      "name": "Bear crawl",
+      "type": "core/puls",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null
+    },
+    {
+      "key": "high_knees",
+      "name": "Høje knæløft",
+      "type": "puls",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null
+    },
+    {
+      "key": "plank_shoulder_tap",
+      "name": "Planke med skuldertap",
+      "type": "core/stabilitet",
+      "equipment": [],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "hip_bridge",
+      "name": "Glute bridge",
+      "type": "hofteaktivering",
+      "equipment": [],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "bodyweight_squat",
+      "name": "Kropsvægt squats",
+      "type": "ben/puls",
+      "equipment": [],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "jump_rope_basic",
+      "name": "Sjippetov – basis",
+      "type": "puls",
+      "equipment": ["jump_rope"],
+      "reps": null,
+      "timeSeconds": 60,
+      "durationSeconds": null
+    },
+    {
+      "key": "jump_rope_double",
+      "name": "Sjippetov – double unders let",
+      "type": "puls",
+      "equipment": ["jump_rope"],
+      "reps": 30,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "jump_rope_side",
+      "name": "Sjippetov – side til side",
+      "type": "koordination",
+      "equipment": ["jump_rope"],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null
+    },
+    {
+      "key": "light_jog",
+      "name": "Let løbetur / jog på stedet",
+      "type": "puls",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 120,
+      "durationSeconds": null
+    },
+    {
+      "key": "butt_kicks",
+      "name": "Baglårskick (butt kicks)",
+      "type": "puls",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null
+    },
+    {
+      "key": "side_lunge_reach",
+      "name": "Sidelunge med reach",
+      "type": "mobilitet/ben",
+      "equipment": [],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "reverse_lunge_twist",
+      "name": "Reverse lunge med rotation",
+      "type": "mobilitet/core",
+      "equipment": [],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "spiderman_crawl",
+      "name": "Spiderman crawl",
+      "type": "mobilitet/core",
+      "equipment": [],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_deadlift_highpull",
+      "name": "KB deadlift til high pull",
+      "type": "hinge",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_clean_press",
+      "name": "KB clean & press let",
+      "type": "overhead/hele kroppen",
+      "equipment": ["kettlebell"],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_push_press",
+      "name": "KB push press",
+      "type": "overhead",
+      "equipment": ["kettlebell"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_suitcase_deadlift",
+      "name": "KB suitcase deadlift",
+      "type": "ben/core",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_sumo_highpull",
+      "name": "KB sumo deadlift high pull",
+      "type": "hinge/puls",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_goblet_squat",
+      "name": "KB goblet squat",
+      "type": "ben",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_lunge_pass",
+      "name": "KB lunge med håndskifte",
+      "type": "ben/koordination",
+      "equipment": ["kettlebell"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_press_hold",
+      "name": "KB overhead hold",
+      "type": "skulder/core",
+      "equipment": ["kettlebell"],
+      "reps": null,
+      "timeSeconds": 30,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_row_single",
+      "name": "KB enarms row",
+      "type": "pull",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_swing_one_arm",
+      "name": "KB enarms swings",
+      "type": "hinge",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_farmers_walk",
+      "name": "KB farmers walk",
+      "type": "greb/core",
+      "equipment": ["kettlebell"],
+      "reps": null,
+      "timeSeconds": null,
+      "durationSeconds": 60
+    },
+    {
+      "key": "kb_swing_hand_switch",
+      "name": "KB swing med håndskifte",
+      "type": "koordination",
+      "equipment": ["kettlebell"],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_clean_squat_press",
+      "name": "KB kompleks (clean-squat-press)",
+      "type": "hele kroppen",
+      "equipment": ["kettlebell"],
+      "reps": 6,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_pullover",
+      "name": "KB pullover",
+      "type": "overkrop",
+      "equipment": ["kettlebell"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_slingshot",
+      "name": "KB slingshot rundt om kroppen",
+      "type": "koordination/greb",
+      "equipment": ["kettlebell"],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_snatch_alternating",
+      "name": "KB snatch alternerende",
+      "type": "explosiv",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_half_getup",
+      "name": "KB halv Turkish get-up",
+      "type": "core/stabilitet",
+      "equipment": ["kettlebell"],
+      "reps": 6,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_reverse_lunge_press",
+      "name": "KB reverse lunge til press",
+      "type": "ben/overkrop",
+      "equipment": ["kettlebell"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "kb_side_bend",
+      "name": "KB side bend",
+      "type": "core",
+      "equipment": ["kettlebell"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "jump_squat",
+      "name": "Explosive hop squats",
+      "type": "puls/ben",
+      "equipment": [],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "skipping_side_shuffle",
+      "name": "Sjippetov – side shuffle",
+      "type": "koordination",
+      "equipment": ["jump_rope"],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null
+    },
+    {
+      "key": "mountain_climbers",
+      "name": "Mountain climbers",
+      "type": "core/puls",
+      "equipment": [],
+      "reps": 30,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "plank_walkout",
+      "name": "Plank walkouts",
+      "type": "core/mobilitet",
+      "equipment": [],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "inchworm",
+      "name": "Inchworm",
+      "type": "mobilitet",
+      "equipment": [],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "scap_pushup",
+      "name": "Scap push-ups",
+      "type": "skulderstabilitet",
+      "equipment": [],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "jump_rope_run",
+      "name": "Sjippetov – løbende bevægelse",
+      "type": "puls",
+      "equipment": ["jump_rope"],
+      "reps": null,
+      "timeSeconds": 60,
+      "durationSeconds": null
+    },
+    {
+      "key": "skater_hops",
+      "name": "Skater hops",
+      "type": "koordination",
+      "equipment": [],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "broad_jumps",
+      "name": "Broad jumps let intensitet",
+      "type": "explosiv",
+      "equipment": [],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "box_step_up",
+      "name": "Step-ups på lav kasse",
+      "type": "ben/puls",
+      "equipment": ["box"],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "box_jump_low",
+      "name": "Box jumps lav højde",
+      "type": "ben/explosiv",
+      "equipment": ["box"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "medball_slam_light",
+      "name": "Medball slams let vægt",
+      "type": "puls/overkrop",
+      "equipment": ["medball"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "medball_chest_pass",
+      "name": "Medball chest pass mod væg",
+      "type": "push",
+      "equipment": ["medball"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "medball_rotational_throw",
+      "name": "Medball rotationskast",
+      "type": "core/explosiv",
+      "equipment": ["medball"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "slow_row_machine",
+      "name": "Rolig roning",
+      "type": "puls",
+      "equipment": ["rower"],
+      "reps": null,
+      "timeSeconds": null,
+      "durationSeconds": 120
+    },
+    {
+      "key": "bike_easy",
+      "name": "Let cykling (air bike)",
+      "type": "puls",
+      "equipment": ["airbike"],
+      "reps": null,
+      "timeSeconds": null,
+      "durationSeconds": 120
+    },
+    {
+      "key": "treadmill_walk",
+      "name": "Gang på løbebånd",
+      "type": "puls",
+      "equipment": ["treadmill"],
+      "reps": null,
+      "timeSeconds": null,
+      "durationSeconds": 180
+    },
+    {
+      "key": "ski_erg_warmup",
+      "name": "Ski-erg let tempo",
+      "type": "puls/overkrop",
+      "equipment": ["skierg"],
+      "reps": null,
+      "timeSeconds": null,
+      "durationSeconds": 90
+    },
+    {
+      "key": "shadow_boxing",
+      "name": "Shadow boxing",
+      "type": "puls/koordination",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 60,
+      "durationSeconds": null
+    },
+    {
+      "key": "jumping_lunges",
+      "name": "Jumping lunges let intensitet",
+      "type": "ben",
+      "equipment": [],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "ankle_mobility_circle",
+      "name": "Ankelcirkler",
+      "type": "mobilitet",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null
+    },
+    {
+      "key": "hip_openers",
+      "name": "Knæ-til-bryst/hofteløft",
+      "type": "mobilitet",
+      "equipment": [],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "thoracic_rotation",
+      "name": "Thoracic rotation på alle fire",
+      "type": "mobilitet",
+      "equipment": [],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null
+    },
+    {
+      "key": "cat_cow",
+      "name": "Cat-cow flow",
+      "type": "mobilitet",
+      "equipment": [],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null
+    },
+    {
+      "key": "trx_chest_press",
+      "name": "TRX chest press",
+      "type": "push",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_high_row",
+      "name": "TRX high row",
+      "type": "pull",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_low_row",
+      "name": "TRX low row",
+      "type": "pull",
+      "equipment": ["trx"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_bicep_curl",
+      "name": "TRX biceps curl",
+      "type": "arm",
+      "equipment": ["trx"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_tricep_press",
+      "name": "TRX triceps press",
+      "type": "arm",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_t_y_i",
+      "name": "TRX T-Y-I raises",
+      "type": "skulder/forside",
+      "equipment": ["trx"],
+      "reps": 9,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_reverse_fly",
+      "name": "TRX reverse fly",
+      "type": "skulder/bagside",
+      "equipment": ["trx"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_face_pull",
+      "name": "TRX face pull",
+      "type": "upper back",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_y_deltoid",
+      "name": "TRX Y deltoid raise",
+      "type": "skulder",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_pike",
+      "name": "TRX pike",
+      "type": "core",
+      "equipment": ["trx"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_knee_tuck",
+      "name": "TRX knee tucks",
+      "type": "core",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_mountain_climber",
+      "name": "TRX mountain climbers",
+      "type": "core/puls",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_plank",
+      "name": "TRX plank hold",
+      "type": "core",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_hamstring_curl",
+      "name": "TRX hamstring curl",
+      "type": "ben",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_glute_bridge",
+      "name": "TRX glute bridge",
+      "type": "hofte",
+      "equipment": ["trx"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_lunge",
+      "name": "TRX-assisted lunge",
+      "type": "ben",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_single_leg_squat",
+      "name": "TRX single-leg squat",
+      "type": "ben/balance",
+      "equipment": ["trx"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_side_lunge",
+      "name": "TRX side lunge",
+      "type": "ben/mobilitet",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_curtsy_lunge",
+      "name": "TRX curtsy lunge",
+      "type": "ben",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_suspension_run",
+      "name": "TRX suspension runner",
+      "type": "puls/ben",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_hip_drop",
+      "name": "TRX hip drop",
+      "type": "skulder/lat",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_oblique_crunch",
+      "name": "TRX oblique crunch",
+      "type": "core",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_pendulum_swing",
+      "name": "TRX pendulum swing",
+      "type": "core/puls",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_side_plank",
+      "name": "TRX side plank",
+      "type": "core",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 30,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_atomic_pushup",
+      "name": "TRX atomic push-up",
+      "type": "push/core",
+      "equipment": ["trx"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_saw",
+      "name": "TRX body saw",
+      "type": "core",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 30,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_spiderman",
+      "name": "TRX spiderman push-up",
+      "type": "push/core",
+      "equipment": ["trx"],
+      "reps": 10,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_power_pull",
+      "name": "TRX power pull",
+      "type": "pull/rotation",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_squat_jump",
+      "name": "TRX squat jumps",
+      "type": "ben/puls",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_assisted_pistol",
+      "name": "TRX assisteret pistol squat",
+      "type": "ben/balance",
+      "equipment": ["trx"],
+      "reps": 8,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_rear_deltoid",
+      "name": "TRX rear deltoid fly",
+      "type": "skulder/bagside",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_pushup_plus",
+      "name": "TRX push-up plus",
+      "type": "push",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "trx_sprinter_start",
+      "name": "TRX sprinter start",
+      "type": "ben/puls",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 40,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "trx_chest_stretch",
+      "name": "TRX bryststræk",
+      "type": "mobilitet",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 30,
+      "durationSeconds": null,
+      "sets": 1,
+      "restSeconds": 0
+    },
+    {
+      "key": "trx_lat_stretch",
+      "name": "TRX lat strækker",
+      "type": "mobilitet",
+      "equipment": ["trx"],
+      "reps": null,
+      "timeSeconds": 30,
+      "durationSeconds": null,
+      "sets": 1,
+      "restSeconds": 0
+    },
+    {
+      "key": "trx_shoulder_dislocate",
+      "name": "TRX skulder dislocates",
+      "type": "mobilitet",
+      "equipment": ["trx"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 1,
+      "restSeconds": 0
+    },
+    {
+      "key": "band_row_standing",
+      "name": "Elastik stående row",
+      "type": "pull",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_chest_press_standing",
+      "name": "Elastik chest press",
+      "type": "push",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_overhead_press_light",
+      "name": "Elastik overhead press",
+      "type": "skulder",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_lateral_raise_light",
+      "name": "Elastik lateral raise",
+      "type": "skulder",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_front_raise_light",
+      "name": "Elastik front raise",
+      "type": "skulder",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_upright_row_light",
+      "name": "Elastik upright row",
+      "type": "skulder",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_facepull_high",
+      "name": "Elastik face pull højt",
+      "type": "upper back",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_pullapart_overhead",
+      "name": "Elastik pull-apart over hovedet",
+      "type": "skulder/mobilitet",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_diagonal_press",
+      "name": "Elastik diagonal press",
+      "type": "skulder/core",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_pallof_hold",
+      "name": "Elastik Pallof hold",
+      "type": "core",
+      "equipment": ["band"],
+      "reps": null,
+      "timeSeconds": 30,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_rotational_chop",
+      "name": "Elastik rotational chop",
+      "type": "core/rotation",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_pushup_plus",
+      "name": "Elastik push-up plus",
+      "type": "push",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_bear_hug",
+      "name": "Elastik bear hug",
+      "type": "bryst",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_resisted_march",
+      "name": "Elastik modstandsmarch",
+      "type": "ben/puls",
+      "equipment": ["band"],
+      "reps": null,
+      "timeSeconds": 45,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 15
+    },
+    {
+      "key": "band_assisted_squat",
+      "name": "Elastik assisteret squat",
+      "type": "ben",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_split_squat_assist",
+      "name": "Elastik split squat assisteret",
+      "type": "ben",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_terminal_knee_extension",
+      "name": "Elastik terminal knee extension",
+      "type": "ben",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_leg_abduction",
+      "name": "Elastik benabduktion",
+      "type": "glute",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_leg_adduction",
+      "name": "Elastik benadduktion",
+      "type": "indre lår",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_glute_bridge",
+      "name": "Elastik glute bridge",
+      "type": "hofte",
+      "equipment": ["band"],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_fire_hydrant",
+      "name": "Elastik fire hydrant",
+      "type": "glute",
+      "equipment": ["band"],
+      "reps": 15,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_deadbug_press",
+      "name": "Elastik deadbug press",
+      "type": "core",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_woodchop_high",
+      "name": "Elastik woodchop høj-lav",
+      "type": "core/rotation",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_woodchop_low",
+      "name": "Elastik woodchop lav-høj",
+      "type": "core/rotation",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_row_pulse",
+      "name": "Elastik row med pulser",
+      "type": "pull",
+      "equipment": ["band"],
+      "reps": 20,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_single_arm_press",
+      "name": "Elastik enarms press",
+      "type": "push",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    },
+    {
+      "key": "band_single_arm_row",
+      "name": "Elastik enarms row",
+      "type": "pull",
+      "equipment": ["band"],
+      "reps": 12,
+      "timeSeconds": null,
+      "durationSeconds": null,
+      "sets": 2,
+      "restSeconds": 10
+    }
+  ]
+}

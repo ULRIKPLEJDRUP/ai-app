@@ -33,6 +33,7 @@ const AVATAR_DIR = path.join(UPLOAD_DIR, "avatar");
 const PROGRESS_DIR = path.join(UPLOAD_DIR, "progress");
 const PROFILE_RM_FILE = "rm.json";
 const PROFILE_METRICS_FILE = "metrics.json";
+const PROFILE_WORKOUT_LOG_FILE = "workouts.json";
 const EXERCISE_METRICS = {
   dips: { count: true },
   pull_ups: { count: true },
@@ -188,6 +189,10 @@ function profileRMPath(profileId = DEFAULT_PROFILE_ID) {
 
 function profileMetricsPath(profileId = DEFAULT_PROFILE_ID) {
   return path.join(profileDir(profileId), PROFILE_METRICS_FILE);
+}
+
+function profileWorkoutLogPath(profileId = DEFAULT_PROFILE_ID) {
+  return path.join(profileDir(profileId), PROFILE_WORKOUT_LOG_FILE);
 }
 
 function programFilePath(profileId = DEFAULT_PROFILE_ID) {
@@ -459,6 +464,32 @@ function writeProfileMetrics(profileId = DEFAULT_PROFILE_ID, data = {}) {
   const dir = profileDir(id);
   ensureDir(dir);
   fs.writeFileSync(profileMetricsPath(id), JSON.stringify(data, null, 2), "utf8");
+}
+
+function readWorkoutLog(profileId = DEFAULT_PROFILE_ID) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const filePath = profileWorkoutLogPath(id);
+  try {
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      const data = JSON.parse(raw);
+      return Array.isArray(data) ? data : [];
+    }
+  } catch {
+    // ignore
+  }
+  return [];
+}
+
+function appendWorkoutLog(profileId = DEFAULT_PROFILE_ID, entry) {
+  const id = resolveProfileId(profileId);
+  ensureProfileMeta(id);
+  const log = readWorkoutLog(id);
+  log.push(entry);
+  ensureDir(profileDir(id));
+  fs.writeFileSync(profileWorkoutLogPath(id), JSON.stringify(log, null, 2), "utf8");
+  return entry;
 }
 
 function normalizeEquipmentEntry(entry) {
@@ -1323,6 +1354,68 @@ app.post("/api/rm-metric", (req, res) => {
   res.json({ ok: true, profileId, metrics: metrics[exerciseKey] || {} });
 });
 
+function sanitizeWorkoutLogPayload(body) {
+  if (!body || typeof body !== "object") throw new Error("Payload mangler");
+  const sessionLabel = String(body.sessionLabel || "").trim() || "Ukendt session";
+  const durationSeconds = Number(body.durationSeconds) || 0;
+  const exercises = Array.isArray(body.exercises) ? body.exercises : [];
+  const evalObj =
+    body.evaluation && typeof body.evaluation === "object"
+      ? {
+          rating: Number(body.evaluation.rating) || null,
+          comment: String(body.evaluation.comment || "").trim(),
+        }
+      : { rating: null, comment: "" };
+  const cleanExercises = exercises
+    .map((item) => {
+      if (!item || typeof item !== "object" || !item.exerciseKey) return null;
+      return {
+        exerciseKey: item.exerciseKey,
+        name: item.name || item.exerciseKey,
+        plannedSets: Number(item.plannedSets) || 0,
+        completedSets: Number(item.completedSets) || 0,
+        feedback: Array.isArray(item.feedback) ? item.feedback : [],
+        phase: item.phase === "warmup" ? "warmup" : "session",
+      };
+    })
+    .filter(Boolean);
+  return {
+    sessionLabel,
+    week: Number(body.week) || null,
+    goal: body.goal || null,
+    structure: body.structure || null,
+    programId: body.programId || null,
+    startTime: body.startTime || new Date().toISOString(),
+    durationSeconds,
+    exercises: cleanExercises,
+    notes: String(body.notes || "").trim(),
+    evaluation: evalObj,
+  };
+}
+
+app.get("/api/workouts", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  const logs = readWorkoutLog(profileId);
+  res.json(logs);
+});
+
+app.post("/api/workouts", (req, res) => {
+  const profileId = getProfileIdFromRequest(req);
+  try {
+    const payload = sanitizeWorkoutLogPayload(req.body || {});
+    const entry = {
+      id: randomUUID(),
+      profileId,
+      ...payload,
+      savedAt: new Date().toISOString(),
+    };
+    appendWorkoutLog(profileId, entry);
+    res.json({ ok: true, entry });
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Kunne ikke gemme workout log" });
+  }
+});
+
 // Opdater hvilke udstyrstyper en øvelse kræver
 app.post("/api/exercise-equipment", (req, res) => {
   const { exerciseKey, equipmentKeys } = req.body || {};
@@ -1355,6 +1448,10 @@ app.get("/rm", (req, res) => {
 
 app.get("/common.js", (req, res) => {
   res.type("application/javascript").sendFile(path.join(__dirname, "common.js"));
+});
+
+app.get("/nav.css", (req, res) => {
+  res.type("text/css").sendFile(path.join(__dirname, "nav.css"));
 });
 
 app.get("/equipment", (req, res) => {
@@ -1391,6 +1488,10 @@ app.get("/execute", (req, res) => {
 
 app.get("/warmup", (req, res) => {
   res.sendFile(path.join(__dirname, "warmup.html"));
+});
+
+app.get("/workouts", (req, res) => {
+  res.sendFile(path.join(__dirname, "workouts.html"));
 });
 
 app.listen(PORT, () => {

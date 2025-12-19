@@ -61,6 +61,10 @@
       ],
       "equipment": [
         "barbell"
+      ],
+      "muscleGroups": [
+        "chest",
+        "shoulder"
       ]
     },
     {
@@ -98,6 +102,9 @@
       ],
       "equipment": [
         "cable"
+      ],
+      "muscleGroups": [
+        "triceps"
       ]
     },
     {
@@ -116,6 +123,9 @@
       "equipment": [
         "bodyweight",
         "pullup_bar"
+      ],
+      "muscleGroups": [
+        "upper_back"
       ]
     },
     {
@@ -250,6 +260,10 @@
       "equipment": [
         "barbell",
         "rack"
+      ],
+      "muscleGroups": [
+        "leg",
+        "glute"
       ]
     },
     {
@@ -288,6 +302,10 @@
       "equipment": [
         "barbell",
         "dumbbell"
+      ],
+      "muscleGroups": [
+        "leg",
+        "glute"
       ]
     },
     {

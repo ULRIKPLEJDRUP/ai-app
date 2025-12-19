@@ -11,9 +11,6 @@
     th,td { border:1px solid #ddd; padding:8px 10px; font-size:14px; text-align:left; }
     th { background:#f5f5f5; }
     button { padding:6px 10px; font-size:13px; cursor:pointer; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
-    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
-    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     form { background:#fff; border:1px solid #ddd; padding:16px; margin-top:20px; max-width:500px; }
     form label { display:block; font-size:13px; color:#555; margin-bottom:4px; }
     form input, form select { width:100%; padding:8px; font-size:14px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px; }
@@ -24,22 +21,12 @@
     body.admin-locked [data-admin-only] { pointer-events:none; }
     [data-admin-toggle] { margin-left:12px; padding:4px 10px; font-size:12px; }
   </style>
+  <link rel="stylesheet" href="/nav.css" />
   <script src="/common.js"></script>
 </head>
-<body>
+<body data-page="profiles">
 
-<nav class="tabs">
-  <a href="/rm">RM</a>
-  <a href="/equipment">Udstyr</a>
-  <a href="/profile">Profil</a>
-  <a href="/muscles">Muskler</a>
-  <a href="/vision">Vision</a>
-  <a href="/program">Programbygger</a>
-  <a href="/programs">Programarkiv</a>
-  <a href="/warmup">Opvarmning</a>
-  <a href="/execute">Eksekvering</a>
-  <a href="/profiles" class="active">Profiler</a>
-</nav>
+<nav class="global-nav" data-global-nav></nav>
 
 <div class="active-profile">
   Aktiv profil: <strong data-active-profile-label>Indlæser…</strong> —
@@ -94,9 +81,11 @@ const {
   syncActiveProfileMeta,
   toggleAdminMode,
   applyAdminState,
+  renderNavigation,
 } = window.AppState;
 
 ensureActiveProfileId();
+renderNavigation("profiles");
 updateActiveProfileBadge();
 applyAdminState();
 

@@ -1,5 +1,14 @@
 {
   "ab_wheel": {
+    "count": 20
+  },
+  "dips": {
     "count": 25
+  },
+  "plank": {
+    "time": 300
+  },
+  "pull_ups": {
+    "count": 34
   }
 }

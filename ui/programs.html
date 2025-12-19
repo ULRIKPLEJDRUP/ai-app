@@ -7,9 +7,6 @@
     body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; margin:0; background:#f5f6fb; color:#10182b; }
     h1 { margin:0 0 8px; font-size:24px; }
     p.muted { color:#667086; font-size:13px; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:0 0 16px; list-style:none; }
-    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
-    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     .active-profile { margin:0 0 16px; font-size:13px; color:#333; }
     .active-profile strong { color:#000; }
     section { background:#fff; border:1px solid #e2e6f2; border-radius:10px; padding:16px; box-shadow:0 4px 12px rgba(15,20,60,0.05); }
@@ -24,7 +21,9 @@
     .badge-active { background:#0b72ff; color:#fff; border-radius:999px; padding:2px 8px; font-size:11px; margin-left:8px; }
     .empty { padding:30px 0; text-align:center; color:#5a627b; font-size:14px; }
     .list-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .list-header .header-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
     .list-header button { border:none; background:#0b72ff; color:#fff; border-radius:20px; padding:8px 16px; font-size:14px; cursor:pointer; }
+    #resetProgramShortcut { background:#fff; color:#142a60; border:1px solid #d6dff5; }
     .goal-label { font-weight:600; color:#111a35; }
     @media (max-width:720px) {
       table, thead, tbody, th, td, tr { display:block; }
@@ -34,22 +33,12 @@
       tr { border-bottom:1px solid #e5e8f5; margin-bottom:10px; padding-bottom:10px; }
     }
   </style>
+  <link rel="stylesheet" href="/nav.css" />
   <script src="/common.js"></script>
 </head>
-<body>
+<body data-page="programs">
 
-<nav class="tabs">
-  <a href="/rm">RM</a>
-  <a href="/equipment">Udstyr</a>
-  <a href="/profile">Profil</a>
-  <a href="/muscles">Muskler</a>
-  <a href="/vision">Vision</a>
-  <a href="/program">Programbygger</a>
-  <a href="/programs" class="active">Programarkiv</a>
-  <a href="/warmup">Opvarmning</a>
-  <a href="/execute">Eksekvering</a>
-  <a href="/profiles">Profiler</a>
-</nav>
+<nav class="global-nav" data-global-nav></nav>
 
 <div class="active-profile">
   Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
@@ -63,7 +52,9 @@
         Arkivet viser alle gemte programmer for den aktive profil. Brug knapperne for at redigere i Programbyggeren, sætte et program som aktivt eller fjerne det.
       </p>
     </div>
-    <button id="newProgramBtn">Nyt program i Programbygger</button>
+    <div class="header-actions">
+      <button id="resetProgramShortcut">Start helt nyt</button>
+    </div>
   </div>
 
   <div id="programList"></div>
@@ -76,9 +67,12 @@ const {
   updateActiveProfileBadge,
   syncActiveProfileMeta,
   withProfileParam,
+  renderNavigation,
+  getStoredProfileId,
 } = window.AppState;
 
 ensureActiveProfileId();
+renderNavigation("programs");
 updateActiveProfileBadge();
 syncActiveProfileMeta();
 
@@ -216,8 +210,11 @@ document.getElementById("programList").addEventListener("click", (event) => {
   }
 });
 
-document.getElementById("newProgramBtn").addEventListener("click", () => {
-  window.location.href = withProfileParam("/program");
+document.getElementById("resetProgramShortcut").addEventListener("click", () => {
+  if (!window.confirm("Vil du starte et helt nyt program i builderen?")) return;
+  const baseUrl = withProfileParam("/program");
+  const url = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}reset=1`;
+  window.location.href = url;
 });
 
 loadArchive();

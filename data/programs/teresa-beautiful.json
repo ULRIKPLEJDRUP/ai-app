@@ -1,0 +1,74 @@
+{
+  "activeProgramId": "a42c672b-3e37-4e56-bcfd-29f08f8b4202",
+  "programs": [
+    {
+      "id": "a42c672b-3e37-4e56-bcfd-29f08f8b4202",
+      "name": "Teresa træning 1",
+      "savedAt": "2025-12-18T20:14:34.936Z",
+      "blueprint": {
+        "goal": "hypertrophy",
+        "archetype": "volume_focus",
+        "structure": "full_body",
+        "sessions": {
+          "0": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "deadlift",
+                "name": "Deadlift",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "lower_back",
+                  "upper_back"
+                ],
+                "type": "compound"
+              },
+              {
+                "exerciseKey": "bench_press",
+                "name": "Bænkpres",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound"
+              },
+              {
+                "exerciseKey": "back_squat",
+                "name": "Squat (back squat)",
+                "equipment": [
+                  "barbell",
+                  "rack"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "glute"
+                ],
+                "type": "compound"
+              }
+            ]
+          },
+          "1": {
+            "notes": "",
+            "exercises": []
+          },
+          "2": {
+            "notes": "",
+            "exercises": []
+          }
+        },
+        "profileId": "teresa-beautiful",
+        "savedAt": "2025-12-18T20:14:34.936Z",
+        "programId": null,
+        "programName": "Teresa træning 1"
+      }
+    }
+  ]
+}

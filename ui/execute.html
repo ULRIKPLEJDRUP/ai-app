@@ -7,9 +7,6 @@
     body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; padding:20px; background:#f5f6fb; color:#1b1f2b; }
     h1 { margin:0 0 8px; font-size:24px; }
     p.muted { color:#666; font-size:13px; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none; }
-    .tabs a { text-decoration:none; padding:6px 14px; border:1px solid #cfd8e3; border-radius:18px; font-size:13px; color:#223; background:#fff; }
-    .tabs a.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     .active-profile { margin:0 0 12px; font-size:13px; color:#333; }
     .active-profile strong { color:#000; }
     .layout { display:grid; grid-template-columns: 3fr 1fr; gap:18px; }
@@ -22,7 +19,7 @@
     .session-buttons button { padding:8px 14px; border:1px solid #ccd7ef; border-radius:20px; background:#fff; cursor:pointer; font-size:13px; }
     .session-buttons button.active { background:#0b72ff; color:#fff; border-color:#0b72ff; }
     table { width:100%; border-collapse:collapse; margin-top:12px; }
-    th, td { border:1px solid #e5e8f5; padding:8px; font-size:13px; text-align:left; }
+    th, td { border:1px solid #e5e8f5; padding:8px; font-size:13px; text-align:left; vertical-align:top; }
     th { background:#f3f5fb; font-size:12px; text-transform:uppercase; letter-spacing:0.03em; color:#495169; }
     .time-control { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
     input[type="range"] { flex:1; }
@@ -42,23 +39,40 @@
     .warmup-plan ul { margin:8px 0 0; padding-left:18px; font-size:13px; color:#4a3b24; }
     .warmup-plan li { margin-bottom:4px; }
     .warmup-equip { font-size:12px; color:#7a4b00; }
+    .rest-editors { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:6px; font-size:12px; color:#3b4263; }
+    .rest-editors label { display:flex; flex-direction:column; gap:3px; text-transform:none; letter-spacing:normal; font-weight:600; }
+    .rest-editors input { width:100%; padding:6px; border:1px solid #cfd5ea; border-radius:6px; font-size:12px; }
+    .superset-note { font-size:12px; color:#7a0b2b; margin-top:6px; font-weight:600; }
+    .runner-section { margin-top:18px; background:#fff; border:1px solid #e0e0f4; border-radius:12px; padding:16px; box-shadow:0 4px 12px rgba(17,26,66,0.05); }
+    .runner-section h2 { margin:0 0 8px; }
+    .runner-status { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:14px; color:#2b3051; }
+    .runner-timer { font-size:24px; font-weight:600; color:#121a3f; }
+    .runner-controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+    .runner-controls button { border:1px solid #d8def4; background:#fff; padding:8px 14px; border-radius:20px; cursor:pointer; font-size:13px; }
+    .runner-controls button:disabled { opacity:0.4; cursor:not-allowed; }
+    .runner-eval { margin-top:16px; border-top:1px solid #e5e8f5; padding-top:12px; }
+    .runner-eval label { display:block; margin-bottom:6px; font-size:13px; color:#333; }
+    .runner-eval textarea { width:100%; padding:8px; border:1px solid #cfd5ea; border-radius:6px; font-size:13px; min-height:70px; }
+    .runner-progress { margin-top:10px; font-size:13px; color:#454b6c; }
+    .runner-flow { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+    .runner-step { border:1px solid #e1e5f7; border-radius:10px; padding:10px 12px; background:#fdfdff; display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .runner-step .step-main { flex:1; }
+    .runner-step .step-phase { font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#7a82a5; margin-bottom:2px; }
+    .runner-step .step-title { font-weight:600; color:#131a39; font-size:14px; }
+    .runner-step .step-meta { font-size:12px; color:#505572; margin-top:4px; }
+    .runner-step .step-progress { font-size:12px; font-weight:600; color:#2b3460; }
+    .runner-step.completed { opacity:0.55; }
+    .runner-step.active { border-color:#0b72ff; background:#eef4ff; box-shadow:0 0 0 1px rgba(11,114,255,0.2); }
+    .runner-step.warmup .step-phase { color:#b25c00; }
+    .runner-step.warmup.completed { display:none; }
+    .runner-step.warmup.warmup-hidden { display:none; }
   </style>
+  <link rel="stylesheet" href="/nav.css" />
   <script src="/common.js"></script>
 </head>
-<body>
+<body data-page="execute">
 
-<nav class="tabs">
-  <a href="/rm">RM</a>
-  <a href="/equipment">Udstyr</a>
-  <a href="/profile">Profil</a>
-  <a href="/muscles">Muskler</a>
-  <a href="/vision">Vision</a>
-  <a href="/program">Programbygger</a>
-  <a href="/programs">Programarkiv</a>
-  <a href="/warmup">Opvarmning</a>
-  <a href="/execute" class="active">Eksekvering</a>
-  <a href="/profiles">Profiler</a>
-</nav>
+<nav class="global-nav" data-global-nav></nav>
 
 <div class="active-profile">
   Aktiv profil: <strong data-active-profile-label>Indlæser…</strong>
@@ -118,17 +132,47 @@
               <th>Sæt × Reps</th>
               <th>Forslag (kg)</th>
               <th>Est. tid</th>
+              <th>Pauser</th>
               <th>Noter</th>
             </tr>
           </thead>
           <tbody id="planRows">
-            <tr><td colspan="5">Vælg dag…</td></tr>
+            <tr><td colspan="6">Vælg dag…</td></tr>
           </tbody>
         </table>
         <div class="time-status" id="timeStatus"></div>
         <div>
           <strong>Justeringer</strong>
           <ul class="notes-list" id="adjustNotes"></ul>
+        </div>
+      </section>
+
+      <section class="runner-section">
+        <h2>Session Runner</h2>
+        <div class="runner-status">
+          <div id="runnerStatusText">Tryk “Start helt nyt” for at køre programmet.</div>
+          <div class="runner-timer" id="runnerTimer">00:00</div>
+        </div>
+        <div class="runner-progress" id="runnerProgress"></div>
+        <div class="runner-controls">
+          <button id="startRunnerBtn">Start session</button>
+          <button id="completeSetBtn" disabled>Markér sæt udført</button>
+          <button id="skipRestBtn" disabled>Spring pause over</button>
+          <button id="stopRunnerBtn" disabled>Afbryd</button>
+          <button id="completePlannedBtn">Program gennemført som planlagt</button>
+        </div>
+        <p class="muted" id="runnerAutoNote">
+          Sæt markeres automatisk med planlagte reps/vægte. Giv samlet feedback under evalueringen, og justér evt. programmet i builderen bagefter.
+        </p>
+        <div class="runner-flow" id="runnerFlow"></div>
+        <div class="runner-eval hidden" id="runnerEval">
+          <label>Overordnet rating (1-10)
+            <input type="number" id="evalRating" min="1" max="10" />
+          </label>
+          <label>Opsummering / noter
+            <textarea id="evalNotes" placeholder="Hvordan gik paset?"></textarea>
+          </label>
+          <button type="button" id="evalSaveBtn">Gem træningslog</button>
         </div>
       </section>
     </div>
@@ -149,9 +193,11 @@ const {
   getStoredProfileLabel,
   withProfileParam,
   setActiveProfileMeta,
+  renderNavigation,
 } = window.AppState;
 
 ensureActiveProfileId();
+renderNavigation("execute");
 updateActiveProfileBadge();
 syncActiveProfileMeta();
 
@@ -209,9 +255,8 @@ const EXECUTION_PRESETS = {
 };
 
 const WARMUP_MINUTES = 10;
-const MAX_WARMUP_EXERCISES = 6;
-const REST_BETWEEN_EXERCISES = 12;
-const DEFAULT_SET_REST = 5;
+const REST_BETWEEN_EXERCISES = 15;
+const DEFAULT_SET_REST = 15;
 
 let blueprint = null;
 let sessionLabels = [];
@@ -222,6 +267,21 @@ let currentWeek = 1;
 let availableMinutes = 60;
 let warmupCatalog = [];
 let equipmentMap = {};
+let currentPlanEntries = [];
+let currentWarmupEntries = [];
+const runnerState = {
+  active: false,
+  plan: [],
+  exerciseIndex: 0,
+  setIndex: 1,
+  mode: "idle",
+  restRemaining: 0,
+  restType: "",
+  startedAt: null,
+  startIso: null,
+  restEndTime: null,
+};
+let runnerTimerInterval = null;
 
 initExecution();
 
@@ -406,6 +466,34 @@ const GOAL_STRUCTURES = {
   },
 };
 
+function defaultSessionRestBetweenSets(entry) {
+  const type = entry?.type || "";
+  if (type === "compound") return 120;
+  if (type === "isolation") return 60;
+  return 75;
+}
+
+function defaultSessionRestBetweenExercises(entry) {
+  const type = entry?.type || "";
+  if (type === "compound") return 45;
+  if (type === "isolation") return 30;
+  return 30;
+}
+
+function ensureSessionExerciseFields(entry) {
+  if (!entry || typeof entry !== "object") return { restBetweenSets: 90, restBetweenExercises: 30 };
+  if (entry.restBetweenSets === undefined || entry.restBetweenSets === null) {
+    entry.restBetweenSets = defaultSessionRestBetweenSets(entry);
+  }
+  if (entry.restBetweenExercises === undefined || entry.restBetweenExercises === null) {
+    entry.restBetweenExercises = defaultSessionRestBetweenExercises(entry);
+  }
+  entry.restBetweenSets = Number(entry.restBetweenSets) || 0;
+  entry.restBetweenExercises = Number(entry.restBetweenExercises) || 0;
+  entry.supersetWithNext = Boolean(entry.supersetWithNext);
+  return entry;
+}
+
 async function fetchBlueprintFromServer() {
   try {
     const res = await fetch(withProfileParam("/api/program-blueprint"));
@@ -471,11 +559,14 @@ function renderPlan() {
   if (!blueprint) return;
   const basePlan = buildBasePlan(currentSessionIndex);
   const adjusted = adjustPlanForTime(basePlan, availableMinutes);
-  renderPlanTable(adjusted.plan);
+  currentPlanEntries = adjusted.plan.map((item) => ({ ...item }));
+  renderPlanTable(currentPlanEntries);
   updateTimeStatus(basePlan, adjusted);
   renderAdjustmentNotes(adjusted.notes);
   renderSessionSummary();
   renderWarmupPlan();
+  renderRunnerFlow();
+  updateRunnerButtons();
 }
 
 function buildBasePlan(index) {
@@ -489,15 +580,23 @@ function buildBasePlan(index) {
       type: row.type,
     }));
   }
-  return exercises.map((ex) => {
+  return exercises.map((ex, exIndex) => {
+    const sessionEntry = ensureSessionExerciseFields(ex);
     const rmRow = rmMap[ex.exerciseKey];
     const type = ex.type || rmRow?.type || inferTypeFromTags(rmRow);
     const sets = pickPresetValue(preset.baseSets, type);
     const repsText = pickPresetValue(preset.repText, type);
     const targetReps = pickPresetValue(preset.targetReps, type);
-    const minutesPerSet = pickPresetValue(preset.minutesPerSet, type);
+    const workMinutesPerSet = pickPresetValue(preset.minutesPerSet, type);
     const minSets = pickPresetValue(preset.minSets, type);
     const loadPct = pickPresetValue(preset.loadPct, type);
+    const restBetweenSetsSec = Number(sessionEntry.restBetweenSets) || defaultSessionRestBetweenSets(sessionEntry);
+    const restBetweenExercisesSec =
+      sessionEntry.supersetWithNext
+        ? 0
+        : Number(sessionEntry.restBetweenExercises) || defaultSessionRestBetweenExercises(sessionEntry);
+    const minutesPerSet = workMinutesPerSet + restBetweenSetsSec / 60;
+    const restBetweenExercisesMin = restBetweenExercisesSec / 60;
     return {
       name: ex.name || rmRow?.name || ex.exerciseKey,
       exerciseKey: ex.exerciseKey,
@@ -507,8 +606,14 @@ function buildBasePlan(index) {
       repsText,
       targetReps,
       minutesPerSet,
+      workMinutesPerSet,
       loadSuggestion: formatLoadSuggestion(rmRow, targetReps, loadPct),
-      estimatedMinutes: sets * minutesPerSet,
+      estimatedMinutes: sets * minutesPerSet + restBetweenExercisesMin,
+      restBetweenSetsSec,
+      restBetweenExercisesSec,
+      restBetweenExercisesMin,
+      supersetWithNext: Boolean(sessionEntry.supersetWithNext),
+      sessionExerciseIndex: exIndex,
       note: rmRow?.metricTypes ? metricNote(rmRow.metricTypes) : "",
       rmAvailable: Boolean(rmRow),
     };
@@ -598,6 +703,15 @@ function roundLoad(value) {
   return Math.round((value || 0) / 0.5) * 0.5;
 }
 
+function parseLoadValue(text) {
+  if (!text) return null;
+  const match = String(text).match(/([\d.,]+)\s*kg/i);
+  if (!match) return null;
+  const normalized = match[1].replace(",", ".");
+  const value = Number(normalized);
+  return Number.isFinite(value) ? value : null;
+}
+
 function adjustPlanForTime(plan, minutesAvailable) {
   const adjusted = plan.map((item) => ({ ...item }));
   const notes = [];
@@ -630,25 +744,40 @@ function adjustPlanForTime(plan, minutesAvailable) {
 }
 
 function estimateTotalMinutes(entries) {
-  return entries.reduce((sum, item) => sum + item.sets * item.minutesPerSet, 0);
+  return entries.reduce((sum, item) => sum + item.sets * item.minutesPerSet + (item.restBetweenExercisesMin || 0), 0);
 }
 
 function renderPlanTable(entries) {
   const tbody = document.getElementById("planRows");
   if (!entries.length) {
-    tbody.innerHTML = `<tr><td colspan="5">Ingen øvelser valgt på blueprintet endnu. Tilføj dem på <a href="/program">Programbyggeren</a>.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6">Ingen øvelser valgt på blueprintet endnu. Tilføj dem på <a href="/program">Programbyggeren</a>.</td></tr>`;
     return;
   }
   tbody.innerHTML = entries
-    .map((item) => `
-      <tr>
+    .map(
+      (item, idx) => `
+      <tr data-plan-index="${idx}">
         <td>${item.name}${item.rmAvailable ? "" : "<br><span class='warning'>Manglende RM-data</span>"}</td>
         <td>${item.sets} sæt · ${item.repsText}</td>
         <td>${item.loadSuggestion}</td>
-        <td>${Math.round(item.sets * item.minutesPerSet)} min</td>
+        <td>${Math.round(item.sets * item.minutesPerSet + (item.restBetweenExercisesMin || 0))} min</td>
+        <td>
+          <div class="rest-editors">
+            <label>Pause sæt (sek)
+              <input type="number" min="0" step="5" value="${Math.round(item.restBetweenSetsSec || 0)}"
+                     data-role="plan-rest-sets" data-plan-index="${idx}" />
+            </label>
+            <label>Pause mellem øvelser (sek)
+              <input type="number" min="0" step="5" value="${Math.round(item.restBetweenExercisesSec || 0)}"
+                     data-role="plan-rest-between" data-plan-index="${idx}" />
+            </label>
+          </div>
+          ${item.supersetWithNext ? `<div class="superset-note">Supersæt med næste øvelse</div>` : ""}
+        </td>
         <td>${item.note || ""}</td>
       </tr>
-    `)
+    `
+    )
     .join("");
 }
 
@@ -673,6 +802,49 @@ function renderAdjustmentNotes(notes) {
   list.innerHTML = notes.map((note) => `<li>${note}</li>`).join("");
 }
 
+function ensureBlueprintSession(index) {
+  if (!blueprint.sessions) blueprint.sessions = [];
+  if (!blueprint.sessions[index]) {
+    blueprint.sessions[index] = { notes: "", exercises: [] };
+  }
+  if (!Array.isArray(blueprint.sessions[index].exercises)) {
+    blueprint.sessions[index].exercises = [];
+  }
+  return blueprint.sessions[index];
+}
+
+function ensureBlueprintExerciseForPlan(planItem) {
+  const session = ensureBlueprintSession(currentSessionIndex);
+  const idx = planItem.sessionExerciseIndex ?? session.exercises.length;
+  if (!session.exercises[idx]) {
+    session.exercises[idx] = {
+      exerciseKey: planItem.exerciseKey,
+      name: planItem.name,
+      type: planItem.type,
+      equipment: planItem.equipment || [],
+      muscleGroups: planItem.muscleGroups || [],
+    };
+  }
+  return session.exercises[idx];
+}
+
+document.getElementById("planRows").addEventListener("input", (event) => {
+  const role = event.target.dataset.role;
+  if (role !== "plan-rest-sets" && role !== "plan-rest-between") return;
+  const planIndex = Number(event.target.dataset.planIndex);
+  if (!Number.isFinite(planIndex)) return;
+  const planItem = currentPlanEntries[planIndex];
+  if (!planItem) return;
+  const value = Math.max(0, Number(event.target.value) || 0);
+  const exercise = ensureBlueprintExerciseForPlan(planItem);
+  if (role === "plan-rest-sets") {
+    exercise.restBetweenSets = value;
+  } else if (role === "plan-rest-between") {
+    exercise.restBetweenExercises = value;
+  }
+  renderPlan();
+});
+
 function renderSessionSummary() {
   const title = document.getElementById("sessionTitle");
   const sessionName = sessionLabels[currentSessionIndex] || `Session ${currentSessionIndex + 1}`;
@@ -687,16 +859,24 @@ function renderWarmupPlan() {
   const container = document.getElementById("warmupPlan");
   if (!container) return;
   if (!warmupCatalog.length) {
+    currentWarmupEntries = [];
     container.innerHTML = `<strong>Opvarmningsforslag:</strong>
       <p class="muted">Tilføj øvelser på <a href="/warmup">/warmup</a> for at få automatisk forslag.</p>`;
     return;
   }
-  const plan = buildWarmupPlan();
+  const planResult = buildWarmupPlan();
+  const plan = planResult.items;
   if (!plan.length) {
+    currentWarmupEntries = [];
     container.innerHTML = `<strong>Opvarmningsforslag:</strong>
       <p class="muted">Kunne ikke generere — tilføj flere øvelser.</p>`;
     return;
   }
+  currentWarmupEntries = plan.map((item, idx) => ({
+    ...item,
+    uid: item.uid || item.id || item.key || `${item.name || "warmup"}_${idx}`,
+    rounds: Math.max(1, item.rounds || 1),
+  }));
   const listItems = plan
     .map((item) => {
       const detail = describeWarmupItem(item);
@@ -704,14 +884,12 @@ function renderWarmupPlan() {
       return `<li><strong>${item.name}</strong> — ${detail}${equip ? `<br><span class="warmup-equip">${equip}</span>` : ""}</li>`;
     })
     .join("");
-  const totalSeconds = plan.reduce((sum, item) => sum + (item.seconds || 0), 0);
+  const totalSeconds = planResult.totalSeconds;
   container.innerHTML = `
     <strong>Opvarmningsforslag:</strong>
     <ul>${listItems}</ul>
     <p class="muted">
-      Varighed ca. ${Math.round(totalSeconds / 60)} min (del af de 10 min). Beregning: (tid pr. sæt + pauser ${
-        DEFAULT_SET_REST
-      } sek) × antal sæt + ${REST_BETWEEN_EXERCISES} sek mellem øvelser.
+      Varighed ca. ${Math.round(totalSeconds / 60)} min (del af de 10 min). Vi justerer automatisk sæt/pauser for at lande tæt på 10 minutter – gentag planen hvis du har energi til mere.
     </p>
   `;
 }
@@ -723,6 +901,7 @@ function describeWarmupItem(item) {
   if (item.durationSeconds) parts.push(`${Math.round(item.durationSeconds / 60)} min`);
   const sets = item.sets && item.sets > 1 ? `${item.sets} sæt` : null;
   if (sets) parts.push(sets);
+  if (item.note) parts.push(item.note);
   if (!parts.length) return "Arbejd i eget tempo";
   return parts.join(" · ");
 }
@@ -736,21 +915,40 @@ function formatWarmupEquipment(list) {
 }
 
 function buildWarmupPlan(targetMinutes = WARMUP_MINUTES) {
-  if (!warmupCatalog.length) return [];
+  if (!warmupCatalog.length) return { items: [], totalSeconds: 0 };
   const shuffled = [...warmupCatalog].sort(() => Math.random() - 0.5);
+  const targetSeconds = targetMinutes * 60;
   const plan = [];
-  let remainingSeconds = targetMinutes * 60;
+  let totalSeconds = 0;
+
   for (const entry of shuffled) {
-    if (plan.length >= MAX_WARMUP_EXERCISES) break;
-    const seconds = estimateWarmupSeconds(entry);
-    if (!seconds) continue;
-    const withRest = seconds + (plan.length ? REST_BETWEEN_EXERCISES : 0);
-    if (remainingSeconds - withRest < -15 && plan.length) continue;
-    plan.push({ ...entry, seconds });
-    remainingSeconds -= withRest;
-    if (remainingSeconds <= 0) break;
+    const baseSeconds = estimateWarmupSeconds(entry);
+    if (!baseSeconds) continue;
+    const restBetween = plan.length ? REST_BETWEEN_EXERCISES : 0;
+    plan.push({ ...entry, seconds: baseSeconds });
+    totalSeconds += baseSeconds + restBetween;
+    if (totalSeconds >= targetSeconds * 0.6) break;
   }
-  return plan;
+
+  if (!plan.length) return { items: [], totalSeconds: 0 };
+
+  let round = 1;
+  while (totalSeconds < targetSeconds && round < 4) {
+    for (const item of plan) {
+      const restBetween = REST_BETWEEN_EXERCISES;
+      totalSeconds += item.seconds + restBetween;
+      item.rounds = (item.rounds || 1) + 1;
+      if (totalSeconds >= targetSeconds) break;
+    }
+    round += 1;
+  }
+
+  plan.forEach((item) => {
+    const rounds = item.rounds || 1;
+    if (rounds > 1) item.note = `Gentag ${rounds} runder`;
+  });
+
+  return { items: plan, totalSeconds };
 }
 
 function estimateWarmupSeconds(entry) {
@@ -765,6 +963,564 @@ function estimateWarmupSeconds(entry) {
   const rest = Number.isFinite(entry.restSeconds) ? entry.restSeconds : DEFAULT_SET_REST;
   return sets * perSet + (sets > 1 ? (sets - 1) * rest : 0);
 }
+
+function buildRunnerExecutionPlan() {
+  const plan = [];
+  const warmupBase = currentWarmupEntries.map((item, idx) => ({
+    item,
+    idx,
+    rounds: Math.max(1, item.rounds || 1),
+    setsPerRound: Math.max(1, item.sets || 1),
+    detail: describeWarmupItem(item),
+  }));
+  const maxRounds = warmupBase.length ? warmupBase.reduce((max, entry) => Math.max(max, entry.rounds), 1) : 0;
+  for (let round = 1; round <= maxRounds; round++) {
+    warmupBase.forEach(({ item, idx, rounds, setsPerRound, detail }) => {
+      if (round > rounds) return;
+      const title = rounds > 1 ? `${item.name || "Opvarmning"} – runde ${round}/${rounds}` : item.name || "Opvarmning";
+      plan.push({
+        phase: "warmup",
+        name: title,
+        exerciseKey: (item.uid ? `warmup:${item.uid}` : `warmup:${idx}`) + `:r${round}`,
+        totalSets: setsPerRound,
+        targetReps: item.reps || null,
+        repsText: detail,
+        warmupDetail: detail,
+        loadSuggestion: formatWarmupLoadSuggestion(item),
+        restBetweenSetsSec: Math.min(20, REST_BETWEEN_EXERCISES),
+        restBetweenExercisesSec: REST_BETWEEN_EXERCISES,
+        supersetWithNext: false,
+        type: "warmup",
+        note: item.note,
+        completedSets: 0,
+        feedback: [],
+      });
+    });
+  }
+  currentPlanEntries.forEach((item, idx) => {
+    plan.push({
+      phase: "session",
+      name: item.name,
+      exerciseKey: item.exerciseKey || `session_${idx}`,
+      totalSets: item.sets || item.totalSets || 1,
+      targetReps: item.targetReps,
+      repsText: item.repsText,
+      loadSuggestion: item.loadSuggestion,
+      restBetweenSetsSec: item.restBetweenSetsSec || defaultSessionRestBetweenSets(item),
+      restBetweenExercisesSec: item.restBetweenExercisesSec || defaultSessionRestBetweenExercises(item),
+      supersetWithNext: item.supersetWithNext,
+      type: item.type,
+      note: item.note,
+      completedSets: 0,
+      feedback: [],
+    });
+  });
+  for (let i = 0; i < plan.length; i++) {
+    const entry = plan[i];
+    if (entry.phase !== "session" || !entry.supersetWithNext) continue;
+    const partner = plan[i + 1];
+    if (!partner || partner.phase !== "session") continue;
+    entry.supersetPartnerIndex = i + 1;
+    partner.pairedWithPrev = true;
+    partner.supersetLeadIndex = i;
+  }
+  return plan;
+}
+
+function formatWarmupLoadSuggestion(item) {
+  if (Number.isFinite(item.timeSeconds)) return `${Math.round(item.timeSeconds)} sek pr. runde`;
+  if (Number.isFinite(item.durationSeconds)) return `${Math.round(item.durationSeconds / 60)} min pr. øvelse`;
+  if (Number.isFinite(item.seconds)) return `${Math.round(item.seconds)} sek pr. øvelse`;
+  return "";
+}
+
+function getRunnerPlanPreview() {
+  if (runnerState.active || runnerState.mode === "complete") {
+    return runnerState.plan;
+  }
+  return buildRunnerExecutionPlan();
+}
+
+function formatRunnerStepMeta(entry) {
+  if (entry.phase === "warmup") {
+    const bits = [entry.warmupDetail || entry.repsText];
+    if (entry.loadSuggestion) bits.push(entry.loadSuggestion);
+    return bits.filter(Boolean).join(" · ") || "Let opvarmning";
+  }
+  const total = entry.totalSets || entry.sets || 1;
+  const bits = [`${total} sæt${entry.repsText ? ` · ${entry.repsText}` : ""}`];
+  if (entry.loadSuggestion) bits.push(entry.loadSuggestion);
+  if (entry.note) bits.push(entry.note);
+  if (entry.supersetWithNext) bits.push("Supersæt – fortsæt direkte til næste");
+  if (entry.pairedWithPrev) bits.push("Supersæt – del af forrige øvelse");
+  return bits.filter(Boolean).join(" · ");
+}
+
+function formatRunnerStepProgress(entry) {
+  const total = Math.max(1, entry.totalSets || entry.sets || 1);
+  const completed = Math.min(entry.completedSets || 0, total);
+  const label = entry.phase === "warmup" ? "runder" : "sæt";
+  return `${completed}/${total} ${label}`;
+}
+
+function getRunnerStepStatus(index) {
+  if (runnerState.mode === "complete") return "completed";
+  if (!runnerState.active) return "";
+  if (runnerState.mode === "rest_exercise") {
+    if (index <= runnerState.exerciseIndex) return "completed";
+    if (index === runnerState.exerciseIndex + 1 && runnerState.exerciseIndex + 1 < runnerState.plan.length) {
+      return "active";
+    }
+    return "";
+  }
+  if (index < runnerState.exerciseIndex) return "completed";
+  if (index === runnerState.exerciseIndex) return "active";
+  return "";
+}
+
+function renderRunnerFlow() {
+  const container = runnerElements.flow || document.getElementById("runnerFlow");
+  if (!container) return;
+  const plan = getRunnerPlanPreview();
+  if (!plan.length) {
+    container.innerHTML = `<p class="muted">Ingen øvelser klar endnu – vælg uge og dag.</p>`;
+    return;
+  }
+  const html = plan
+    .map((entry, idx) => {
+      const status = getRunnerStepStatus(idx);
+      const classes = ["runner-step", entry.phase === "warmup" ? "warmup" : "session"];
+      if (status) classes.push(status);
+      if (runnerState.active && entry.phase === "warmup" && status !== "active") {
+        classes.push("warmup-hidden");
+      }
+      return `
+        <div class="${classes.join(" ")}" data-step-index="${idx}">
+          <div class="step-main">
+            <div class="step-phase">${entry.phase === "warmup" ? "Opvarmning" : "Session"}</div>
+            <div class="step-title">${entry.name || ""}</div>
+            <div class="step-meta">${formatRunnerStepMeta(entry)}</div>
+          </div>
+          <div class="step-progress">${formatRunnerStepProgress(entry)}</div>
+        </div>
+      `;
+    })
+    .join("");
+  container.innerHTML = html;
+}
+
+function formatTimer(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+const runnerElements = {
+  statusText: document.getElementById("runnerStatusText"),
+  timer: document.getElementById("runnerTimer"),
+  progress: document.getElementById("runnerProgress"),
+  flow: document.getElementById("runnerFlow"),
+  startBtn: document.getElementById("startRunnerBtn"),
+  completeBtn: document.getElementById("completeSetBtn"),
+  skipBtn: document.getElementById("skipRestBtn"),
+  stopBtn: document.getElementById("stopRunnerBtn"),
+  completePlanBtn: document.getElementById("completePlannedBtn"),
+  evalBox: document.getElementById("runnerEval"),
+  evalRating: document.getElementById("evalRating"),
+  evalNotes: document.getElementById("evalNotes"),
+  evalSave: document.getElementById("evalSaveBtn"),
+};
+
+function updateRunnerButtons() {
+  const hasPlan = currentPlanEntries.length > 0;
+  if (!runnerElements.startBtn) return;
+  runnerElements.startBtn.disabled = runnerState.active || !hasPlan;
+  runnerElements.completeBtn.disabled = !runnerState.active || runnerState.mode !== "work";
+  const resting = runnerState.mode === "rest_set" || runnerState.mode === "rest_exercise";
+  runnerElements.skipBtn.disabled = !runnerState.active || !resting;
+  runnerElements.stopBtn.disabled = !runnerState.active;
+  if (runnerElements.completePlanBtn) {
+    runnerElements.completePlanBtn.disabled = runnerState.active || !hasPlan;
+  }
+}
+
+function disablePlanControls(flag) {
+  const weekSelect = document.getElementById("weekSelect");
+  const timeInput = document.getElementById("timeInput");
+  const timeSlider = document.getElementById("timeSlider");
+  if (weekSelect) weekSelect.disabled = flag;
+  if (timeInput) timeInput.disabled = flag;
+  if (timeSlider) timeSlider.disabled = flag;
+}
+
+function updateRunnerStatus() {
+  if (!runnerElements.statusText) return;
+  if (!runnerState.active && runnerState.mode !== "complete") {
+    runnerElements.statusText.textContent = currentPlanEntries.length
+      ? "Klar til at starte sessionen"
+      : "Planen er tom – vælg først mål og session.";
+    runnerElements.progress.textContent = "";
+    runnerElements.timer.textContent = "00:00";
+     renderRunnerFlow();
+    return;
+  }
+  const elapsed = runnerState.startedAt ? Math.floor((Date.now() - runnerState.startedAt) / 1000) : 0;
+  runnerElements.timer.textContent = formatTimer(elapsed);
+  if (runnerState.mode === "complete") {
+    runnerElements.statusText.textContent = "Session gennemført – udfyld evaluering";
+    runnerElements.progress.textContent = "";
+    renderRunnerFlow();
+    return;
+  }
+  const exercise = runnerState.plan[runnerState.exerciseIndex];
+  if (!exercise) {
+    runnerElements.statusText.textContent = "Session afsluttet";
+    runnerElements.progress.textContent = "";
+    renderRunnerFlow();
+    return;
+  }
+  runnerState.setIndex = Math.min((exercise.completedSets || 0) + 1, exercise.totalSets || 1);
+  const phaseLabel = exercise.phase === "warmup" ? "Opvarmning" : "Øvelse";
+  const unitLabel = exercise.phase === "warmup" ? "runde" : "sæt";
+  if (runnerState.mode === "rest_set") {
+    runnerElements.statusText.textContent = `Pause mellem ${unitLabel} – ${exercise.name}`;
+  } else if (runnerState.mode === "rest_exercise") {
+    const nextEntry = runnerState.plan[runnerState.exerciseIndex + 1];
+    const nextLabel = nextEntry ? (nextEntry.phase === "warmup" ? "opvarmning" : "øvelse") : "afslut";
+    runnerElements.statusText.textContent = `Pause mellem øvelser – næste: ${
+      nextEntry ? `${nextEntry.name} (${nextLabel})` : "afslut"
+    }`;
+  } else {
+    runnerElements.statusText.textContent = `${phaseLabel}: ${exercise.name} · ${unitLabel} ${runnerState.setIndex}/${exercise.totalSets}`;
+  }
+  const restInfo =
+    runnerState.restRemaining && (runnerState.mode === "rest_set" || runnerState.mode === "rest_exercise")
+      ? ` · ${runnerState.restRemaining}s pause`
+      : "";
+  runnerElements.progress.textContent = `${phaseLabel} ${Math.min(
+    runnerState.exerciseIndex + 1,
+    runnerState.plan.length
+  )}/${runnerState.plan.length}${restInfo}`;
+  renderRunnerFlow();
+}
+
+function startSessionRunner() {
+  const runnerPlan = buildRunnerExecutionPlan();
+  if (!runnerPlan.length) {
+    alert("Planen er tom. Vælg mål/uge først.");
+    return;
+  }
+  runnerState.active = true;
+  runnerState.plan = runnerPlan.map((item) => ({
+    ...item,
+    totalSets: Math.max(1, item.totalSets || 1),
+    completedSets: 0,
+    feedback: [],
+  }));
+  runnerState.exerciseIndex = 0;
+  runnerState.setIndex = 1;
+  runnerState.mode = "work";
+  runnerState.startedAt = Date.now();
+  runnerState.startIso = new Date().toISOString();
+  runnerState.restRemaining = 0;
+  runnerState.restEndTime = null;
+  runnerElements.evalBox.classList.add("hidden");
+  disablePlanControls(true);
+  startRunnerTimer();
+  updateRunnerStatus();
+  updateRunnerButtons();
+}
+
+function startRunnerTimer() {
+  if (runnerTimerInterval) clearInterval(runnerTimerInterval);
+  runnerTimerInterval = setInterval(() => {
+    if (!runnerState.active && runnerState.mode !== "complete") return;
+    updateRunnerStatus();
+    if (
+      runnerState.restEndTime &&
+      (runnerState.mode === "rest_set" || runnerState.mode === "rest_exercise")
+    ) {
+      const remaining = Math.max(0, Math.round((runnerState.restEndTime - Date.now()) / 1000));
+      runnerState.restRemaining = remaining;
+      if (remaining <= 0) {
+        runnerState.restEndTime = null;
+        advanceToNextWork();
+      }
+    }
+  }, 1000);
+}
+
+function handleCompleteSetClick() {
+  if (!runnerState.active || runnerState.mode !== "work") return;
+  autoRecordCurrentSet();
+  advanceAfterSet();
+  updateRunnerStatus();
+  updateRunnerButtons();
+}
+
+function autoRecordCurrentSet() {
+  const exercise = runnerState.plan[runnerState.exerciseIndex];
+  if (!exercise) return;
+  const noteParts = [];
+  if (exercise.repsText) noteParts.push(exercise.repsText);
+  if (exercise.loadSuggestion) noteParts.push(exercise.loadSuggestion);
+  exercise.feedback.push({
+    set: runnerState.setIndex,
+    reps: exercise.targetReps || null,
+    weight: parseLoadValue(exercise.loadSuggestion),
+    notes: noteParts.length ? `Plan: ${noteParts.join(" · ")}` : "Planlagte værdier",
+    timestamp: new Date().toISOString(),
+    auto: true,
+  });
+}
+
+function buildPlanFeedbackEntries(exercise) {
+  const entries = [];
+  const total = Math.max(1, exercise.totalSets || exercise.sets || 1);
+  const noteParts = [];
+  if (exercise.phase === "warmup") {
+    if (exercise.warmupDetail) noteParts.push(exercise.warmupDetail);
+  } else {
+    if (exercise.repsText) noteParts.push(exercise.repsText);
+    if (exercise.loadSuggestion) noteParts.push(exercise.loadSuggestion);
+  }
+  for (let set = 1; set <= total; set++) {
+    entries.push({
+      set,
+      reps: exercise.targetReps || null,
+      weight: parseLoadValue(exercise.loadSuggestion),
+      notes: noteParts.length ? `Plan: ${noteParts.join(" · ")}` : "Planlagte værdier",
+      timestamp: new Date().toISOString(),
+      auto: true,
+    });
+  }
+  return entries;
+}
+
+function advanceAfterSet() {
+  const exercise = runnerState.plan[runnerState.exerciseIndex];
+  if (!exercise) return;
+  exercise.completedSets = (exercise.completedSets || 0) + 1;
+  if (runnerState.setIndex >= exercise.totalSets) {
+    startRest("exercise", exercise.restBetweenExercisesSec || 0);
+  } else {
+    runnerState.setIndex += 1;
+    startRest("set", exercise.restBetweenSetsSec || 0);
+  }
+}
+
+function startRest(type, seconds) {
+  runnerState.restRemaining = Math.max(0, Math.round(seconds || 0));
+  runnerState.restEndTime =
+    runnerState.restRemaining > 0 ? Date.now() + runnerState.restRemaining * 1000 : null;
+  runnerState.mode = type === "exercise" ? "rest_exercise" : "rest_set";
+  if (runnerState.restRemaining === 0) {
+    advanceToNextWork();
+  }
+  updateRunnerStatus();
+  updateRunnerButtons();
+}
+
+function advanceToNextWork() {
+  if (runnerState.mode === "rest_set") {
+    runnerState.mode = "work";
+    updateRunnerStatus();
+    updateRunnerButtons();
+    return;
+  }
+  if (runnerState.mode === "rest_exercise") {
+    runnerState.exerciseIndex += 1;
+    if (runnerState.exerciseIndex >= runnerState.plan.length) {
+      finishSessionRunner();
+    } else {
+      runnerState.setIndex = 1;
+      runnerState.mode = "work";
+      updateRunnerStatus();
+      updateRunnerButtons();
+    }
+  }
+}
+
+function finishSessionRunner() {
+  runnerState.active = false;
+  runnerState.mode = "complete";
+  if (runnerTimerInterval) {
+    clearInterval(runnerTimerInterval);
+    runnerTimerInterval = null;
+  }
+  updateRunnerStatus();
+  updateRunnerButtons();
+  disablePlanControls(false);
+  runnerElements.evalBox.classList.remove("hidden");
+}
+
+function resetRunnerState() {
+  runnerState.active = false;
+  runnerState.plan = [];
+  runnerState.exerciseIndex = 0;
+  runnerState.setIndex = 1;
+  runnerState.mode = "idle";
+  runnerState.restRemaining = 0;
+  runnerState.startedAt = null;
+  runnerState.startIso = null;
+  if (runnerTimerInterval) {
+    clearInterval(runnerTimerInterval);
+    runnerTimerInterval = null;
+  }
+  runnerElements.timer.textContent = "00:00";
+  runnerElements.evalBox.classList.add("hidden");
+  disablePlanControls(false);
+  updateRunnerStatus();
+  updateRunnerButtons();
+}
+
+function cancelRunner() {
+  if (!runnerState.active) return;
+  if (!window.confirm("Afbryd sessionen? Fremdrift logges ikke.")) return;
+  resetRunnerState();
+}
+
+function skipCurrentRest() {
+  if (runnerState.mode !== "rest_set" && runnerState.mode !== "rest_exercise") return;
+  runnerState.restRemaining = 0;
+  runnerState.restEndTime = null;
+  advanceToNextWork();
+}
+
+function markPlanCompletedAutomatically() {
+  if (runnerState.active) {
+    alert("Stop først den igangværende session, eller fullfør den manuelt.");
+    return;
+  }
+  if (!currentPlanEntries.length) {
+    alert("Planen er tom. Vælg uge/dag først.");
+    return;
+  }
+  const runnerPlan = buildRunnerExecutionPlan();
+  if (!runnerPlan.length) {
+    alert("Kunne ikke finde øvelser for sessionen.");
+    return;
+  }
+  runnerPlan.forEach((entry) => {
+    const total = Math.max(1, entry.totalSets || 1);
+    entry.completedSets = total;
+    entry.feedback = buildPlanFeedbackEntries(entry);
+  });
+  const estimatedSeconds = Math.max(
+    600,
+    Math.round((estimateTotalMinutes(currentPlanEntries) + WARMUP_MINUTES) * 60)
+  );
+  const now = Date.now();
+  runnerState.active = false;
+  runnerState.plan = runnerPlan;
+  runnerState.exerciseIndex = runnerPlan.length - 1;
+  runnerState.setIndex = runnerPlan[runnerPlan.length - 1]?.totalSets || 1;
+  runnerState.mode = "complete";
+  runnerState.startedAt = now - estimatedSeconds * 1000;
+  runnerState.startIso = new Date(runnerState.startedAt).toISOString();
+  runnerState.restRemaining = 0;
+  runnerState.restEndTime = null;
+  disablePlanControls(false);
+  runnerElements.evalBox.classList.remove("hidden");
+  renderRunnerFlow();
+  updateRunnerStatus();
+  updateRunnerButtons();
+}
+
+async function saveWorkoutLog() {
+  const rating = runnerElements.evalRating.value ? Number(runnerElements.evalRating.value) : null;
+  const notes = runnerElements.evalNotes.value.trim();
+  const payload = {
+    sessionLabel: sessionLabels[currentSessionIndex] || `Session ${currentSessionIndex + 1}`,
+    week: currentWeek,
+    goal: blueprint?.goal || null,
+    structure: blueprint?.structure || null,
+    programId: blueprint?.programId || null,
+    startTime: runnerState.startIso || new Date().toISOString(),
+    durationSeconds: runnerState.startedAt ? Math.round((Date.now() - runnerState.startedAt) / 1000) : 0,
+    exercises: runnerState.plan.map((item) => ({
+      exerciseKey: item.exerciseKey,
+      name: item.name,
+      plannedSets: item.totalSets,
+      completedSets: Math.min(item.completedSets || item.feedback.length, item.totalSets),
+      feedback: item.feedback,
+      phase: item.phase || "session",
+    })),
+    notes,
+    evaluation: { rating, comment: notes },
+  };
+  runnerElements.evalSave.disabled = true;
+  try {
+    const res = await fetch(withProfileParam("/api/workouts"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    runnerElements.statusText.textContent = "Træningspas gemt ✅";
+    runnerElements.evalBox.classList.add("hidden");
+    runnerElements.evalNotes.value = "";
+    runnerElements.evalRating.value = "";
+    resetRunnerState();
+  } catch (err) {
+    console.error(err);
+    runnerElements.statusText.textContent = "Kunne ikke gemme træningslog ❌";
+  } finally {
+    runnerElements.evalSave.disabled = false;
+  }
+}
+
+runnerElements.startBtn.addEventListener("click", startSessionRunner);
+runnerElements.completeBtn.addEventListener("click", handleCompleteSetClick);
+runnerElements.skipBtn.addEventListener("click", skipCurrentRest);
+runnerElements.stopBtn.addEventListener("click", cancelRunner);
+if (runnerElements.completePlanBtn) {
+  runnerElements.completePlanBtn.addEventListener("click", markPlanCompletedAutomatically);
+}
+runnerElements.evalSave.addEventListener("click", saveWorkoutLog);
+
+if (runnerElements.flow) {
+  runnerElements.flow.addEventListener("click", (event) => {
+    const stepEl = event.target.closest("[data-step-index]");
+    if (!stepEl) return;
+    const idx = Number(stepEl.dataset.stepIndex);
+    if (!Number.isFinite(idx)) return;
+    if (!runnerState.active) return;
+    if (runnerState.mode === "work" && idx === runnerState.exerciseIndex) {
+      handleCompleteSetClick();
+    } else if (
+      (runnerState.mode === "rest_set" || runnerState.mode === "rest_exercise") &&
+      idx === runnerState.exerciseIndex
+    ) {
+      skipCurrentRest();
+    }
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  const tag = event.target?.tagName;
+  if (tag && ["INPUT", "TEXTAREA", "SELECT"].includes(tag.toUpperCase())) return;
+  if (!runnerState.active) return;
+  if (event.code === "Space") {
+    event.preventDefault();
+    if (runnerState.mode === "work") {
+      handleCompleteSetClick();
+    } else if (runnerState.mode === "rest_set" || runnerState.mode === "rest_exercise") {
+      skipCurrentRest();
+    }
+  } else if (event.code === "Enter") {
+    event.preventDefault();
+    if (runnerState.mode === "work") {
+      handleCompleteSetClick();
+    } else if (runnerState.mode === "rest_set" || runnerState.mode === "rest_exercise") {
+      skipCurrentRest();
+    }
+  }
+});
+
+updateRunnerStatus();
+updateRunnerButtons();
+</script>
 </script>
 
 </body>

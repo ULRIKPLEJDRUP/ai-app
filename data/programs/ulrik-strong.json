@@ -1,0 +1,777 @@
+{
+  "activeProgramId": "73a8ee71-2f13-4290-a58c-3204724b2a37",
+  "programs": [
+    {
+      "id": "ac46f927-e627-4285-bdda-8b889404b967",
+      "name": "Program",
+      "savedAt": "2025-12-18T16:14:18.396Z",
+      "blueprint": {
+        "goal": "strength",
+        "archetype": "conjugate",
+        "structure": "power4",
+        "sessions": {
+          "0": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "bench_press",
+                "name": "Bænkpres",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound"
+              },
+              {
+                "exerciseKey": "ab_wheel",
+                "name": "Ab wheel rollout",
+                "equipment": [
+                  "ab_wheel"
+                ],
+                "muscleGroups": [
+                  "core"
+                ],
+                "type": "isolation"
+              },
+              {
+                "exerciseKey": "dips",
+                "name": "Dips",
+                "equipment": [
+                  "bodyweight"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound"
+              },
+              {
+                "exerciseKey": "incline_dumbbell_press",
+                "name": "Incline dumbbell press",
+                "equipment": [
+                  "dumbbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound"
+              },
+              {
+                "exerciseKey": "plank",
+                "name": "Plank",
+                "equipment": [
+                  "bodyweight"
+                ],
+                "muscleGroups": [
+                  "core"
+                ],
+                "type": "isolation"
+              }
+            ]
+          },
+          "1": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "biceps_curl",
+                "name": "Biceps curls",
+                "equipment": [
+                  "dumbbell"
+                ],
+                "muscleGroups": [
+                  "biceps"
+                ],
+                "type": "isolation"
+              }
+            ]
+          },
+          "2": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "bench_press",
+                "name": "Bænkpres",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound"
+              }
+            ]
+          },
+          "3": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "deadlift",
+                "name": "Deadlift",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "lower_back",
+                  "upper_back"
+                ],
+                "type": "compound"
+              },
+              {
+                "exerciseKey": "face_pull",
+                "name": "Face pull",
+                "equipment": [
+                  "cable"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "isolation"
+              }
+            ]
+          }
+        },
+        "profileId": "ulrik-strong",
+        "savedAt": "2025-12-18T16:14:18.396Z"
+      }
+    },
+    {
+      "id": "6c54fb0e-b285-4988-bda0-41f0e5180a64",
+      "name": "Program",
+      "savedAt": "2025-12-18T18:38:57.826Z",
+      "blueprint": {
+        "goal": "strength",
+        "archetype": "intensity_block",
+        "structure": "power4",
+        "sessions": {
+          "0": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "biceps_curl",
+                "name": "Biceps curls",
+                "equipment": [
+                  "dumbbell"
+                ],
+                "muscleGroups": [
+                  "biceps"
+                ],
+                "type": "isolation"
+              },
+              {
+                "exerciseKey": "face_pull",
+                "name": "Face pull",
+                "equipment": [
+                  "cable"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "isolation"
+              }
+            ]
+          },
+          "1": {
+            "notes": "",
+            "exercises": [
+              {
+                "exerciseKey": "calf_raise",
+                "name": "Calf raises",
+                "equipment": [
+                  "rack",
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "calf"
+                ],
+                "type": "isolation"
+              }
+            ]
+          },
+          "2": {
+            "notes": "",
+            "exercises": []
+          },
+          "3": {
+            "notes": "",
+            "exercises": []
+          }
+        },
+        "profileId": "ulrik-strong",
+        "savedAt": "2025-12-18T18:38:57.826Z",
+        "programId": null,
+        "programName": "Program"
+      }
+    },
+    {
+      "id": "50d128fd-8e41-433f-b05f-be4fbd82604a",
+      "name": "rrr",
+      "savedAt": "2025-12-18T22:12:19.188Z",
+      "blueprint": {
+        "goal": "strength",
+        "archetype": "intensity_block",
+        "structure": "power4",
+        "sessions": {
+          "0": {
+            "notes": "ME Upp",
+            "exercises": [
+              {
+                "exerciseKey": "bench_press",
+                "name": "Bænkpres",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "overhead_press",
+                "name": "Shoulder press (OHP)",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "barbell_row",
+                "name": "Barbell row",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "face_pull",
+                "name": "Face pull",
+                "equipment": [
+                  "cable"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          },
+          "1": {
+            "notes": "ME Lower",
+            "exercises": [
+              {
+                "exerciseKey": "back_squat",
+                "name": "Squat (back squat)",
+                "equipment": [
+                  "barbell",
+                  "rack"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "glute"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "deadlift",
+                "name": "Deadlift",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "lower_back",
+                  "upper_back"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "leg_press",
+                "name": "Leg press",
+                "equipment": [
+                  "machine"
+                ],
+                "muscleGroups": [
+                  "leg"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "calf_raise",
+                "name": "Calf raises",
+                "equipment": [
+                  "rack",
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "calf"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          },
+          "2": {
+            "notes": "DE Upper",
+            "exercises": [
+              {
+                "exerciseKey": "incline_dumbbell_press",
+                "name": "Incline dumbbell press",
+                "equipment": [
+                  "dumbbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "dips",
+                "name": "Dips",
+                "equipment": [
+                  "bodyweight"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "pull_ups",
+                "name": "Pull-ups",
+                "equipment": [
+                  "bodyweight",
+                  "pullup_bar"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "triceps_pushdown",
+                "name": "Triceps pushdown",
+                "equipment": [
+                  "cable"
+                ],
+                "muscleGroups": [
+                  "triceps"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          },
+          "3": {
+            "notes": "DE Lower",
+            "exercises": [
+              {
+                "exerciseKey": "romanian_deadlift",
+                "name": "Romanian deadlift",
+                "equipment": [
+                  "barbell",
+                  "dumbbell"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "glute"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "hip_thrust",
+                "name": "Hip thrust",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "core",
+                  "glute"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "leg_press",
+                "name": "Leg press",
+                "equipment": [
+                  "machine"
+                ],
+                "muscleGroups": [
+                  "leg"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "ab_wheel",
+                "name": "Ab wheel rollout",
+                "equipment": [
+                  "ab_wheel"
+                ],
+                "muscleGroups": [
+                  "core"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          }
+        },
+        "profileId": "ulrik-strong",
+        "savedAt": "2025-12-18T22:12:19.188Z",
+        "programId": "50d128fd-8e41-433f-b05f-be4fbd82604a",
+        "programName": "rrr"
+      }
+    },
+    {
+      "id": "73a8ee71-2f13-4290-a58c-3204724b2a37",
+      "name": "Superset test",
+      "savedAt": "2025-12-18T21:07:50.738Z",
+      "blueprint": {
+        "goal": "strength",
+        "archetype": "conjugate",
+        "structure": "power4",
+        "sessions": {
+          "0": {
+            "notes": "ME Upper",
+            "exercises": [
+              {
+                "exerciseKey": "bench_press",
+                "name": "Bænkpres",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": true
+              },
+              {
+                "exerciseKey": "overhead_press",
+                "name": "Shoulder press (OHP)",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": true
+              },
+              {
+                "exerciseKey": "barbell_row",
+                "name": "Barbell row",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "face_pull",
+                "name": "Face pull",
+                "equipment": [
+                  "cable"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          },
+          "1": {
+            "notes": "ME Lower",
+            "exercises": [
+              {
+                "exerciseKey": "back_squat",
+                "name": "Squat (back squat)",
+                "equipment": [
+                  "barbell",
+                  "rack"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "glute"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "deadlift",
+                "name": "Deadlift",
+                "equipment": [
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "lower_back",
+                  "upper_back"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "leg_press",
+                "name": "Leg press",
+                "equipment": [
+                  "machine"
+                ],
+                "muscleGroups": [
+                  "leg"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "calf_raise",
+                "name": "Calf raises",
+                "equipment": [
+                  "rack",
+                  "barbell"
+                ],
+                "muscleGroups": [
+                  "calf"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          },
+          "2": {
+            "notes": "DE Upper",
+            "exercises": [
+              {
+                "exerciseKey": "incline_dumbbell_press",
+                "name": "Incline dumbbell press",
+                "equipment": [
+                  "dumbbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "dips",
+                "name": "Dips",
+                "equipment": [
+                  "bodyweight"
+                ],
+                "muscleGroups": [
+                  "chest",
+                  "shoulder",
+                  "triceps"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "pull_ups",
+                "name": "Pull-ups",
+                "equipment": [
+                  "bodyweight",
+                  "pullup_bar"
+                ],
+                "muscleGroups": [
+                  "upper_back"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "triceps_pushdown",
+                "name": "Triceps pushdown",
+                "equipment": [
+                  "cable"
+                ],
+                "muscleGroups": [
+                  "triceps"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          },
+          "3": {
+            "notes": "DE Lower",
+            "exercises": [
+              {
+                "exerciseKey": "romanian_deadlift",
+                "name": "Romanian deadlift",
+                "equipment": [
+                  "barbell",
+                  "dumbbell"
+                ],
+                "muscleGroups": [
+                  "leg",
+                  "glute"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "hip_thrust",
+                "name": "Hip thrust",
+                "equipment": [
+                  "barbell",
+                  "bench"
+                ],
+                "muscleGroups": [
+                  "core",
+                  "glute"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "leg_press",
+                "name": "Leg press",
+                "equipment": [
+                  "machine"
+                ],
+                "muscleGroups": [
+                  "leg"
+                ],
+                "type": "compound",
+                "restBetweenSets": 120,
+                "restBetweenExercises": 45,
+                "supersetWithNext": false
+              },
+              {
+                "exerciseKey": "ab_wheel",
+                "name": "Ab wheel rollout",
+                "equipment": [
+                  "ab_wheel"
+                ],
+                "muscleGroups": [
+                  "core"
+                ],
+                "type": "isolation",
+                "restBetweenSets": 60,
+                "restBetweenExercises": 30,
+                "supersetWithNext": false
+              }
+            ]
+          }
+        },
+        "profileId": "ulrik-strong",
+        "savedAt": "2025-12-18T21:07:50.738Z",
+        "programId": "73a8ee71-2f13-4290-a58c-3204724b2a37",
+        "programName": "Superset test"
+      }
+    }
+  ]
+}

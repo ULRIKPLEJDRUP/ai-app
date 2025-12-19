@@ -1,0 +1,641 @@
+[
+  {
+    "id": "25817a42-1b4b-48c8-b1d7-85c277dd58cc",
+    "profileId": "ulrik-strong",
+    "sessionLabel": "ME Upper",
+    "week": 1,
+    "goal": "strength",
+    "structure": "power4",
+    "programId": "73a8ee71-2f13-4290-a58c-3204724b2a37",
+    "startTime": "2025-12-18T23:16:57.934Z",
+    "durationSeconds": 54,
+    "exercises": [
+      {
+        "exerciseKey": "warmup:ankle_mobility_circle:r1",
+        "name": "Ankelcirkler – runde 1/2",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 40 sek · Gentag 2 runder · 40 sek pr. runde",
+            "timestamp": "2025-12-18T23:16:59.154Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:ankle_mobility_circle:r2",
+        "name": "Ankelcirkler – runde 2/2",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 40 sek · Gentag 2 runder · 40 sek pr. runde",
+            "timestamp": "2025-12-18T23:17:01.308Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:arm_circles:r1",
+        "name": "Arm-cirkler frem/tilbage – runde 1/2",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 40 sek · Gentag 2 runder · 40 sek pr. runde",
+            "timestamp": "2025-12-18T23:17:02.398Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:arm_circles:r2",
+        "name": "Arm-cirkler frem/tilbage – runde 2/2",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 40 sek · Gentag 2 runder · 40 sek pr. runde",
+            "timestamp": "2025-12-18T23:17:03.140Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_pushup_plus:r1",
+        "name": "Elastik push-up plus – runde 1/2",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:03.982Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:04.738Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_pushup_plus:r2",
+        "name": "Elastik push-up plus – runde 2/2",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:05.506Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:06.095Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_facepull_high:r1",
+        "name": "Elastik face pull højt",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:06.767Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:07.557Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:pushup_knee:r1",
+        "name": "Armstrækkere på knæ",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 36 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:08.226Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_pullapart_overhead:r1",
+        "name": "Elastik pull-apart over hovedet",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:10.512Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:17:11.958Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "bench_press",
+        "name": "Bænkpres",
+        "plannedSets": 3,
+        "completedSets": 3,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 4,
+            "weight": 122,
+            "notes": "Plan: 3-5 reps · 122 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:19.028Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 4,
+            "weight": 122,
+            "notes": "Plan: 3-5 reps · 122 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:21.240Z",
+            "auto": true
+          },
+          {
+            "set": 3,
+            "reps": 4,
+            "weight": 122,
+            "notes": "Plan: 3-5 reps · 122 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:22.068Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      },
+      {
+        "exerciseKey": "overhead_press",
+        "name": "Shoulder press (OHP)",
+        "plannedSets": 3,
+        "completedSets": 3,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 4,
+            "weight": null,
+            "notes": "Plan: 3-5 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:17:23.112Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 4,
+            "weight": null,
+            "notes": "Plan: 3-5 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:17:23.504Z",
+            "auto": true
+          },
+          {
+            "set": 3,
+            "reps": 4,
+            "weight": null,
+            "notes": "Plan: 3-5 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:17:23.821Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      },
+      {
+        "exerciseKey": "barbell_row",
+        "name": "Barbell row",
+        "plannedSets": 4,
+        "completedSets": 4,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:24.105Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:24.392Z",
+            "auto": true
+          },
+          {
+            "set": 3,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:24.691Z",
+            "auto": true
+          },
+          {
+            "set": 4,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:17:25.370Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      },
+      {
+        "exerciseKey": "face_pull",
+        "name": "Face pull",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 8,
+            "weight": null,
+            "notes": "Plan: 8-10 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:17:26.875Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      }
+    ],
+    "notes": "Jeg syntes pausene er for lange...",
+    "evaluation": {
+      "rating": 10,
+      "comment": "Jeg syntes pausene er for lange..."
+    },
+    "savedAt": "2025-12-18T23:17:51.576Z"
+  },
+  {
+    "id": "ae0679cf-7a19-4a57-9d69-9d6a521433d3",
+    "profileId": "ulrik-strong",
+    "sessionLabel": "ME Upper",
+    "week": 1,
+    "goal": "strength",
+    "structure": "power4",
+    "programId": "73a8ee71-2f13-4290-a58c-3204724b2a37",
+    "startTime": "2025-12-18T23:30:14.685Z",
+    "durationSeconds": 24,
+    "exercises": [
+      {
+        "exerciseKey": "warmup:band_deadbug_press:r1",
+        "name": "Elastik deadbug press – runde 1/2",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:15.436Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:16.927Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:worlds_greatest_stretch:r1",
+        "name": "World's greatest stretch – runde 1/2",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 60 sek · Gentag 2 runder · 60 sek pr. runde",
+            "timestamp": "2025-12-18T23:30:18.264Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_assisted_squat:r1",
+        "name": "Elastik assisteret squat – runde 1/2",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 15,
+            "weight": null,
+            "notes": "Plan: 15 reps · 2 sæt · Gentag 2 runder · 100 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:19.858Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 15,
+            "weight": null,
+            "notes": "Plan: 15 reps · 2 sæt · Gentag 2 runder · 100 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:21.567Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:pushup_knee:r1",
+        "name": "Armstrækkere på knæ",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 36 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:23.021Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:arm_circles:r1",
+        "name": "Arm-cirkler frem/tilbage",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 40 sek · 40 sek pr. runde",
+            "timestamp": "2025-12-18T23:30:24.039Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_deadbug_press:r2",
+        "name": "Elastik deadbug press – runde 2/2",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:24.855Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 12,
+            "weight": null,
+            "notes": "Plan: 12 reps · 2 sæt · Gentag 2 runder · 82 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:25.882Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:worlds_greatest_stretch:r2",
+        "name": "World's greatest stretch – runde 2/2",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": null,
+            "weight": null,
+            "notes": "Plan: 60 sek · Gentag 2 runder · 60 sek pr. runde",
+            "timestamp": "2025-12-18T23:30:26.927Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "warmup:band_assisted_squat:r2",
+        "name": "Elastik assisteret squat – runde 2/2",
+        "plannedSets": 2,
+        "completedSets": 2,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 15,
+            "weight": null,
+            "notes": "Plan: 15 reps · 2 sæt · Gentag 2 runder · 100 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:27.999Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 15,
+            "weight": null,
+            "notes": "Plan: 15 reps · 2 sæt · Gentag 2 runder · 100 sek pr. øvelse",
+            "timestamp": "2025-12-18T23:30:29.369Z",
+            "auto": true
+          }
+        ],
+        "phase": "warmup"
+      },
+      {
+        "exerciseKey": "bench_press",
+        "name": "Bænkpres",
+        "plannedSets": 3,
+        "completedSets": 3,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 4,
+            "weight": 122,
+            "notes": "Plan: 3-5 reps · 122 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:32.742Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 4,
+            "weight": 122,
+            "notes": "Plan: 3-5 reps · 122 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:33.087Z",
+            "auto": true
+          },
+          {
+            "set": 3,
+            "reps": 4,
+            "weight": 122,
+            "notes": "Plan: 3-5 reps · 122 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:33.300Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      },
+      {
+        "exerciseKey": "overhead_press",
+        "name": "Shoulder press (OHP)",
+        "plannedSets": 3,
+        "completedSets": 3,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 4,
+            "weight": null,
+            "notes": "Plan: 3-5 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:30:33.523Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 4,
+            "weight": null,
+            "notes": "Plan: 3-5 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:30:33.673Z",
+            "auto": true
+          },
+          {
+            "set": 3,
+            "reps": 4,
+            "weight": null,
+            "notes": "Plan: 3-5 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:30:33.919Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      },
+      {
+        "exerciseKey": "barbell_row",
+        "name": "Barbell row",
+        "plannedSets": 4,
+        "completedSets": 4,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:34.156Z",
+            "auto": true
+          },
+          {
+            "set": 2,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:34.391Z",
+            "auto": true
+          },
+          {
+            "set": 3,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:34.569Z",
+            "auto": true
+          },
+          {
+            "set": 4,
+            "reps": 4,
+            "weight": 91.5,
+            "notes": "Plan: 3-5 reps · 91.5 kg (~87% af 1RM)",
+            "timestamp": "2025-12-18T23:30:34.747Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      },
+      {
+        "exerciseKey": "face_pull",
+        "name": "Face pull",
+        "plannedSets": 1,
+        "completedSets": 1,
+        "feedback": [
+          {
+            "set": 1,
+            "reps": 8,
+            "weight": null,
+            "notes": "Plan: 8-10 reps · Brug RPE 7-8",
+            "timestamp": "2025-12-18T23:30:34.943Z",
+            "auto": true
+          }
+        ],
+        "phase": "session"
+      }
+    ],
+    "notes": "",
+    "evaluation": {
+      "rating": null,
+      "comment": ""
+    },
+    "savedAt": "2025-12-18T23:30:38.694Z"
+  }
+]
